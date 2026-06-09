@@ -1,0 +1,180 @@
+{
+  "format": "relpy",
+  "format_version": 1,
+  "schema": {
+    "users": {
+      "name": "users",
+      "columns": {
+        "id": {
+          "name": "id",
+          "data_type": "AutoNumber",
+          "storage_type": "int",
+          "nullable": false,
+          "has_default": false,
+          "default": null,
+          "is_primary_key": true,
+          "is_pii": false,
+          "is_encrypted": false
+        },
+        "name": {
+          "name": "name",
+          "data_type": "str",
+          "storage_type": "str",
+          "nullable": false,
+          "has_default": false,
+          "default": null,
+          "is_primary_key": false,
+          "is_pii": false,
+          "is_encrypted": false
+        },
+        "status": {
+          "name": "status",
+          "data_type": "str",
+          "storage_type": "str",
+          "nullable": false,
+          "has_default": false,
+          "default": null,
+          "is_primary_key": false,
+          "is_pii": false,
+          "is_encrypted": false
+        }
+      },
+      "primary_key": [
+        "id"
+      ],
+      "foreign_keys": {},
+      "auto_sequences": {
+        "id": 2
+      }
+    },
+    "orders": {
+      "name": "orders",
+      "columns": {
+        "id": {
+          "name": "id",
+          "data_type": "AutoNumber",
+          "storage_type": "int",
+          "nullable": false,
+          "has_default": false,
+          "default": null,
+          "is_primary_key": true,
+          "is_pii": false,
+          "is_encrypted": false
+        },
+        "user_id": {
+          "name": "user_id",
+          "data_type": "int",
+          "storage_type": "int",
+          "nullable": false,
+          "has_default": false,
+          "default": null,
+          "is_primary_key": false,
+          "is_pii": false,
+          "is_encrypted": false
+        },
+        "amount": {
+          "name": "amount",
+          "data_type": "float",
+          "storage_type": "float",
+          "nullable": false,
+          "has_default": false,
+          "default": null,
+          "is_primary_key": false,
+          "is_pii": false,
+          "is_encrypted": false
+        },
+        "status": {
+          "name": "status",
+          "data_type": "str",
+          "storage_type": "str",
+          "nullable": false,
+          "has_default": false,
+          "default": null,
+          "is_primary_key": false,
+          "is_pii": false,
+          "is_encrypted": false
+        }
+      },
+      "primary_key": [
+        "id"
+      ],
+      "foreign_keys": {
+        "user_id": {
+          "local_column": "user_id",
+          "target_table": "users",
+          "target_column": "id",
+          "on_delete": "CASCADE"
+        }
+      },
+      "auto_sequences": {
+        "id": 3
+      }
+    }
+  },
+  "data": {
+    "users": [
+      {
+        "id": 1,
+        "name": "Alice",
+        "status": "active",
+        "__relpy_row_id__": 1
+      },
+      {
+        "id": 2,
+        "name": "Bob",
+        "status": "active",
+        "__relpy_row_id__": 2
+      }
+    ],
+    "orders": [
+      {
+        "id": 1,
+        "user_id": 1,
+        "amount": 120.0,
+        "status": "paid",
+        "__relpy_row_id__": 1
+      },
+      {
+        "id": 2,
+        "user_id": 1,
+        "amount": 80.0,
+        "status": "paid",
+        "__relpy_row_id__": 2
+      },
+      {
+        "id": 3,
+        "user_id": 2,
+        "amount": 50.0,
+        "status": "pending",
+        "__relpy_row_id__": 3
+      }
+    ]
+  },
+  "indexes": {
+    "idx_users_name": {
+      "name": "idx_users_name",
+      "table_name": "users",
+      "columns": [
+        "name"
+      ],
+      "unique": false,
+      "nulls_distinct": true
+    },
+    "idx_orders_user_id_status": {
+      "name": "idx_orders_user_id_status",
+      "table_name": "orders",
+      "columns": [
+        "user_id",
+        "status"
+      ],
+      "unique": false,
+      "nulls_distinct": true
+    }
+  },
+  "internal": {
+    "next_row_id": {
+      "users": 3,
+      "orders": 4
+    }
+  }
+}

@@ -1,0 +1,56 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "relpydb"
+version = "0.1.0"
+description = "An in-memory relational data modeling and query library for Python."
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+authors = [
+    { name = "Reuven Zierl" }
+]
+keywords = [
+    "relational",
+    "database",
+    "in-memory",
+    "query",
+    "tables",
+    "joins",
+    "group-by",
+    "indexes"
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Topic :: Database",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Operating System :: OS Independent",
+]
+
+dependencies = []
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8",
+    "build>=1",
+    "twine>=5",
+]
+bench = [
+    "duckdb>=1",
+    "sqlalchemy>=2",
+]
+
+[project.urls]
+Homepage = "https://github.com/mandelreouven2002/RelPy"
+Repository = "https://github.com/mandelreouven2002/RelPy"
+Issues = "https://github.com/mandelreouven2002/RelPy/issues"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["relpy*"]
