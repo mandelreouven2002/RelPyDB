@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1" name="viewport"/><meta content="RelPyDB documentation" name="description"/><title>0. Start Here - RelPyDB</title><link href="../styles.css" rel="stylesheet"/></head><body><header class="topbar"><a class="brand" href="../index.html"><span class="brand-mark">Rp</span><span><strong>RelPyDB</strong><small>Relational Python</small></span></a><button aria-expanded="false" class="nav-toggle" type="button"><svg viewbox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"></path></svg><span class="sr-only">Menu</span></button><nav class="site-nav"><a href="../index.html">Home</a><a href="../installation.html">Installation</a><a href="../docs/start-here.html">Start Here</a><a class="active" href="../docs/index.html">Docs</a><a href="../ide.html">Online IDE</a><a href="https://github.com/mandelreouven2002/RelPyDB" rel="noreferrer" target="_blank">GitHub</a></nav></header><main><section class="docs-layout"><aside class="docs-sidebar"><div class="docs-sidebar-header"><span>Documentation</span><input id="docs-filter" placeholder="Filter docs..." type="search"/></div><nav class="docs-tree"><a class="" href="index.html">Docs Overview</a><a class="active" href="start-here.html">0. Start Here</a><a class="" href="quickstart.html">1. 5-Minute Quickstart</a><a class="" href="tutorial-shop.html">2. Full Tutorial</a><a class="" href="recipes.html">3. Common Recipes</a><a class="" href="why-relpy.html">4. Why RelPyDB?</a><a class="" href="alternatives.html">5. RelPyDB vs Alternatives</a><a class="" href="concepts.html">6. Concepts</a><a class="" href="tables-schema.html">7. Tables and Schema</a><a class="" href="data-operations.html">8. Data Operations</a><a class="" href="querying.html">9. Querying</a><a class="" href="joins.html">10. Joins</a><a class="" href="grouping.html">11. Grouping</a><a class="" href="views.html">12. Views</a><a class="" href="indexes.html">13. Indexes</a><a class="" href="exports.html">14. Exports</a><a class="" href="persistence.html">15. Persistence</a><a class="" href="encryption.html">16. Encryption</a><a class="" href="python-integration.html">17. Python Integration</a><a class="" href="capabilities.html">18. Full Capability Checklist</a><a class="" href="errors-limitations.html">19. Common Errors and Limitations</a><a class="" href="api-reference.html">20. API Reference</a><a class="" href="api-functions.html">21. Function Reference</a><a class="" href="examples.html">22. Examples</a></nav></aside><article class="docs-content"><section class="page-title docs-page-title"><p class="eyebrow">Documentation</p><h1>0. Start Here</h1><p>A guided entry point for new developers who want to understand how to use RelPyDB.</p></section>
+<section class="doc-topic"><h2>Start here</h2><p>RelPyDB is easiest to learn as a small relational database object inside Python. The basic flow is simple: create a database object, define schema, insert rows, query, export, and optionally save the object.</p><ol class="sequence"><li>Create a <code>RelPy()</code> object.</li><li>Create tables with <code>create_table</code>.</li><li>Add columns with <code>add_column</code>.</li><li>Insert one row with <code>insert</code> or many rows with <code>insert_many</code>.</li><li>Query with <code>db.query(...)</code>, <code>where</code>, <code>select</code>, joins, and grouping.</li><li>Export with <code>to_list</code>, <code>to_json</code>, <code>to_pandas</code>, <code>to_numpy</code>, <code>to_sql</code>, or <code>to_ddl</code>.</li><li>Save and load with <code>save</code> and <code>RelPy.load</code>.</li></ol></section>
+<section class="doc-topic"><h2>The mental model</h2><p>Think of RelPyDB as a Python object that contains relational tables. It is not a server and it is not a full SQL engine. You work with normal Python code, but the data has relational structure.</p><pre><code>RelPy object
+  ├── schema
+  │   ├── tables
+  │   ├── columns
+  │   ├── primary keys
+  │   └── foreign keys
+  ├── data rows
+  ├── indexes
+  ├── views
+  ├── query builder
+  └── exports / persistence</code></pre></section>
+<section class="doc-topic"><h2>The first thing to read</h2><table class="param-table"><thead><tr><th>Goal</th><th>Read this</th><th>Why</th></tr></thead><tbody><tr><td>I want to run code now</td><td><a href="quickstart.html">5-Minute Quickstart</a></td><td>Small complete script with <code>insert</code>, then <code>insert_many</code>, query, output, save and load.</td></tr><tr><td>I want to build a realistic model</td><td><a href="tutorial-shop.html">Full Tutorial</a></td><td>Users, orders, support tickets, joins and grouping.</td></tr><tr><td>I have a specific task</td><td><a href="recipes.html">Common Recipes</a></td><td>Copyable patterns for common use cases.</td></tr><tr><td>I want every function</td><td><a href="api-functions.html">Function Reference</a></td><td>Inputs, outputs, imports, examples and notes.</td></tr></tbody></table></section>
+<section class="doc-topic"><h2>Small complete example</h2><pre><code>from relpy import RelPy, AutoNumber, col
+
+db = RelPy()
+
+db.create_table("users")
+db.add_column("users", "id", AutoNumber, is_primary_key=True)
+db.add_column("users", "name", str, nullable=False)
+db.add_column("users", "status", str, nullable=False, default="active")
+
+db.insert("users", {"name": "Alice"})
+
+db.insert_many("users", [
+    {"name": "Bob", "status": "inactive"},
+    {"name": "Carol"},
+])
+
+active_users = (
+    db.query("users")
+      .where(col("status") == "active")
+      .select("id", "name")
+      .to_list()
+)
+
+print(active_users)</code></pre><div class="code-panel"><div class="panel-title">Output</div><pre><code>[{"id": 1, "name": "Alice"}, {"id": 3, "name": "Carol"}]</code></pre></div></section>
+</article></section></main><footer class="footer"><div class="footer-inner"><div class="footer-brand">RelPyDB<small>Relational objects for Python</small></div><nav class="footer-links"><a href="../index.html">Home</a><a href="../installation.html">Installation</a><a href="../docs/start-here.html">Start Here</a><a href="../docs/index.html">Docs</a><a href="../ide.html">Online IDE</a><a href="https://github.com/mandelreouven2002/RelPyDB" rel="noreferrer" target="_blank">GitHub ↗</a></nav></div></footer><script src="../script.js"></script></body></html>

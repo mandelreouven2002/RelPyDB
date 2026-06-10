@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1" name="viewport"/><title>18. Examples - RelPyDB</title><link href="../styles.css" rel="stylesheet"/></head><body>
+<header class="topbar"><a class="brand" href="../index.html"><span class="brand-mark">Rp</span><span><strong>RelPyDB</strong><small>Relational Python</small></span></a><button aria-expanded="false" class="nav-toggle" type="button"><svg viewbox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"></path></svg><span class="sr-only">Menu</span></button><nav class="site-nav"><a href="../index.html">Home</a><a href="../installation.html">Installation</a><a href="../docs/start-here.html">Start Here</a><a class="active" href="../docs/index.html">Docs</a><a href="../ide.html">Online IDE</a><a href="https://github.com/mandelreouven2002/RelPyDB" rel="noreferrer" target="_blank">GitHub</a></nav></header>
+<main>
+<section class="docs-layout">
+<aside class="docs-sidebar"><div class="docs-sidebar-header"><span>Documentation</span><input id="docs-filter" placeholder="Filter docs..." type="search"/></div><nav class="docs-tree"><a class="" href="index.html">Docs Overview</a><a class="" href="start-here.html">0. Start Here</a><a class="" href="quickstart.html">1. 5-Minute Quickstart</a><a class="" href="tutorial-shop.html">2. Full Tutorial</a><a class="" href="recipes.html">3. Common Recipes</a><a class="" href="why-relpy.html">4. Why RelPyDB?</a><a class="" href="alternatives.html">5. RelPyDB vs Alternatives</a><a class="" href="concepts.html">6. Concepts</a><a class="" href="tables-schema.html">7. Tables and Schema</a><a class="" href="data-operations.html">8. Data Operations</a><a class="" href="querying.html">9. Querying</a><a class="" href="joins.html">10. Joins</a><a class="" href="grouping.html">11. Grouping</a><a class="" href="views.html">12. Views</a><a class="" href="indexes.html">13. Indexes</a><a class="" href="exports.html">14. Exports</a><a class="" href="persistence.html">15. Persistence</a><a class="" href="encryption.html">16. Encryption</a><a class="" href="python-integration.html">17. Python Integration</a><a class="" href="capabilities.html">18. Full Capability Checklist</a><a class="" href="errors-limitations.html">19. Common Errors and Limitations</a><a class="" href="api-reference.html">20. API Reference</a><a class="" href="api-functions.html">21. Function Reference</a><a class="active" href="examples.html">22. Examples</a></nav></aside>
+<article class="docs-content"><section class="page-title docs-page-title"><p class="eyebrow">Documentation</p><h1>18. Examples</h1><p>Complete, runnable examples with expected outputs for common patterns.</p></section>
+<section class="doc-topic">
+<h2>Example 1 — Ingest JSON from an API, query, export</h2>
+<p>A common pattern: receive a JSON payload from a server, normalise it into tables, run a relational query, and export results.</p>
+<pre><code>import json
+from relpy import RelPy, AutoNumber, col, count, sum_, avg
+
+# --- Schema ---
+db = RelPy()
+
+db.create_table("sessions")
+db.add_column("sessions", "id",          AutoNumber, is_primary_key=True)
+db.add_column("sessions", "game_system", str, nullable=False)
+db.add_column("sessions", "city",        str, nullable=False)
+
+db.create_table("registrations")
+db.add_column("registrations", "id",         AutoNumber, is_primary_key=True)
+db.add_column("registrations", "session_id", int, nullable=False, references="sessions.id")
+db.add_column("registrations", "status",     str, nullable=False)
+db.add_column("registrations", "price",      float, nullable=False)
+db.add_column("registrations", "checked_in", bool, nullable=False, default=False)
+
+# --- Simulate JSON payload ---
+payload = json.loads('''[
+    {"session": {"game_system": "D&amp;D 5e", "city": "Tel Aviv"},
+     "registrations": [
+         {"status": "confirmed", "price": 55.0, "checked_in": true},
+         {"status": "confirmed", "price": 55.0, "checked_in": false}
+     ]},
+    {"session": {"game_system": "Pathfinder", "city": "Haifa"},
+     "registrations": [
+         {"status": "confirmed", "price": 50.0, "checked_in": true},
+         {"status": "waitlist",  "price": 0.0,  "checked_in": false}
+     ]}
+]''')
+
+# --- Normalise and insert ---
+for item in payload:
+    sess = db.insert("sessions", item["session"])
+    for reg in item["registrations"]:
+        db.insert("registrations", {**reg, "session_id": sess["id"]})
+
+# --- Query: confirmed + checked-in revenue by game system ---
+result = (
+    db.query("registrations")
+      .join("sessions")
+      .where(
+          (col("registrations.status")     == "confirmed") &amp;
+          (col("registrations.checked_in") == True)
+      )
+      .group_by("sessions.game_system")
+      .aggregate(
+          players=count(),
+          revenue=sum_("registrations.price"),
+          avg_price=avg("registrations.price"),
+      )
+      .order_by("revenue", descending=True)
+      .to_list()
+)
+
+for row in result:
+    print(row)
+</code></pre>
+<div class="code-panel"><div class="panel-title">Output</div>
+<table class="data-table"><thead><tr><th>game_system</th><th>players</th><th>revenue</th><th>avg_price</th></tr></thead><tbody>
+<tr><td>D&amp;D 5e</td><td>1</td><td>55.0</td><td>55.0</td></tr>
+<tr><td>Pathfinder</td><td>1</td><td>50.0</td><td>50.0</td></tr>
+</tbody></table></div>
+</section>
+<section class="doc-topic">
+<h2>Example 2 — Save, load, and continue inserting</h2>
+<pre><code>from relpy import RelPy, AutoNumber, col
+
+db = RelPy()
+db.create_table("tasks")
+db.add_column("tasks", "id",     AutoNumber, is_primary_key=True)
+db.add_column("tasks", "title",  str, nullable=False)
+db.add_column("tasks", "done",   bool, nullable=False, default=False)
+
+db.insert("tasks", {"title": "Write docs"})
+db.insert("tasks", {"title": "Write tests"})
+
+db.save("tasks.relpy.json")
+
+# ---  Later in a different script ---
+db2 = RelPy.load("tasks.relpy.json")
+
+# AutoNumber continues from where it left off
+db2.insert("tasks", {"title": "Ship it", "done": False})
+
+print(db2.query("tasks").pluck("id"))   # [1, 2, 3]
+print(db2.query("tasks").count())       # 3
+</code></pre>
+<div class="code-panel"><div class="panel-title">Output</div>
+<pre><code>[1, 2, 3]
+3</code></pre></div>
+</section>
+<section class="doc-topic">
+<h2>Example 3 — Encrypted email column</h2>
+<pre><code>from relpy import RelPy, AutoNumber, col
+
+key = RelPy.generate_encryption_key()
+
+db = RelPy(encryption_key=key)
+db.create_table("users")
+db.add_column("users", "id",    AutoNumber, is_primary_key=True)
+db.add_column("users", "name",  str, nullable=False)
+db.add_column("users", "email", str, nullable=False, is_encrypted=True)
+
+db.insert("users", {"name": "Alice", "email": "alice@example.com"})
+
+# Default export hides the value
+print(db.to_list("users"))
+# [{"id": 1, "name": "Alice", "email": "[ENCRYPTED]"}]
+
+# Decrypted export requires the key
+print(db.to_list("users", decrypt=True))
+# [{"id": 1, "name": "Alice", "email": "alice@example.com"}]
+
+# Query on an encrypted column works via blind index
+result = db.query("users").where(col("email") == "alice@example.com").first()
+print(result["name"])  # Alice
+</code></pre>
+</section>
+<section class="doc-topic">
+<h2>Example 4 — Mixing RelPyDB results with plain Python</h2>
+<pre><code>from relpy import RelPy, AutoNumber, col
+
+db = RelPy()
+# ... (insert orders as above)
+
+# Pull rows into Python and continue with plain logic
+paid_rows = (
+    db.query("orders")
+      .where(col("status") == "paid")
+      .to_list()
+)
+
+# Standard Python comprehension
+totals_by_user = {}
+for row in paid_rows:
+    uid = row["user_id"]
+    totals_by_user[uid] = totals_by_user.get(uid, 0) + row["amount"]
+
+top_user_id = max(totals_by_user, key=totals_by_user.get)
+print(f"Top buyer: user {top_user_id}, total: {totals_by_user[top_user_id]}")
+</code></pre>
+<p>RelPyDB rows are plain Python dicts — pass them to any standard library function, third-party tool, or your own logic without conversion.</p>
+</section>
+<section class="doc-topic">
+<h2>Example 5 — Export to pandas and NumPy</h2>
+<pre><code>import pandas as pd
+import numpy as np
+from relpy import RelPy, AutoNumber
+
+db = RelPy()
+# ... setup and inserts
+
+# to pandas
+df = db.to_pandas("orders")
+print(df.describe())
+
+# to numpy
+arr = db.to_numpy("orders")
+print(arr.shape)
+
+# export only one column
+amounts = db.to_numpy("orders", column_name="amount")
+print(amounts.mean())
+</code></pre>
+<div class="callout">Both <code>to_pandas()</code> and <code>to_numpy()</code> require the respective library to be installed. RelPyDB will raise an <code>ImportError</code> with a clear message if they are missing.</div>
+</section>
+<section class="doc-topic">
+<h2>Example 6 — Unique index prevents duplicates</h2>
+<pre><code>from relpy import RelPy, AutoNumber, ConstraintError
+
+db = RelPy()
+db.create_table("users")
+db.add_column("users", "id",    AutoNumber, is_primary_key=True)
+db.add_column("users", "email", str, nullable=False)
+
+db.create_index("users", "email", unique=True)
+
+db.insert("users", {"email": "alice@example.com"})  # OK
+
+try:
+    db.insert("users", {"email": "alice@example.com"})  # duplicate
+except ConstraintError as e:
+    print(f"Blocked: {e}")
+</code></pre>
+<div class="code-panel"><div class="panel-title">Output</div>
+<pre><code>Blocked: Unique index violation on users.email: alice@example.com</code></pre></div>
+</section>
+<div class="doc-nav">
+<a class="button secondary" href="api-reference.html">← 17. API Reference</a>
+<a class="button teal" href="../ide.html">Try Online IDE →</a>
+</div>
+</article>
+</section>
+</main>
+<footer class="footer"><div class="footer-inner"><div class="footer-brand">RelPyDB<small>Relational objects for Python</small></div><nav class="footer-links"><a href="../index.html">Home</a><a href="../installation.html">Installation</a><a href="../docs/start-here.html">Start Here</a><a href="../docs/index.html">Docs</a><a href="../ide.html">Online IDE</a><a href="https://github.com/mandelreouven2002/RelPyDB" rel="noreferrer" target="_blank">GitHub ↗</a></nav></div></footer>
+<script src="../script.js"></script></body></html>

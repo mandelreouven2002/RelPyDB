@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1" name="viewport"/><meta content="RelPyDB documentation" name="description"/><title>3. Common Recipes - RelPyDB</title><link href="../styles.css" rel="stylesheet"/></head><body><header class="topbar"><a class="brand" href="../index.html"><span class="brand-mark">Rp</span><span><strong>RelPyDB</strong><small>Relational Python</small></span></a><button aria-expanded="false" class="nav-toggle" type="button"><svg viewbox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"></path></svg><span class="sr-only">Menu</span></button><nav class="site-nav"><a href="../index.html">Home</a><a href="../installation.html">Installation</a><a href="../docs/start-here.html">Start Here</a><a class="active" href="../docs/index.html">Docs</a><a href="../ide.html">Online IDE</a><a href="https://github.com/mandelreouven2002/RelPyDB" rel="noreferrer" target="_blank">GitHub</a></nav></header><main><section class="docs-layout"><aside class="docs-sidebar"><div class="docs-sidebar-header"><span>Documentation</span><input id="docs-filter" placeholder="Filter docs..." type="search"/></div><nav class="docs-tree"><a class="" href="index.html">Docs Overview</a><a class="" href="start-here.html">0. Start Here</a><a class="" href="quickstart.html">1. 5-Minute Quickstart</a><a class="" href="tutorial-shop.html">2. Full Tutorial</a><a class="active" href="recipes.html">3. Common Recipes</a><a class="" href="why-relpy.html">4. Why RelPyDB?</a><a class="" href="alternatives.html">5. RelPyDB vs Alternatives</a><a class="" href="concepts.html">6. Concepts</a><a class="" href="tables-schema.html">7. Tables and Schema</a><a class="" href="data-operations.html">8. Data Operations</a><a class="" href="querying.html">9. Querying</a><a class="" href="joins.html">10. Joins</a><a class="" href="grouping.html">11. Grouping</a><a class="" href="views.html">12. Views</a><a class="" href="indexes.html">13. Indexes</a><a class="" href="exports.html">14. Exports</a><a class="" href="persistence.html">15. Persistence</a><a class="" href="encryption.html">16. Encryption</a><a class="" href="python-integration.html">17. Python Integration</a><a class="" href="capabilities.html">18. Full Capability Checklist</a><a class="" href="errors-limitations.html">19. Common Errors and Limitations</a><a class="" href="api-reference.html">20. API Reference</a><a class="" href="api-functions.html">21. Function Reference</a><a class="" href="examples.html">22. Examples</a></nav></aside><article class="docs-content"><section class="page-title docs-page-title"><p class="eyebrow">Documentation</p><h1>3. Common Recipes</h1><p>Copyable patterns for common RelPyDB tasks.</p></section>
+<section class="doc-topic"><h2>Common recipes</h2><p>Recipes are task-oriented examples. Use them when you know what you want to do, but not which function to look for.</p></section>
+<section class="doc-topic"><h2>Create a table with an auto id</h2><pre><code>from relpy import RelPy, AutoNumber
+
+db = RelPy()
+db.create_table("users")
+db.add_column("users", "id", AutoNumber, is_primary_key=True)
+db.add_column("users", "name", str, nullable=False)</code></pre></section>
+<section class="doc-topic"><h2>Insert many rows from JSON</h2><p>This is the most important import pattern for API data, JSON files and generated test data.</p><pre><code>users_json = [
+    {"name": "Alice", "status": "active"},
+    {"name": "Bob", "status": "inactive"},
+    {"name": "Carol", "status": "active"},
+]
+
+db.insert_many("users", users_json)</code></pre></section>
+<section class="doc-topic"><h2>Query active users</h2><pre><code>from relpy import col
+
+active_users = (
+    db.query("users")
+      .where(col("status") == "active")
+      .select("id", "name")
+      .order_by("name")
+      .to_list()
+)</code></pre></section>
+<section class="doc-topic"><h2>Join two tables</h2><pre><code>orders_with_users = (
+    db.query("orders")
+      .join("users")
+      .select("orders.id", "users.name", "orders.amount")
+      .to_list()
+)</code></pre><p>If automatic FK inference is not available, use explicit columns:</p><pre><code>db.query("orders").join("users", on=("user_id", "id"))</code></pre></section>
+<section class="doc-topic"><h2>Use join shortcuts</h2><pre><code>db.query("orders").inner_join("users")
+db.query("orders").left_join("users")
+db.query("orders").right_join("users")
+db.query("orders").full_join("users")
+db.query("orders").cross_join("users")
+db.query("orders").natural_join("users")</code></pre></section>
+<section class="doc-topic"><h2>Group and aggregate</h2><pre><code>from relpy import count, sum_
+
+summary = (
+    db.query("orders")
+      .group_by("status")
+      .aggregate(
+          order_count=count(),
+          total_amount=sum_("amount"),
+      )
+      .to_list()
+)</code></pre></section>
+<section class="doc-topic"><h2>Export to pandas</h2><pre><code>df = db.to_pandas("users")</code></pre></section>
+<section class="doc-topic"><h2>Save and load</h2><pre><code>db.save("database.relpy.json")
+loaded_db = RelPy.load("database.relpy.json")</code></pre></section>
+<section class="doc-topic"><h2>Use encrypted columns</h2><pre><code>from relpy import RelPy, AutoNumber
+
+key = RelPy.generate_encryption_key()
+db = RelPy(encryption_key=key)
+
+db.create_table("users")
+db.add_column("users", "id", AutoNumber, is_primary_key=True)
+db.add_column("users", "email", str, nullable=False, is_encrypted=True)
+
+db.insert("users", {"email": "alice@example.com"})
+
+print(db.to_list("users"))
+print(db.to_list("users", decrypt=True))</code></pre></section>
+<section class="doc-topic"><h2>Catch RelPyDB errors</h2><pre><code>from relpy import RelPyError
+
+try:
+    db.insert("users", {"unknown_column": "value"})
+except RelPyError as exc:
+    print("RelPyDB error:", exc)</code></pre></section>
+</article></section></main><footer class="footer"><div class="footer-inner"><div class="footer-brand">RelPyDB<small>Relational objects for Python</small></div><nav class="footer-links"><a href="../index.html">Home</a><a href="../installation.html">Installation</a><a href="../docs/start-here.html">Start Here</a><a href="../docs/index.html">Docs</a><a href="../ide.html">Online IDE</a><a href="https://github.com/mandelreouven2002/RelPyDB" rel="noreferrer" target="_blank">GitHub ↗</a></nav></div></footer><script src="../script.js"></script></body></html>

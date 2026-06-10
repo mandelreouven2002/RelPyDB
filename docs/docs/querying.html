@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1" name="viewport"/><title>6. Querying - RelPyDB</title><link href="../styles.css" rel="stylesheet"/></head><body>
+<header class="topbar"><a class="brand" href="../index.html"><span class="brand-mark">Rp</span><span><strong>RelPyDB</strong><small>Relational Python</small></span></a><button aria-expanded="false" class="nav-toggle" type="button"><svg viewbox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"></path></svg><span class="sr-only">Menu</span></button><nav class="site-nav"><a href="../index.html">Home</a><a href="../installation.html">Installation</a><a href="../docs/start-here.html">Start Here</a><a class="active" href="../docs/index.html">Docs</a><a href="../ide.html">Online IDE</a><a href="https://github.com/mandelreouven2002/RelPyDB" rel="noreferrer" target="_blank">GitHub</a></nav></header>
+<main>
+<section class="docs-layout">
+<aside class="docs-sidebar"><div class="docs-sidebar-header"><span>Documentation</span><input id="docs-filter" placeholder="Filter docs..." type="search"/></div><nav class="docs-tree"><a class="" href="index.html">Docs Overview</a><a class="" href="start-here.html">0. Start Here</a><a class="" href="quickstart.html">1. 5-Minute Quickstart</a><a class="" href="tutorial-shop.html">2. Full Tutorial</a><a class="" href="recipes.html">3. Common Recipes</a><a class="" href="why-relpy.html">4. Why RelPyDB?</a><a class="" href="alternatives.html">5. RelPyDB vs Alternatives</a><a class="" href="concepts.html">6. Concepts</a><a class="" href="tables-schema.html">7. Tables and Schema</a><a class="" href="data-operations.html">8. Data Operations</a><a class="active" href="querying.html">9. Querying</a><a class="" href="joins.html">10. Joins</a><a class="" href="grouping.html">11. Grouping</a><a class="" href="views.html">12. Views</a><a class="" href="indexes.html">13. Indexes</a><a class="" href="exports.html">14. Exports</a><a class="" href="persistence.html">15. Persistence</a><a class="" href="encryption.html">16. Encryption</a><a class="" href="python-integration.html">17. Python Integration</a><a class="" href="capabilities.html">18. Full Capability Checklist</a><a class="" href="errors-limitations.html">19. Common Errors and Limitations</a><a class="" href="api-reference.html">20. API Reference</a><a class="" href="api-functions.html">21. Function Reference</a><a class="" href="examples.html">22. Examples</a></nav></aside>
+<article class="docs-content"><section class="page-title docs-page-title"><p class="eyebrow">Documentation</p><h1>6. Querying</h1><p>Filter, sort, project, and retrieve rows using RelPyDB's chainable query builder.</p></section>
+<section class="doc-topic">
+<h2>Query execution order</h2>
+<p>RelPyDB processes a query as a pipeline. You can chain methods in any order syntactically, but the engine always executes them in this sequence:</p>
+<ol class="sequence">
+<li>Source rows from the table (or join result)</li>
+<li><code>where</code> — filter rows</li>
+<li><code>order_by</code> — sort the filtered set</li>
+<li><code>select</code> — project columns</li>
+<li><code>distinct</code> — deduplicate</li>
+<li><code>offset</code> — skip N rows</li>
+<li><code>limit</code> — take at most N rows</li>
+</ol>
+<p>For grouped queries the order is: source → where → group_by → aggregate → having → order_by → select → distinct → offset → limit.</p>
+</section>
+<section class="doc-topic">
+<h2>Starting a query</h2>
+<pre><code>rows = db.query("users").to_list()
+</code></pre>
+<p><code>db.query(table_name)</code> returns a <code>Query</code> object. Nothing is executed until you call a terminal method like <code>to_list()</code>, <code>first()</code>, or <code>count()</code>.</p>
+</section>
+<section class="doc-topic">
+<h2>Filtering with <code>where</code> and <code>col</code></h2>
+<p>Use <code>col("column_name")</code> to build conditions.</p>
+<pre><code>from relpy import RelPy, AutoNumber, col
+
+db = RelPy()
+db.create_table("users")
+db.add_column("users", "id",     AutoNumber, is_primary_key=True)
+db.add_column("users", "name",   str, nullable=False)
+db.add_column("users", "status", str, nullable=False, default="active")
+db.add_column("users", "age",    int, nullable=True)
+
+db.insert("users", {"name": "Alice", "age": 30})
+db.insert("users", {"name": "Bob",   "age": 17, "status": "inactive"})
+db.insert("users", {"name": "Carol", "age": 25})
+
+# equality
+result = db.query("users").where(col("status") == "active").to_list()
+</code></pre>
+<div class="code-panel"><div class="panel-title">Output</div>
+<table class="data-table"><thead><tr><th>id</th><th>name</th><th>status</th><th>age</th></tr></thead><tbody>
+<tr><td>1</td><td>Alice</td><td>active</td><td>30</td></tr>
+<tr><td>3</td><td>Carol</td><td>active</td><td>25</td></tr>
+</tbody></table></div>
+</section>
+<section class="doc-topic">
+<h2>All <code>col</code> operators</h2>
+<table class="param-table"><thead><tr><th>Expression</th><th>SQL equivalent</th><th>Example</th></tr></thead><tbody>
+<tr><td><code>col("x") == v</code></td><td><code>x = v</code></td><td><code>col("status") == "active"</code></td></tr>
+<tr><td><code>col("x") != v</code></td><td><code>x != v</code></td><td><code>col("status") != "inactive"</code></td></tr>
+<tr><td><code>col("x") &gt; v</code></td><td><code>x &gt; v</code></td><td><code>col("age") &gt; 18</code></td></tr>
+<tr><td><code>col("x") &gt;= v</code></td><td><code>x &gt;= v</code></td><td><code>col("age") &gt;= 18</code></td></tr>
+<tr><td><code>col("x") &lt; v</code></td><td><code>x &lt; v</code></td><td><code>col("amount") &lt; 100</code></td></tr>
+<tr><td><code>col("x") &lt;= v</code></td><td><code>x &lt;= v</code></td><td><code>col("score") &lt;= 99</code></td></tr>
+<tr><td><code>col("x").like(pattern)</code></td><td><code>x LIKE pattern</code></td><td><code>col("email").like("%@gmail.com")</code></td></tr>
+<tr><td><code>col("x").in_([...])</code></td><td><code>x IN (...)</code></td><td><code>col("status").in_(["paid","pending"])</code></td></tr>
+<tr><td><code>col("x").between(lo, hi)</code></td><td><code>x BETWEEN lo AND hi</code></td><td><code>col("amount").between(100, 500)</code></td></tr>
+<tr><td><code>col("x").is_null()</code></td><td><code>x IS NULL</code></td><td><code>col("deleted_at").is_null()</code></td></tr>
+<tr><td><code>col("x").is_not_null()</code></td><td><code>x IS NOT NULL</code></td><td><code>col("email").is_not_null()</code></td></tr>
+</tbody></table>
+</section>
+<section class="doc-topic">
+<h2>Combining conditions</h2>
+<div class="callout warning"><strong>Do not use Python's <code>and</code> / <code>or</code>.</strong> Use <code>&amp;</code>, <code>|</code>, <code>~</code> or the <code>AND()</code>, <code>OR()</code>, <code>NOT()</code> functions instead.</div>
+<div class="comparison-grid">
+<div class="code-panel"><div class="panel-title">Operator style</div>
+<pre><code>from relpy import col
+
+result = (
+    db.query("users")
+      .where(
+          (col("age") &gt;= 18) &amp;
+          (col("status") == "active")
+      )
+      .to_list()
+)
+</code></pre></div>
+<div class="code-panel"><div class="panel-title">Function style</div>
+<pre><code>from relpy import col, AND, OR, NOT
+
+result = (
+    db.query("users")
+      .where(
+          AND(
+              col("age") &gt;= 18,
+              col("status") == "active",
+          )
+      )
+      .to_list()
+)
+</code></pre></div>
+</div>
+<p>Both styles produce the same result. Use whichever is more readable for your team.</p>
+</section>
+<section class="doc-topic">
+<h2>select — project columns</h2>
+<div class="comparison-grid">
+<div class="code-panel"><div class="panel-title">RelPyDB</div>
+<pre><code>result = (
+    db.query("users")
+      .select("id", "name")
+      .to_list()
+)
+</code></pre></div>
+<div class="code-panel"><div class="panel-title">SQL equivalent</div>
+<pre><code>SELECT id, name
+FROM users;
+</code></pre></div>
+</div>
+<div class="code-panel"><div class="panel-title">Output</div>
+<table class="data-table"><thead><tr><th>id</th><th>name</th></tr></thead><tbody>
+<tr><td>1</td><td>Alice</td></tr>
+<tr><td>2</td><td>Bob</td></tr>
+<tr><td>3</td><td>Carol</td></tr>
+</tbody></table></div>
+</section>
+<section class="doc-topic">
+<h2>order_by — sort</h2>
+<pre><code># single column
+db.query("users").order_by("name").to_list()
+
+# descending
+db.query("users").order_by("age", descending=True).to_list()
+
+# multiple columns
+db.query("users").order_by(("status", "asc"), ("age", "desc")).to_list()
+
+# alias
+db.query("users").orderby("name").to_list()
+</code></pre>
+</section>
+<section class="doc-topic">
+<h2>limit and offset</h2>
+<div class="comparison-grid">
+<div class="code-panel"><div class="panel-title">RelPyDB</div>
+<pre><code>db.query("users").limit(10).to_list()
+
+# pagination: page 2, 10 per page
+db.query("users").offset(10).limit(10).to_list()
+</code></pre></div>
+<div class="code-panel"><div class="panel-title">SQL equivalent</div>
+<pre><code>SELECT * FROM users LIMIT 10;
+
+SELECT * FROM users
+LIMIT 10 OFFSET 10;
+</code></pre></div>
+</div>
+</section>
+<section class="doc-topic">
+<h2>distinct</h2>
+<div class="comparison-grid">
+<div class="code-panel"><div class="panel-title">RelPyDB</div>
+<pre><code>statuses = (
+    db.query("users")
+      .select("status")
+      .distinct()
+      .to_list()
+)
+</code></pre></div>
+<div class="code-panel"><div class="panel-title">SQL equivalent</div>
+<pre><code>SELECT DISTINCT status
+FROM users;
+</code></pre></div>
+</div>
+<div class="code-panel"><div class="panel-title">Output</div>
+<table class="data-table"><thead><tr><th>status</th></tr></thead><tbody>
+<tr><td>active</td></tr>
+<tr><td>inactive</td></tr>
+</tbody></table></div>
+</section>
+<section class="doc-topic">
+<h2>Terminal methods</h2>
+<table class="param-table"><thead><tr><th>Method</th><th>Returns</th><th>Notes</th></tr></thead><tbody>
+<tr><td><code>.to_list()</code></td><td><code>list[dict]</code></td><td>All matching rows as plain Python dicts.</td></tr>
+<tr><td><code>.first()</code></td><td><code>dict | None</code></td><td>First matching row, or <code>None</code> if no rows match.</td></tr>
+<tr><td><code>.one()</code></td><td><code>dict</code></td><td>Exactly one row. Raises <code>NoRowsFoundError</code> or <code>MultipleRowsFoundError</code> otherwise.</td></tr>
+<tr><td><code>.exists()</code></td><td><code>bool</code></td><td><code>True</code> if at least one row matches.</td></tr>
+<tr><td><code>.pluck("col")</code></td><td><code>list</code></td><td>Flat list of values for a single column.</td></tr>
+<tr><td><code>.count()</code></td><td><code>int</code></td><td>Number of matching rows.</td></tr>
+<tr><td><code>.sum("col")</code></td><td><code>number</code></td><td>Sum of column values.</td></tr>
+<tr><td><code>.avg("col")</code></td><td><code>float</code></td><td>Average of column values.</td></tr>
+<tr><td><code>.min("col")</code></td><td>value</td><td>Minimum value.</td></tr>
+<tr><td><code>.max("col")</code></td><td>value</td><td>Maximum value.</td></tr>
+</tbody></table>
+<pre><code># practical examples
+db.query("users").where(col("status") == "active").count()       # 2
+db.query("users").pluck("name")                                  # ["Alice", "Bob", "Carol"]
+db.query("users").where(col("age").is_not_null()).avg("age")     # 24.0
+db.query("users").where(col("status") == "active").exists()      # True
+</code></pre>
+</section>
+<section class="doc-topic">
+<h2>Full chained example</h2>
+<div class="comparison-grid">
+<div class="code-panel"><div class="panel-title">RelPyDB</div>
+<pre><code>result = (
+    db.query("users")
+      .where(
+          (col("age") &gt;= 18) &amp;
+          col("status").in_(["active", "pending"])
+      )
+      .order_by("name")
+      .select("id", "name", "age")
+      .limit(5)
+      .to_list()
+)
+</code></pre></div>
+<div class="code-panel"><div class="panel-title">SQL equivalent</div>
+<pre><code>SELECT id, name, age
+FROM users
+WHERE age &gt;= 18
+  AND status IN ('active', 'pending')
+ORDER BY name
+LIMIT 5;
+</code></pre></div>
+</div>
+</section>
+<div class="doc-nav">
+<a class="button secondary" href="data-operations.html">← 5. Data Operations</a>
+<a class="button teal" href="joins.html">7. Joins →</a>
+</div>
+</article>
+</section>
+</main>
+<footer class="footer"><div class="footer-inner"><div class="footer-brand">RelPyDB<small>Relational objects for Python</small></div><nav class="footer-links"><a href="../index.html">Home</a><a href="../installation.html">Installation</a><a href="../docs/start-here.html">Start Here</a><a href="../docs/index.html">Docs</a><a href="../ide.html">Online IDE</a><a href="https://github.com/mandelreouven2002/RelPyDB" rel="noreferrer" target="_blank">GitHub ↗</a></nav></div></footer>
+<script src="../script.js"></script></body></html>

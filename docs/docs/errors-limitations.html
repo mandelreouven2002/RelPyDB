@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1" name="viewport"/><title>16. Errors &amp; Limitations - RelPyDB</title><link href="../styles.css" rel="stylesheet"/></head><body>
+<header class="topbar"><a class="brand" href="../index.html"><span class="brand-mark">Rp</span><span><strong>RelPyDB</strong><small>Relational Python</small></span></a><button aria-expanded="false" class="nav-toggle" type="button"><svg viewbox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"></path></svg><span class="sr-only">Menu</span></button><nav class="site-nav"><a href="../index.html">Home</a><a href="../installation.html">Installation</a><a href="../docs/start-here.html">Start Here</a><a class="active" href="../docs/index.html">Docs</a><a href="../ide.html">Online IDE</a><a href="https://github.com/mandelreouven2002/RelPyDB" rel="noreferrer" target="_blank">GitHub</a></nav></header>
+<main>
+<section class="docs-layout">
+<aside class="docs-sidebar"><div class="docs-sidebar-header"><span>Documentation</span><input id="docs-filter" placeholder="Filter docs..." type="search"/></div><nav class="docs-tree"><a class="" href="index.html">Docs Overview</a><a class="" href="start-here.html">0. Start Here</a><a class="" href="quickstart.html">1. 5-Minute Quickstart</a><a class="" href="tutorial-shop.html">2. Full Tutorial</a><a class="" href="recipes.html">3. Common Recipes</a><a class="" href="why-relpy.html">4. Why RelPyDB?</a><a class="" href="alternatives.html">5. RelPyDB vs Alternatives</a><a class="" href="concepts.html">6. Concepts</a><a class="" href="tables-schema.html">7. Tables and Schema</a><a class="" href="data-operations.html">8. Data Operations</a><a class="" href="querying.html">9. Querying</a><a class="" href="joins.html">10. Joins</a><a class="" href="grouping.html">11. Grouping</a><a class="" href="views.html">12. Views</a><a class="" href="indexes.html">13. Indexes</a><a class="" href="exports.html">14. Exports</a><a class="" href="persistence.html">15. Persistence</a><a class="" href="encryption.html">16. Encryption</a><a class="" href="python-integration.html">17. Python Integration</a><a class="" href="capabilities.html">18. Full Capability Checklist</a><a class="active" href="errors-limitations.html">19. Common Errors and Limitations</a><a class="" href="api-reference.html">20. API Reference</a><a class="" href="api-functions.html">21. Function Reference</a><a class="" href="examples.html">22. Examples</a></nav></aside>
+<article class="docs-content"><section class="page-title docs-page-title"><p class="eyebrow">Documentation</p><h1>16. Errors &amp; Limitations</h1><p>Exception types, what triggers them, and known constraints you should be aware of.</p></section>
+<section class="doc-topic">
+<h2>Exception hierarchy</h2>
+<p>All RelPyDB exceptions inherit from <code>RelPyError</code>, so you can catch any library error with a single <code>except RelPyError</code>.</p>
+<pre><code>from relpy import (
+    RelPyError,
+    SchemaError,
+    TableNotFoundError,
+    ColumnNotFoundError,
+    ConstraintError,
+    QueryError,
+    QueryTypeError,
+    ViewError,
+    RowNotFoundError,
+    NoRowsFoundError,
+    MultipleRowsFoundError,
+    EncryptionError,
+)
+</code></pre>
+</section>
+<section class="doc-topic">
+<h2>Error reference</h2>
+<table class="param-table"><thead><tr><th>Exception</th><th>Triggered by</th></tr></thead><tbody>
+<tr><td><code>TableNotFoundError</code></td><td>Querying or inserting into a table name that does not exist.</td></tr>
+<tr><td><code>ColumnNotFoundError</code></td><td>Referencing a column not defined in the schema.</td></tr>
+<tr><td><code>SchemaError</code></td><td>Calling <code>add_column</code> on a non-existent table, or defining an invalid schema.</td></tr>
+<tr><td><code>ConstraintError</code></td><td>Inserting a duplicate primary key, violating a <code>NOT NULL</code> rule, breaking a foreign key, or violating a unique index.</td></tr>
+<tr><td><code>QueryError</code></td><td>Using <code>update()</code> or <code>delete()</code> without <code>allow_all=True</code> when no <code>where</code> filter is given.</td></tr>
+<tr><td><code>QueryTypeError</code></td><td>Using Python <code>and</code>/<code>or</code> instead of <code>&amp;</code>/<code>|</code> in a <code>where</code> condition.</td></tr>
+<tr><td><code>ViewError</code></td><td>Calling <code>db.view()</code> on a name that was never registered, or saving a database that has views.</td></tr>
+<tr><td><code>NoRowsFoundError</code></td><td>Calling <code>.one()</code> when the query returns zero rows.</td></tr>
+<tr><td><code>MultipleRowsFoundError</code></td><td>Calling <code>.one()</code> when the query returns more than one row.</td></tr>
+<tr><td><code>EncryptionError</code></td><td>Calling <code>to_list(decrypt=True)</code> without a key loaded, or loading a database encrypted with a different key.</td></tr>
+</tbody></table>
+</section>
+<section class="doc-topic">
+<h2>Common mistakes and fixes</h2>
+<h3>Using Python <code>and</code> in a condition</h3>
+<div class="comparison-grid">
+<div class="code-panel"><div class="panel-title">❌ Wrong — raises QueryTypeError</div>
+<pre><code>db.query("users").where(
+    col("age") &gt;= 18 and col("status") == "active"
+)
+</code></pre></div>
+<div class="code-panel"><div class="panel-title">✓ Correct</div>
+<pre><code>db.query("users").where(
+    (col("age") &gt;= 18) &amp;
+    (col("status") == "active")
+)
+</code></pre></div>
+</div>
+<h3>Calling <code>.one()</code> on a query with multiple rows</h3>
+<div class="comparison-grid">
+<div class="code-panel"><div class="panel-title">❌ Wrong — raises MultipleRowsFoundError</div>
+<pre><code>user = db.query("users").one()
+# Raises if there is more than one user
+</code></pre></div>
+<div class="code-panel"><div class="panel-title">✓ Correct</div>
+<pre><code>user = (
+    db.query("users")
+      .where(col("id") == 1)
+      .one()
+)
+</code></pre></div>
+</div>
+<h3>Deleting all rows without the safety flag</h3>
+<div class="comparison-grid">
+<div class="code-panel"><div class="panel-title">❌ Wrong — raises QueryError</div>
+<pre><code>db.delete("users")
+</code></pre></div>
+<div class="code-panel"><div class="panel-title">✓ Correct</div>
+<pre><code>db.delete("users", allow_all=True)
+</code></pre></div>
+</div>
+<h3>Decrypting without loading a key</h3>
+<div class="comparison-grid">
+<div class="code-panel"><div class="panel-title">❌ Wrong — raises EncryptionError</div>
+<pre><code>db = RelPy.load("database.relpy.json")
+db.to_list("users", decrypt=True)
+# No key loaded!
+</code></pre></div>
+<div class="code-panel"><div class="panel-title">✓ Correct</div>
+<pre><code>db = RelPy.load(
+    "database.relpy.json",
+    encryption_key=my_key,
+)
+db.to_list("users", decrypt=True)
+</code></pre></div>
+</div>
+</section>
+<section class="doc-topic">
+<h2>Known limitations</h2>
+<ul class="note-list">
+<li><strong>No concurrent writes.</strong> RelPyDB is a single-process in-memory object. It is not safe for multi-threaded mutation without external locking.</li>
+<li><strong>Views are not persisted.</strong> Views contain Python callables and cannot be serialised. Re-register them after <code>RelPy.load()</code>.</li>
+<li><strong>No subquery support.</strong> Nested queries are not supported in the current query builder. Use views or Python variables to chain results.</li>
+<li><strong>Performance degrades on very large datasets.</strong> The library is optimised for clarity and correctness, not compiled-engine throughput. For &gt;500 000 rows or heavy analytical queries, DuckDB or SQLite will be substantially faster.</li>
+<li><strong>AutoNumber columns cannot be manually set.</strong> Passing an explicit value for an <code>AutoNumber</code> column in <code>insert()</code> raises a <code>ConstraintError</code>.</li>
+<li><strong>Primary keys are immutable.</strong> <code>update()</code> ignores changes to primary key columns.</li>
+</ul>
+</section>
+<section class="doc-topic">
+<h2>Catching errors gracefully</h2>
+<pre><code>from relpy import RelPyError, ConstraintError, TableNotFoundError
+
+try:
+    db.insert("orders", {"user_id": 9999, "amount": 50.0})
+except ConstraintError as e:
+    print(f"FK violation: {e}")
+except TableNotFoundError as e:
+    print(f"Table missing: {e}")
+except RelPyError as e:
+    print(f"Other RelPyDB error: {e}")
+</code></pre>
+</section>
+<div class="doc-nav">
+<a class="button secondary" href="capabilities.html">← 15. Capability Checklist</a>
+<a class="button teal" href="api-reference.html">17. API Reference →</a>
+</div>
+</article>
+</section>
+</main>
+<footer class="footer"><div class="footer-inner"><div class="footer-brand">RelPyDB<small>Relational objects for Python</small></div><nav class="footer-links"><a href="../index.html">Home</a><a href="../installation.html">Installation</a><a href="../docs/start-here.html">Start Here</a><a href="../docs/index.html">Docs</a><a href="../ide.html">Online IDE</a><a href="https://github.com/mandelreouven2002/RelPyDB" rel="noreferrer" target="_blank">GitHub ↗</a></nav></div></footer>
+<script src="../script.js"></script></body></html>

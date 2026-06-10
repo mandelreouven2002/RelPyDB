@@ -1,0 +1,2694 @@
+<!DOCTYPE html>
+
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1" name="viewport"/><meta content="RelPyDB function reference" name="description"/><title>18. Function Reference - RelPyDB</title><link href="../styles.css" rel="stylesheet"/></head><body>
+<header class="topbar"><a class="brand" href="../index.html"><span class="brand-mark">Rp</span><span><strong>RelPyDB</strong><small>Relational Python</small></span></a><button aria-expanded="false" class="nav-toggle" type="button"><svg viewbox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"></path></svg><span class="sr-only">Menu</span></button><nav class="site-nav"><a href="../index.html">Home</a><a href="../installation.html">Installation</a><a href="../docs/start-here.html">Start Here</a><a class="active" href="../docs/index.html">Docs</a><a href="../ide.html">Online IDE</a><a href="https://github.com/mandelreouven2002/RelPyDB" rel="noreferrer" target="_blank">GitHub</a></nav></header>
+<main>
+<section class="docs-layout">
+<aside class="docs-sidebar"><div class="docs-sidebar-header"><span>Documentation</span><input id="docs-filter" placeholder="Filter docs..." type="search"/></div><nav class="docs-tree"><a class="" href="index.html">Docs Overview</a><a class="" href="start-here.html">0. Start Here</a><a class="" href="quickstart.html">1. 5-Minute Quickstart</a><a class="" href="tutorial-shop.html">2. Full Tutorial</a><a class="" href="recipes.html">3. Common Recipes</a><a class="" href="why-relpy.html">4. Why RelPyDB?</a><a class="" href="alternatives.html">5. RelPyDB vs Alternatives</a><a class="" href="concepts.html">6. Concepts</a><a class="" href="tables-schema.html">7. Tables and Schema</a><a class="" href="data-operations.html">8. Data Operations</a><a class="" href="querying.html">9. Querying</a><a class="" href="joins.html">10. Joins</a><a class="" href="grouping.html">11. Grouping</a><a class="" href="views.html">12. Views</a><a class="" href="indexes.html">13. Indexes</a><a class="" href="exports.html">14. Exports</a><a class="" href="persistence.html">15. Persistence</a><a class="" href="encryption.html">16. Encryption</a><a class="" href="python-integration.html">17. Python Integration</a><a class="" href="capabilities.html">18. Full Capability Checklist</a><a class="" href="errors-limitations.html">19. Common Errors and Limitations</a><a class="" href="api-reference.html">20. API Reference</a><a class="active" href="api-functions.html">21. Function Reference</a><a class="" href="examples.html">22. Examples</a></nav></aside>
+<article class="docs-content api-functions-content"><section class="page-title docs-page-title"><p class="eyebrow">Documentation</p><h1>18. Function Reference</h1><p>Every main public object and function, with inputs, outputs, examples, import notes, and usage guidance.</p></section>
+<section class="doc-topic note-topic">
+<h2>About this reference</h2>
+<p>This page is a developer-focused function reference for RelPyDB. It explains what each public object or function does, which inputs it accepts, what it returns, and how to use it in small examples.</p>
+<p>For a shorter table-style API overview, see <a href="api-reference.html">API Reference</a>. For a wider feature map, see <a href="capabilities.html">Full Capability Checklist</a>.</p>
+</section>
+<section class="doc-topic">
+<h2>Common imports</h2>
+<pre><code>from relpy import RelPy, AutoNumber, col
+from relpy import AND, OR, NOT
+from relpy import count, sum_, avg, min_, max_</code></pre>
+<p>Most schema and data operations only need <code>RelPy</code> and <code>AutoNumber</code>. Query filters usually need <code>col</code>. Grouped queries usually need <code>count</code>, <code>sum_</code>, <code>avg</code>, <code>min_</code>, and <code>max_</code>.</p>
+</section>
+<h1 id="relpydb-api-functions-reference">RelPyDB API Functions Reference</h1>
+<p>This document lists the main public functions and objects in RelPyDB, with a short description, inputs, outputs, and examples.</p>
+<hr/>
+<h2 id="core-objects">1. Core Objects</h2>
+<h3 id="relpyencryption_keynone"><code>RelPy(encryption_key=None)</code></h3>
+<p>Creates an in-memory relational database object.</p>
+<p><strong>Inputs</strong></p>
+<table class="param-table">
+<colgroup>
+<col style="width: 25%"/>
+<col style="width: 25%"/>
+<col style="width: 25%"/>
+<col style="width: 25%"/>
+</colgroup>
+<thead>
+<tr class="header">
+<th>Parameter</th>
+<th>Type</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>encryption_key</code></td>
+<td><code>bytes \| str \| None</code></td>
+<td><code>None</code></td>
+<td>Optional encryption key used for encrypted columns.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Output</strong></p>
+<table class="param-table">
+<thead>
+<tr class="header">
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>RelPy</code></td>
+<td>A new empty RelPyDB database object.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Example</strong></p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a aria-hidden="true" href="#cb1-1" tabindex="-1"></a><span class="im">from</span> relpy <span class="im">import</span> RelPy</span>
+<span id="cb1-2"><a aria-hidden="true" href="#cb1-2" tabindex="-1"></a></span>
+<span id="cb1-3"><a aria-hidden="true" href="#cb1-3" tabindex="-1"></a>db <span class="op">=</span> RelPy()</span></code></pre></div>
+<p>With encryption:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a aria-hidden="true" href="#cb2-1" tabindex="-1"></a>key <span class="op">=</span> RelPy.generate_encryption_key()</span>
+<span id="cb2-2"><a aria-hidden="true" href="#cb2-2" tabindex="-1"></a>db <span class="op">=</span> RelPy(encryption_key<span class="op">=</span>key)</span></code></pre></div>
+<hr/>
+<h3 id="autonumber"><code>AutoNumber</code></h3>
+<p>Special logical column type for auto-incrementing integer primary keys.</p>
+<p><strong>Inputs</strong></p>
+<p>None.</p>
+<p><strong>Output</strong></p>
+<p>Used as a column type, not as a normal runtime value.</p>
+<p><strong>Example</strong></p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a aria-hidden="true" href="#cb3-1" tabindex="-1"></a>db.add_column(<span class="st">"users"</span>, <span class="st">"id"</span>, AutoNumber, is_primary_key<span class="op">=</span><span class="va">True</span>)</span></code></pre></div>
+<hr/>
+<h3 id="colcolumn_name"><code>col(column_name)</code></h3>
+<p>Creates a column reference used in query conditions.</p>
+<p><strong>Inputs</strong></p>
+<table class="param-table">
+<thead>
+<tr class="header">
+<th>Parameter</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>column_name</code></td>
+<td><code>str</code></td>
+<td>Name of the column to reference.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Output</strong></p>
+<table class="param-table">
+<thead>
+<tr class="header">
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>ColumnRef</code></td>
+<td>A column reference object used to build conditions.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Example</strong></p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a aria-hidden="true" href="#cb4-1" tabindex="-1"></a>db.query(<span class="st">"users"</span>).where(col(<span class="st">"age"</span>) <span class="op">&gt;=</span> <span class="dv">18</span>)</span></code></pre></div>
+<hr/>
+<h2 id="schema-functions">2. Schema Functions</h2>
+<h3 id="create_tabletable_name"><code>create_table(table_name)</code></h3>
+<p>Creates a new empty table.</p>
+<p><strong>Inputs</strong></p>
+<table class="param-table">
+<thead>
+<tr class="header">
+<th>Parameter</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>table_name</code></td>
+<td><code>str</code></td>
+<td>Name of the table to create.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Output</strong></p>
+<table class="param-table">
+<thead>
+<tr class="header">
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>RelPy</code></td>
+<td>The same database object, allowing chaining.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Example</strong></p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a aria-hidden="true" href="#cb5-1" tabindex="-1"></a>db.create_table(<span class="st">"users"</span>)</span></code></pre></div>
+<hr/>
+<h3 id="add_columntable_name-column_name-data_type-..."><code>add_column(table_name, column_name, data_type, ...)</code></h3>
+<p>Adds a column to an existing table.</p>
+<p><strong>Inputs</strong></p>
+<table class="param-table">
+<colgroup>
+<col style="width: 25%"/>
+<col style="width: 25%"/>
+<col style="width: 25%"/>
+<col style="width: 25%"/>
+</colgroup>
+<thead>
+<tr class="header">
+<th>Parameter</th>
+<th>Type</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>table_name</code></td>
+<td><code>str</code></td>
+<td>required</td>
+<td>Target table.</td>
+</tr>
+<tr class="even">
+<td><code>column_name</code></td>
+<td><code>str</code></td>
+<td>required</td>
+<td>New column name.</td>
+</tr>
+<tr class="odd">
+<td><code>data_type</code></td>
+<td><code>type</code></td>
+<td>required</td>
+<td>Python type or <code>AutoNumber</code>.</td>
+</tr>
+<tr class="even">
+<td><code>is_primary_key</code></td>
+<td><code>bool</code></td>
+<td><code>False</code></td>
+<td>Whether the column is a primary key.</td>
+</tr>
+<tr class="odd">
+<td><code>is_pii</code></td>
+<td><code>bool</code></td>
+<td><code>False</code></td>
+<td>Marks the column as personally identifiable information.</td>
+</tr>
+<tr class="even">
+<td><code>is_encrypted</code></td>
+<td><code>bool</code></td>
+<td><code>False</code></td>
+<td>Stores the column encrypted.</td>
+</tr>
+<tr class="odd">
+<td><code>references</code></td>
+<td><code>str \| None</code></td>
+<td><code>None</code></td>
+<td>Foreign key target in <code>"table.column"</code> format.</td>
+</tr>
+<tr class="even">
+<td><code>on_delete</code></td>
+<td><code>str \| None</code></td>
+<td><code>None</code></td>
+<td>FK delete behavior: <code>RESTRICT</code>, <code>CASCADE</code>, or <code>SET NULL</code>.</td>
+</tr>
+<tr class="odd">
+<td><code>nullable</code></td>
+<td><code>bool \| None</code></td>
+<td><code>None</code></td>
+<td>Whether the column can contain <code>None</code>.</td>
+</tr>
+<tr class="even">
+<td><code>default</code></td>
+<td><code>Any</code></td>
+<td>not set</td>
+<td>Optional default value.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Output</strong></p>
+<table class="param-table">
+<thead>
+<tr class="header">
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>RelPy</code></td>
+<td>The same database object.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Example</strong></p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a aria-hidden="true" href="#cb6-1" tabindex="-1"></a>db.add_column(<span class="st">"users"</span>, <span class="st">"id"</span>, AutoNumber, is_primary_key<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb6-2"><a aria-hidden="true" href="#cb6-2" tabindex="-1"></a>db.add_column(<span class="st">"users"</span>, <span class="st">"name"</span>, <span class="bu">str</span>, nullable<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb6-3"><a aria-hidden="true" href="#cb6-3" tabindex="-1"></a>db.add_column(<span class="st">"users"</span>, <span class="st">"email"</span>, <span class="bu">str</span>, is_encrypted<span class="op">=</span><span class="va">True</span>)</span></code></pre></div>
+<p>Foreign key:</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a aria-hidden="true" href="#cb7-1" tabindex="-1"></a>db.add_column(</span>
+<span id="cb7-2"><a aria-hidden="true" href="#cb7-2" tabindex="-1"></a>    <span class="st">"orders"</span>,</span>
+<span id="cb7-3"><a aria-hidden="true" href="#cb7-3" tabindex="-1"></a>    <span class="st">"user_id"</span>,</span>
+<span id="cb7-4"><a aria-hidden="true" href="#cb7-4" tabindex="-1"></a>    <span class="bu">int</span>,</span>
+<span id="cb7-5"><a aria-hidden="true" href="#cb7-5" tabindex="-1"></a>    nullable<span class="op">=</span><span class="va">False</span>,</span>
+<span id="cb7-6"><a aria-hidden="true" href="#cb7-6" tabindex="-1"></a>    references<span class="op">=</span><span class="st">"users.id"</span>,</span>
+<span id="cb7-7"><a aria-hidden="true" href="#cb7-7" tabindex="-1"></a>    on_delete<span class="op">=</span><span class="st">"CASCADE"</span>,</span>
+<span id="cb7-8"><a aria-hidden="true" href="#cb7-8" tabindex="-1"></a>)</span></code></pre></div>
+<hr/>
+<h3 id="set_primary_keytable_name-columns-replacefalse"><code>set_primary_key(table_name, columns, replace=False)</code></h3>
+<p>Sets a primary key using one or more existing columns.</p>
+<p><strong>Inputs</strong></p>
+<table class="param-table">
+<colgroup>
+<col style="width: 25%"/>
+<col style="width: 25%"/>
+<col style="width: 25%"/>
+<col style="width: 25%"/>
+</colgroup>
+<thead>
+<tr class="header">
+<th>Parameter</th>
+<th>Type</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>table_name</code></td>
+<td><code>str</code></td>
+<td>required</td>
+<td>Target table.</td>
+</tr>
+<tr class="even">
+<td><code>columns</code></td>
+<td><code>list[str]</code></td>
+<td>required</td>
+<td>Column names that form the primary key.</td>
+</tr>
+<tr class="odd">
+<td><code>replace</code></td>
+<td><code>bool</code></td>
+<td><code>False</code></td>
+<td>Whether to replace an existing primary key.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Output</strong></p>
+<table class="param-table">
+<thead>
+<tr class="header">
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>RelPy</code></td>
+<td>The same database object.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Example</strong></p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb8-1"><a aria-hidden="true" href="#cb8-1" tabindex="-1"></a>db.set_primary_key(<span class="st">"order_items"</span>, [<span class="st">"order_id"</span>, <span class="st">"product_id"</span>])</span></code></pre></div>
+<hr/>
+<h3 id="describe_tabletable_name"><code>describe_table(table_name)</code></h3>
+<p>Returns metadata about one table.</p>
+<p><strong>Inputs</strong></p>
+<table class="param-table">
+<thead>
+<tr class="header">
+<th>Parameter</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>table_name</code></td>
+<td><code>str</code></td>
+<td>Name of the table.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Output</strong></p>
+<table class="param-table">
+<thead>
+<tr class="header">
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>dict[str, Any]</code></td>
+<td>Table schema metadata.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Example</strong></p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb9-1"><a aria-hidden="true" href="#cb9-1" tabindex="-1"></a>info <span class="op">=</span> db.describe_table(<span class="st">"users"</span>)</span></code></pre></div>
+<hr/>
+<h3 id="describe_schema"><code>describe_schema()</code></h3>
+<p>Returns metadata about the entire schema.</p>
+<p><strong>Inputs</strong></p>
+<p>None.</p>
+<p><strong>Output</strong></p>
+<table class="param-table">
+<thead>
+<tr class="header">
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>dict[str, Any]</code></td>
+<td>Schema metadata for all tables.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Example</strong></p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb10-1"><a aria-hidden="true" href="#cb10-1" tabindex="-1"></a>schema <span class="op">=</span> db.describe_schema()</span></code></pre></div>
+<hr/>
+<h2 id="data-operation-functions">3. Data Operation Functions</h2>
+<h3 id="inserttable_name-values"><code>insert(table_name, values)</code></h3>
+<p>Inserts one row into a table.</p>
+<p><strong>Inputs</strong></p>
+<table class="param-table">
+<thead>
+<tr class="header">
+<th>Parameter</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>table_name</code></td>
+<td><code>str</code></td>
+<td>Target table.</td>
+</tr>
+<tr class="even">
+<td><code>values</code></td>
+<td><code>dict[str, Any]</code></td>
+<td>Row values to insert.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Output</strong></p>
+<table class="param-table">
+<colgroup>
+<col style="width: 50%"/>
+<col style="width: 50%"/>
+</colgroup>
+<thead>
+<tr class="header">
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>dict[str, Any]</code></td>
+<td>The inserted public row. Internal metadata is hidden.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Example</strong></p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb11-1"><a aria-hidden="true" href="#cb11-1" tabindex="-1"></a>user <span class="op">=</span> db.insert(<span class="st">"users"</span>, {<span class="st">"name"</span>: <span class="st">"Alice"</span>})</span></code></pre></div>
+<hr/>
+<h3 id="insert_manytable_name-rows"><code>insert_many(table_name, rows)</code></h3>
+<p>Inserts many rows into a table efficiently.</p>
+<p><strong>Inputs</strong></p>
+<table class="param-table">
+<thead>
+<tr class="header">
+<th>Parameter</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>table_name</code></td>
+<td><code>str</code></td>
+<td>Target table.</td>
+</tr>
+<tr class="even">
+<td><code>rows</code></td>
+<td><code>list[dict[str, Any]]</code></td>
+<td>Rows to insert.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Output</strong></p>
+<table class="param-table">
+<thead>
+<tr class="header">
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>list[dict[str, Any]]</code></td>
+<td>Inserted public rows.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Example</strong></p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb12-1"><a aria-hidden="true" href="#cb12-1" tabindex="-1"></a>db.insert_many(<span class="st">"users"</span>, [</span>
+<span id="cb12-2"><a aria-hidden="true" href="#cb12-2" tabindex="-1"></a>    {<span class="st">"name"</span>: <span class="st">"Alice"</span>},</span>
+<span id="cb12-3"><a aria-hidden="true" href="#cb12-3" tabindex="-1"></a>    {<span class="st">"name"</span>: <span class="st">"Bob"</span>},</span>
+<span id="cb12-4"><a aria-hidden="true" href="#cb12-4" tabindex="-1"></a>])</span></code></pre></div>
+<hr/>
+<h3 id="updatetable_name-values-wherenone-allow_allfalse"><code>update(table_name, values, where=None, allow_all=False)</code></h3>
+<p>Updates rows in a table.</p>
+<p><strong>Inputs</strong></p>
+<table class="param-table">
+<colgroup>
+<col style="width: 25%"/>
+<col style="width: 25%"/>
+<col style="width: 25%"/>
+<col style="width: 25%"/>
+</colgroup>
+<thead>
+<tr class="header">
+<th>Parameter</th>
+<th>Type</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>table_name</code></td>
+<td><code>str</code></td>
+<td>required</td>
+<td>Target table.</td>
+</tr>
+<tr class="even">
+<td><code>values</code></td>
+<td><code>dict[str, Any]</code></td>
+<td>required</td>
+<td>Values to update.</td>
+</tr>
+<tr class="odd">
+<td><code>where</code></td>
+<td><code>Callable[[dict], bool] \| None</code></td>
+<td><code>None</code></td>
+<td>Predicate selecting rows to update.</td>
+</tr>
+<tr class="even">
+<td><code>allow_all</code></td>
+<td><code>bool</code></td>
+<td><code>False</code></td>
+<td>Required to update all rows intentionally.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Output</strong></p>
+<table class="param-table">
+<thead>
+<tr class="header">
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>int</code></td>
+<td>Number of updated rows.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Example</strong></p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb13-1"><a aria-hidden="true" href="#cb13-1" tabindex="-1"></a>count <span class="op">=</span> db.update(</span>
+<span id="cb13-2"><a aria-hidden="true" href="#cb13-2" tabindex="-1"></a>    <span class="st">"users"</span>,</span>
+<span id="cb13-3"><a aria-hidden="true" href="#cb13-3" tabindex="-1"></a>    {<span class="st">"status"</span>: <span class="st">"active"</span>},</span>
+<span id="cb13-4"><a aria-hidden="true" href="#cb13-4" tabindex="-1"></a>    where<span class="op">=</span><span class="kw">lambda</span> row: row[<span class="st">"age"</span>] <span class="op">&gt;=</span> <span class="dv">18</span>,</span>
+<span id="cb13-5"><a aria-hidden="true" href="#cb13-5" tabindex="-1"></a>)</span></code></pre></div>
+<p>Update all rows intentionally:</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb14-1"><a aria-hidden="true" href="#cb14-1" tabindex="-1"></a>db.update(<span class="st">"users"</span>, {<span class="st">"status"</span>: <span class="st">"active"</span>}, allow_all<span class="op">=</span><span class="va">True</span>)</span></code></pre></div>
+<hr/>
+<h3 id="deletetable_name-wherenone-allow_allfalse"><code>delete(table_name, where=None, allow_all=False)</code></h3>
+<p>Deletes rows from a table.</p>
+<p><strong>Inputs</strong></p>
+<table class="param-table">
+<colgroup>
+<col style="width: 25%"/>
+<col style="width: 25%"/>
+<col style="width: 25%"/>
+<col style="width: 25%"/>
+</colgroup>
+<thead>
+<tr class="header">
+<th>Parameter</th>
+<th>Type</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>table_name</code></td>
+<td><code>str</code></td>
+<td>required</td>
+<td>Target table.</td>
+</tr>
+<tr class="even">
+<td><code>where</code></td>
+<td><code>Callable[[dict], bool] \| None</code></td>
+<td><code>None</code></td>
+<td>Predicate selecting rows to delete.</td>
+</tr>
+<tr class="odd">
+<td><code>allow_all</code></td>
+<td><code>bool</code></td>
+<td><code>False</code></td>
+<td>Required to delete all rows intentionally.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Output</strong></p>
+<table class="param-table">
+<thead>
+<tr class="header">
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>int</code></td>
+<td>Number of deleted rows, including cascaded rows.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Example</strong></p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb15-1"><a aria-hidden="true" href="#cb15-1" tabindex="-1"></a>deleted <span class="op">=</span> db.delete(</span>
+<span id="cb15-2"><a aria-hidden="true" href="#cb15-2" tabindex="-1"></a>    <span class="st">"users"</span>,</span>
+<span id="cb15-3"><a aria-hidden="true" href="#cb15-3" tabindex="-1"></a>    where<span class="op">=</span><span class="kw">lambda</span> row: row[<span class="st">"id"</span>] <span class="op">==</span> <span class="dv">1</span>,</span>
+<span id="cb15-4"><a aria-hidden="true" href="#cb15-4" tabindex="-1"></a>)</span></code></pre></div>
+<p>Delete all rows intentionally:</p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb16-1"><a aria-hidden="true" href="#cb16-1" tabindex="-1"></a>db.delete(<span class="st">"logs"</span>, allow_all<span class="op">=</span><span class="va">True</span>)</span></code></pre></div>
+<hr/>
+<h2 id="query-builder-functions">4. Query Builder Functions</h2>
+<h3 id="querytable_name"><code>query(table_name)</code></h3>
+<p>Starts a query on a table.</p>
+<p><strong>Inputs</strong></p>
+<table class="param-table">
+<thead>
+<tr class="header">
+<th>Parameter</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>table_name</code></td>
+<td><code>str</code></td>
+<td>Table to query.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Output</strong></p>
+<table class="param-table">
+<thead>
+<tr class="header">
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>Query</code></td>
+<td>A query builder object.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Example</strong></p>
+<div class="sourceCode" id="cb17"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb17-1"><a aria-hidden="true" href="#cb17-1" tabindex="-1"></a>q <span class="op">=</span> db.query(<span class="st">"users"</span>)</span></code></pre></div>
+<hr/>
+<h3 id="wherecondition_or_callable"><code>where(condition_or_callable)</code></h3>
+<p>Filters query rows.</p>
+<p><strong>Inputs</strong></p>
+<table class="param-table">
+<colgroup>
+<col style="width: 33%"/>
+<col style="width: 33%"/>
+<col style="width: 33%"/>
+</colgroup>
+<thead>
+<tr class="header">
+<th>Parameter</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>condition_or_callable</code></td>
+<td><code>Condition \| Callable[[dict], bool]</code></td>
+<td>Filtering condition.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Output</strong></p>
+<table class="param-table">
+<thead>
+<tr class="header">
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>Query</code></td>
+<td>A new filtered query.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Example</strong></p>
+<div class="sourceCode" id="cb18"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb18-1"><a aria-hidden="true" href="#cb18-1" tabindex="-1"></a>db.query(<span class="st">"users"</span>).where(col(<span class="st">"status"</span>) <span class="op">==</span> <span class="st">"active"</span>)</span></code></pre></div>
+<hr/>
+<h3 id="selectcolumns"><code>select(*columns)</code></h3>
+<p>Projects selected columns.</p>
+<p><strong>Inputs</strong></p>
+<table class="param-table">
+<thead>
+<tr class="header">
+<th>Parameter</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>columns</code></td>
+<td><code>str...</code> or <code>list[str]</code></td>
+<td>Columns to keep.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Output</strong></p>
+<table class="param-table">
+<thead>
+<tr class="header">
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>Query</code></td>
+<td>A new projected query.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Example</strong></p>
+<div class="sourceCode" id="cb19"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb19-1"><a aria-hidden="true" href="#cb19-1" tabindex="-1"></a>db.query(<span class="st">"users"</span>).select(<span class="st">"id"</span>, <span class="st">"name"</span>)</span></code></pre></div>
+<hr/>
+<h3 id="order_bycolumns-descendingfalse"><code>order_by(*columns, descending=False)</code></h3>
+<p>Sorts query results.</p>
+<p><strong>Inputs</strong></p>
+<table class="param-table">
+<colgroup>
+<col style="width: 25%"/>
+<col style="width: 25%"/>
+<col style="width: 25%"/>
+<col style="width: 25%"/>
+</colgroup>
+<thead>
+<tr class="header">
+<th>Parameter</th>
+<th>Type</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>columns</code></td>
+<td><code>str \| tuple[str, str]</code></td>
+<td>required</td>
+<td>Columns or <code>(column, direction)</code> pairs.</td>
+</tr>
+<tr class="even">
+<td><code>descending</code></td>
+<td><code>bool</code></td>
+<td><code>False</code></td>
+<td>Default direction for string columns.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Output</strong></p>
+<table class="param-table">
+<thead>
+<tr class="header">
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>Query</code></td>
+<td>A sorted query.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Example</strong></p>
+<div class="sourceCode" id="cb20"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb20-1"><a aria-hidden="true" href="#cb20-1" tabindex="-1"></a>db.query(<span class="st">"users"</span>).order_by(<span class="st">"name"</span>)</span>
+<span id="cb20-2"><a aria-hidden="true" href="#cb20-2" tabindex="-1"></a>db.query(<span class="st">"users"</span>).order_by(<span class="st">"age"</span>, descending<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb20-3"><a aria-hidden="true" href="#cb20-3" tabindex="-1"></a>db.query(<span class="st">"users"</span>).order_by((<span class="st">"status"</span>, <span class="st">"asc"</span>), (<span class="st">"age"</span>, <span class="st">"desc"</span>))</span></code></pre></div>
+<hr/>
+<h3 id="orderby..."><code>orderby(...)</code></h3>
+<p>Alias for <code>order_by(...)</code>.</p>
+<p><strong>Inputs</strong></p>
+<p>Same as <code>order_by</code>.</p>
+<p><strong>Output</strong></p>
+<p>Same as <code>order_by</code>.</p>
+<p><strong>Example</strong></p>
+<div class="sourceCode" id="cb21"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb21-1"><a aria-hidden="true" href="#cb21-1" tabindex="-1"></a>db.query(<span class="st">"users"</span>).orderby(<span class="st">"name"</span>)</span></code></pre></div>
+<hr/>
+<h3 id="limitcount"><code>limit(count)</code></h3>
+<p>Limits the number of returned rows.</p>
+<p><strong>Inputs</strong></p>
+<table class="param-table">
+<thead>
+<tr class="header">
+<th>Parameter</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>count</code></td>
+<td><code>int</code></td>
+<td>Maximum number of rows.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Output</strong></p>
+<table class="param-table">
+<thead>
+<tr class="header">
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>Query</code></td>
+<td>A limited query.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Example</strong></p>
+<div class="sourceCode" id="cb22"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb22-1"><a aria-hidden="true" href="#cb22-1" tabindex="-1"></a>db.query(<span class="st">"users"</span>).limit(<span class="dv">10</span>)</span></code></pre></div>
+<hr/>
+<h3 id="offsetcount"><code>offset(count)</code></h3>
+<p>Skips rows before returning results.</p>
+<p><strong>Inputs</strong></p>
+<table class="param-table">
+<thead>
+<tr class="header">
+<th>Parameter</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>count</code></td>
+<td><code>int</code></td>
+<td>Number of rows to skip.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Output</strong></p>
+<table class="param-table">
+<thead>
+<tr class="header">
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>Query</code></td>
+<td>An offset query.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Example</strong></p>
+<div class="sourceCode" id="cb23"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb23-1"><a aria-hidden="true" href="#cb23-1" tabindex="-1"></a>db.query(<span class="st">"users"</span>).order_by(<span class="st">"id"</span>).offset(<span class="dv">20</span>).limit(<span class="dv">10</span>)</span></code></pre></div>
+<hr/>
+<h3 id="distinctenabledtrue"><code>distinct(enabled=True)</code></h3>
+<p>Removes duplicate result rows.</p>
+<p><strong>Inputs</strong></p>
+<table class="param-table">
+<thead>
+<tr class="header">
+<th>Parameter</th>
+<th>Type</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>enabled</code></td>
+<td><code>bool</code></td>
+<td><code>True</code></td>
+<td>Whether distinct mode is enabled.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Output</strong></p>
+<table class="param-table">
+<thead>
+<tr class="header">
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>Query</code></td>
+<td>A distinct query.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Example</strong></p>
+<div class="sourceCode" id="cb24"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb24-1"><a aria-hidden="true" href="#cb24-1" tabindex="-1"></a>db.query(<span class="st">"users"</span>).select(<span class="st">"status"</span>).distinct()</span></code></pre></div>
+<hr/>
+<h2 id="condition-functions">5. Condition Functions</h2>
+<h3 id="column-comparisons">Column comparisons</h3>
+<p><code>col("column")</code> supports:</p>
+<table class="param-table">
+<thead>
+<tr class="header">
+<th>Expression</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>col("x") == value</code></td>
+<td>Equality condition.</td>
+</tr>
+<tr class="even">
+<td><code>col("x") != value</code></td>
+<td>Not-equal condition.</td>
+</tr>
+<tr class="odd">
+<td><code>col("x") &gt; value</code></td>
+<td>Greater-than condition.</td>
+</tr>
+<tr class="even">
+<td><code>col("x") &gt;= value</code></td>
+<td>Greater-than-or-equal condition.</td>
+</tr>
+<tr class="odd">
+<td><code>col("x") &lt; value</code></td>
+<td>Less-than condition.</td>
+</tr>
+<tr class="even">
+<td><code>col("x") &lt;= value</code></td>
+<td>Less-than-or-equal condition.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Output</strong></p>
+<table class="param-table">
+<thead>
+<tr class="header">
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>Condition</code></td>
+<td>A condition object.</td>
+</tr>
+</tbody>
+</table>
+<hr/>
+<h3 id="likepattern-case_sensitivetrue"><code>like(pattern, case_sensitive=True)</code></h3>
+<p>SQL-like pattern matching.</p>
+<p><strong>Inputs</strong></p>
+<table class="param-table">
+<colgroup>
+<col style="width: 25%"/>
+<col style="width: 25%"/>
+<col style="width: 25%"/>
+<col style="width: 25%"/>
+</colgroup>
+<thead>
+<tr class="header">
+<th>Parameter</th>
+<th>Type</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>pattern</code></td>
+<td><code>str</code></td>
+<td>required</td>
+<td>LIKE pattern. <code>%</code> means any sequence, <code>_</code> means one character.</td>
+</tr>
+<tr class="even">
+<td><code>case_sensitive</code></td>
+<td><code>bool</code></td>
+<td><code>True</code></td>
+<td>Whether matching is case-sensitive.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Output</strong></p>
+<table class="param-table">
+<thead>
+<tr class="header">
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>Condition</code></td>
+<td>LIKE condition.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Example</strong></p>
+<div class="sourceCode" id="cb25"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb25-1"><a aria-hidden="true" href="#cb25-1" tabindex="-1"></a>col(<span class="st">"email"</span>).like(<span class="st">"%@gmail.com"</span>)</span></code></pre></div>
+<hr/>
+<h3 id="in_values"><code>in_(values)</code></h3>
+<p>Checks whether the value is included in a collection.</p>
+<p><strong>Inputs</strong></p>
+<table class="param-table">
+<thead>
+<tr class="header">
+<th>Parameter</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>values</code></td>
+<td><code>list \| tuple \| set</code></td>
+<td>Allowed values.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Output</strong></p>
+<table class="param-table">
+<thead>
+<tr class="header">
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>Condition</code></td>
+<td>IN condition.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Example</strong></p>
+<div class="sourceCode" id="cb26"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb26-1"><a aria-hidden="true" href="#cb26-1" tabindex="-1"></a>col(<span class="st">"status"</span>).in_([<span class="st">"paid"</span>, <span class="st">"pending"</span>])</span></code></pre></div>
+<hr/>
+<h3 id="betweenlow-high-inclusivetrue"><code>between(low, high, inclusive=True)</code></h3>
+<p>Checks whether a value is between two bounds.</p>
+<p><strong>Inputs</strong></p>
+<table class="param-table">
+<thead>
+<tr class="header">
+<th>Parameter</th>
+<th>Type</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>low</code></td>
+<td><code>Any</code></td>
+<td>required</td>
+<td>Lower bound.</td>
+</tr>
+<tr class="even">
+<td><code>high</code></td>
+<td><code>Any</code></td>
+<td>required</td>
+<td>Upper bound.</td>
+</tr>
+<tr class="odd">
+<td><code>inclusive</code></td>
+<td><code>bool</code></td>
+<td><code>True</code></td>
+<td>Whether bounds are inclusive.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Output</strong></p>
+<table class="param-table">
+<thead>
+<tr class="header">
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>Condition</code></td>
+<td>BETWEEN condition.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Example</strong></p>
+<div class="sourceCode" id="cb27"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb27-1"><a aria-hidden="true" href="#cb27-1" tabindex="-1"></a>col(<span class="st">"amount"</span>).between(<span class="dv">100</span>, <span class="dv">500</span>)</span></code></pre></div>
+<hr/>
+<h3 id="is_null-and-is_not_null"><code>is_null()</code> and <code>is_not_null()</code></h3>
+<p>Checks whether a column value is or is not <code>None</code>.</p>
+<p><strong>Inputs</strong></p>
+<p>None.</p>
+<p><strong>Output</strong></p>
+<table class="param-table">
+<thead>
+<tr class="header">
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>Condition</code></td>
+<td>NULL-check condition.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Example</strong></p>
+<div class="sourceCode" id="cb28"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb28-1"><a aria-hidden="true" href="#cb28-1" tabindex="-1"></a>col(<span class="st">"deleted_at"</span>).is_null()</span>
+<span id="cb28-2"><a aria-hidden="true" href="#cb28-2" tabindex="-1"></a>col(<span class="st">"email"</span>).is_not_null()</span></code></pre></div>
+<hr/>
+<h3 id="andconditions"><code>AND(*conditions)</code></h3>
+<p>Combines conditions with logical AND.</p>
+<p><strong>Inputs</strong></p>
+<table class="param-table">
+<thead>
+<tr class="header">
+<th>Parameter</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>conditions</code></td>
+<td><code>Condition...</code></td>
+<td>Conditions to combine.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Output</strong></p>
+<table class="param-table">
+<thead>
+<tr class="header">
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>Condition</code></td>
+<td>Combined AND condition.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Example</strong></p>
+<div class="sourceCode" id="cb29"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb29-1"><a aria-hidden="true" href="#cb29-1" tabindex="-1"></a>AND(col(<span class="st">"age"</span>) <span class="op">&gt;=</span> <span class="dv">18</span>, col(<span class="st">"status"</span>) <span class="op">==</span> <span class="st">"active"</span>)</span></code></pre></div>
+<hr/>
+<h3 id="orconditions"><code>OR(*conditions)</code></h3>
+<p>Combines conditions with logical OR.</p>
+<p><strong>Output</strong></p>
+<table class="param-table">
+<thead>
+<tr class="header">
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>Condition</code></td>
+<td>Combined OR condition.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Example</strong></p>
+<div class="sourceCode" id="cb30"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb30-1"><a aria-hidden="true" href="#cb30-1" tabindex="-1"></a>OR(col(<span class="st">"tier"</span>) <span class="op">==</span> <span class="st">"gold"</span>, col(<span class="st">"tier"</span>) <span class="op">==</span> <span class="st">"platinum"</span>)</span></code></pre></div>
+<hr/>
+<h3 id="notcondition"><code>NOT(condition)</code></h3>
+<p>Negates a condition.</p>
+<p><strong>Output</strong></p>
+<table class="param-table">
+<thead>
+<tr class="header">
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>Condition</code></td>
+<td>Negated condition.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Example</strong></p>
+<div class="sourceCode" id="cb31"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb31-1"><a aria-hidden="true" href="#cb31-1" tabindex="-1"></a>NOT(col(<span class="st">"status"</span>) <span class="op">==</span> <span class="st">"inactive"</span>)</span></code></pre></div>
+<hr/>
+<h2 id="join-functions">6. Join Functions</h2>
+<h3 id="joinother-..."><code>join(other, ...)</code></h3>
+<p>Joins the current query with another table, view, or query.</p>
+<p><strong>Inputs</strong></p>
+<table class="param-table">
+<colgroup>
+<col style="width: 25%"/>
+<col style="width: 25%"/>
+<col style="width: 25%"/>
+<col style="width: 25%"/>
+</colgroup>
+<thead>
+<tr class="header">
+<th>Parameter</th>
+<th>Type</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>other</code></td>
+<td><code>str \| Query</code></td>
+<td>required</td>
+<td>Table, view, or query to join.</td>
+</tr>
+<tr class="even">
+<td><code>on</code></td>
+<td><code>str \| tuple \| list[tuple] \| None</code></td>
+<td><code>None</code></td>
+<td>Join column definition.</td>
+</tr>
+<tr class="odd">
+<td><code>left_on</code></td>
+<td><code>str \| list[str] \| None</code></td>
+<td><code>None</code></td>
+<td>Left-side join columns.</td>
+</tr>
+<tr class="even">
+<td><code>right_on</code></td>
+<td><code>str \| list[str] \| None</code></td>
+<td><code>None</code></td>
+<td>Right-side join columns.</td>
+</tr>
+<tr class="odd">
+<td><code>method</code></td>
+<td><code>str</code></td>
+<td><code>"inner"</code></td>
+<td>Join type.</td>
+</tr>
+<tr class="even">
+<td><code>left_prefix</code></td>
+<td><code>str \| None</code></td>
+<td><code>None</code></td>
+<td>Prefix for left columns.</td>
+</tr>
+<tr class="odd">
+<td><code>right_prefix</code></td>
+<td><code>str \| None</code></td>
+<td><code>None</code></td>
+<td>Prefix for right columns.</td>
+</tr>
+<tr class="even">
+<td><code>prefix_columns</code></td>
+<td><code>bool</code></td>
+<td><code>True</code></td>
+<td>Whether to prefix output columns.</td>
+</tr>
+<tr class="odd">
+<td><code>preserve_prefixed_columns</code></td>
+<td><code>bool</code></td>
+<td><code>True</code></td>
+<td>Whether to preserve already-prefixed names.</td>
+</tr>
+<tr class="even">
+<td><code>suffixes</code></td>
+<td><code>tuple[str, str]</code></td>
+<td><code>("_left", "_right")</code></td>
+<td>Suffixes for name collisions.</td>
+</tr>
+<tr class="odd">
+<td><code>match_nulls</code></td>
+<td><code>bool</code></td>
+<td><code>False</code></td>
+<td>Whether <code>None</code> values match.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Output</strong></p>
+<table class="param-table">
+<thead>
+<tr class="header">
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>Query</code></td>
+<td>Joined query.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Example</strong></p>
+<div class="sourceCode" id="cb32"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb32-1"><a aria-hidden="true" href="#cb32-1" tabindex="-1"></a>db.query(<span class="st">"orders"</span>).join(<span class="st">"users"</span>)</span>
+<span id="cb32-2"><a aria-hidden="true" href="#cb32-2" tabindex="-1"></a>db.query(<span class="st">"orders"</span>).join(<span class="st">"users"</span>, on<span class="op">=</span>(<span class="st">"user_id"</span>, <span class="st">"id"</span>))</span>
+<span id="cb32-3"><a aria-hidden="true" href="#cb32-3" tabindex="-1"></a>db.query(<span class="st">"orders"</span>).join(<span class="st">"users"</span>, method<span class="op">=</span><span class="st">"left"</span>)</span></code></pre></div>
+<hr/>
+<h3 id="join-shortcuts">Join shortcuts</h3>
+<p>Shortcut functions call <code>join(..., method=...)</code>.</p>
+<table class="param-table">
+<thead>
+<tr class="header">
+<th>Function</th>
+<th>Join method</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>inner_join(other, **kwargs)</code></td>
+<td><code>inner</code></td>
+</tr>
+<tr class="even">
+<td><code>left_join(other, **kwargs)</code></td>
+<td><code>left</code></td>
+</tr>
+<tr class="odd">
+<td><code>right_join(other, **kwargs)</code></td>
+<td><code>right</code></td>
+</tr>
+<tr class="even">
+<td><code>full_join(other, **kwargs)</code></td>
+<td><code>full</code></td>
+</tr>
+<tr class="odd">
+<td><code>cross_join(other, **kwargs)</code></td>
+<td><code>cross</code></td>
+</tr>
+<tr class="even">
+<td><code>natural_join(other, **kwargs)</code></td>
+<td><code>natural</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Example</strong></p>
+<div class="sourceCode" id="cb33"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb33-1"><a aria-hidden="true" href="#cb33-1" tabindex="-1"></a>db.query(<span class="st">"orders"</span>).left_join(<span class="st">"users"</span>)</span></code></pre></div>
+<hr/>
+<h2 id="grouping-functions">7. Grouping Functions</h2>
+<h3 id="group_bycolumns"><code>group_by(*columns)</code></h3>
+<p>Starts a grouped query.</p>
+<p><strong>Inputs</strong></p>
+<table class="param-table">
+<thead>
+<tr class="header">
+<th>Parameter</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>columns</code></td>
+<td><code>str...</code> or <code>list[str]</code></td>
+<td>Columns to group by.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Output</strong></p>
+<table class="param-table">
+<thead>
+<tr class="header">
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>GroupedQuery</code></td>
+<td>A grouped query object.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Example</strong></p>
+<div class="sourceCode" id="cb34"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb34-1"><a aria-hidden="true" href="#cb34-1" tabindex="-1"></a>db.query(<span class="st">"orders"</span>).group_by(<span class="st">"status"</span>)</span></code></pre></div>
+<hr/>
+<h3 id="aggregateaggregations"><code>aggregate(**aggregations)</code></h3>
+<p>Adds aggregate columns to a grouped query.</p>
+<p><strong>Inputs</strong></p>
+<table class="param-table">
+<thead>
+<tr class="header">
+<th>Parameter</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>**aggregations</code></td>
+<td><code>AggregationSpec</code></td>
+<td>Named aggregation aliases.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Output</strong></p>
+<table class="param-table">
+<thead>
+<tr class="header">
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>GroupedQuery</code></td>
+<td>Grouped query with aggregations.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Example</strong></p>
+<div class="sourceCode" id="cb35"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb35-1"><a aria-hidden="true" href="#cb35-1" tabindex="-1"></a>(</span>
+<span id="cb35-2"><a aria-hidden="true" href="#cb35-2" tabindex="-1"></a>    db.query(<span class="st">"orders"</span>)</span>
+<span id="cb35-3"><a aria-hidden="true" href="#cb35-3" tabindex="-1"></a>      .group_by(<span class="st">"status"</span>)</span>
+<span id="cb35-4"><a aria-hidden="true" href="#cb35-4" tabindex="-1"></a>      .aggregate(</span>
+<span id="cb35-5"><a aria-hidden="true" href="#cb35-5" tabindex="-1"></a>          order_count<span class="op">=</span>count(),</span>
+<span id="cb35-6"><a aria-hidden="true" href="#cb35-6" tabindex="-1"></a>          total_amount<span class="op">=</span>sum_(<span class="st">"amount"</span>),</span>
+<span id="cb35-7"><a aria-hidden="true" href="#cb35-7" tabindex="-1"></a>      )</span>
+<span id="cb35-8"><a aria-hidden="true" href="#cb35-8" tabindex="-1"></a>)</span></code></pre></div>
+<hr/>
+<h3 id="havingcondition"><code>having(condition)</code></h3>
+<p>Filters grouped results after aggregation.</p>
+<p><strong>Inputs</strong></p>
+<table class="param-table">
+<thead>
+<tr class="header">
+<th>Parameter</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>condition</code></td>
+<td><code>Condition</code></td>
+<td>Condition over grouped result columns.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Output</strong></p>
+<table class="param-table">
+<thead>
+<tr class="header">
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>GroupedQuery</code></td>
+<td>Filtered grouped query.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Example</strong></p>
+<div class="sourceCode" id="cb36"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb36-1"><a aria-hidden="true" href="#cb36-1" tabindex="-1"></a>.having(col(<span class="st">"total_amount"</span>) <span class="op">&gt;</span> <span class="dv">1000</span>)</span></code></pre></div>
+<hr/>
+<h3 id="aggregation-specification-functions">Aggregation specification functions</h3>
+<table class="param-table">
+<colgroup>
+<col style="width: 25%"/>
+<col style="width: 25%"/>
+<col style="width: 25%"/>
+<col style="width: 25%"/>
+</colgroup>
+<thead>
+<tr class="header">
+<th>Function</th>
+<th>Input</th>
+<th>Output</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>count(column_name=None)</code></td>
+<td><code>str \| None</code></td>
+<td><code>AggregationSpec</code></td>
+<td>Counts rows or non-null values.</td>
+</tr>
+<tr class="even">
+<td><code>sum_(column_name)</code></td>
+<td><code>str</code></td>
+<td><code>AggregationSpec</code></td>
+<td>Sums a numeric column.</td>
+</tr>
+<tr class="odd">
+<td><code>avg(column_name)</code></td>
+<td><code>str</code></td>
+<td><code>AggregationSpec</code></td>
+<td>Computes average.</td>
+</tr>
+<tr class="even">
+<td><code>min_(column_name)</code></td>
+<td><code>str</code></td>
+<td><code>AggregationSpec</code></td>
+<td>Computes minimum.</td>
+</tr>
+<tr class="odd">
+<td><code>max_(column_name)</code></td>
+<td><code>str</code></td>
+<td><code>AggregationSpec</code></td>
+<td>Computes maximum.</td>
+</tr>
+</tbody>
+</table>
+<hr/>
+<h2 id="query-terminal-methods">8. Query Terminal Methods</h2>
+<h3 id="query.to_listdecryptfalse"><code>Query.to_list(decrypt=False)</code></h3>
+<p>Executes a query and returns rows as a list of dictionaries.</p>
+<p><strong>Output</strong></p>
+<table class="param-table">
+<thead>
+<tr class="header">
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>list[dict[str, Any]]</code></td>
+<td>Query rows.</td>
+</tr>
+</tbody>
+</table>
+<hr/>
+<h3 id="query.to_jsondecryptfalse-..."><code>Query.to_json(decrypt=False, ...)</code></h3>
+<p>Executes a query and returns JSON text.</p>
+<p><strong>Output</strong></p>
+<table class="param-table">
+<thead>
+<tr class="header">
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>str</code></td>
+<td>JSON string.</td>
+</tr>
+</tbody>
+</table>
+<hr/>
+<h3 id="query.to_pandasdecryptfalse"><code>Query.to_pandas(decrypt=False)</code></h3>
+<p>Executes a query and returns a pandas DataFrame.</p>
+<p><strong>Output</strong></p>
+<table class="param-table">
+<thead>
+<tr class="header">
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>pandas.DataFrame</code></td>
+<td>Query rows as a DataFrame.</td>
+</tr>
+</tbody>
+</table>
+<hr/>
+<h3 id="query.to_numpydecryptfalse"><code>Query.to_numpy(decrypt=False)</code></h3>
+<p>Executes a query and returns a NumPy array.</p>
+<p><strong>Output</strong></p>
+<table class="param-table">
+<thead>
+<tr class="header">
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>numpy.ndarray</code></td>
+<td>Query rows as an array.</td>
+</tr>
+</tbody>
+</table>
+<hr/>
+<h3 id="first"><code>first()</code></h3>
+<p>Returns the first row or <code>None</code>.</p>
+<p><strong>Output</strong></p>
+<table class="param-table">
+<thead>
+<tr class="header">
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>dict[str, Any] \| None</code></td>
+<td>First row or <code>None</code>.</td>
+</tr>
+</tbody>
+</table>
+<hr/>
+<h3 id="one"><code>one()</code></h3>
+<p>Returns exactly one row.</p>
+<p><strong>Output</strong></p>
+<table class="param-table">
+<thead>
+<tr class="header">
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>dict[str, Any]</code></td>
+<td>The single matching row.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Raises</strong></p>
+<ul>
+<li><code>NoRowsFoundError</code> if there are zero rows.</li>
+<li><code>MultipleRowsFoundError</code> if there is more than one row.</li>
+</ul>
+<hr/>
+<h3 id="exists"><code>exists()</code></h3>
+<p>Checks whether the query returns any rows.</p>
+<p><strong>Output</strong></p>
+<table class="param-table">
+<thead>
+<tr class="header">
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>bool</code></td>
+<td><code>True</code> if at least one row exists.</td>
+</tr>
+</tbody>
+</table>
+<hr/>
+<h3 id="pluckcolumn_name"><code>pluck(column_name)</code></h3>
+<p>Returns one column as a list.</p>
+<p><strong>Inputs</strong></p>
+<table class="param-table">
+<thead>
+<tr class="header">
+<th>Parameter</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>column_name</code></td>
+<td><code>str</code></td>
+<td>Column to extract.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Output</strong></p>
+<table class="param-table">
+<thead>
+<tr class="header">
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>list[Any]</code></td>
+<td>Column values.</td>
+</tr>
+</tbody>
+</table>
+<hr/>
+<h3 id="query-aggregate-terminal-methods">Query aggregate terminal methods</h3>
+<table class="param-table">
+<colgroup>
+<col style="width: 25%"/>
+<col style="width: 25%"/>
+<col style="width: 25%"/>
+<col style="width: 25%"/>
+</colgroup>
+<thead>
+<tr class="header">
+<th>Function</th>
+<th>Input</th>
+<th>Output</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>count(column_name=None)</code></td>
+<td><code>str \| None</code></td>
+<td><code>int</code></td>
+<td>Counts rows or non-null values.</td>
+</tr>
+<tr class="even">
+<td><code>sum(column_name)</code></td>
+<td><code>str</code></td>
+<td><code>int \| float \| None</code></td>
+<td>Sums a numeric column.</td>
+</tr>
+<tr class="odd">
+<td><code>avg(column_name)</code></td>
+<td><code>str</code></td>
+<td><code>float \| None</code></td>
+<td>Computes average.</td>
+</tr>
+<tr class="even">
+<td><code>average(column_name)</code></td>
+<td><code>str</code></td>
+<td><code>float \| None</code></td>
+<td>Alias for <code>avg</code>.</td>
+</tr>
+<tr class="odd">
+<td><code>min(column_name)</code></td>
+<td><code>str</code></td>
+<td><code>Any \| None</code></td>
+<td>Minimum value.</td>
+</tr>
+<tr class="even">
+<td><code>max(column_name)</code></td>
+<td><code>str</code></td>
+<td><code>Any \| None</code></td>
+<td>Maximum value.</td>
+</tr>
+</tbody>
+</table>
+<hr/>
+<h2 id="view-functions">9. View Functions</h2>
+<h3 id="create_viewview_name-query_builder-descriptionnone"><code>create_view(view_name, query_builder, description=None)</code></h3>
+<p>Creates a named logical view.</p>
+<p><strong>Inputs</strong></p>
+<table class="param-table">
+<colgroup>
+<col style="width: 25%"/>
+<col style="width: 25%"/>
+<col style="width: 25%"/>
+<col style="width: 25%"/>
+</colgroup>
+<thead>
+<tr class="header">
+<th>Parameter</th>
+<th>Type</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>view_name</code></td>
+<td><code>str</code></td>
+<td>required</td>
+<td>Name of the view.</td>
+</tr>
+<tr class="even">
+<td><code>query_builder</code></td>
+<td><code>Callable[[RelPy], Query]</code></td>
+<td>required</td>
+<td>Function that builds the view query.</td>
+</tr>
+<tr class="odd">
+<td><code>description</code></td>
+<td><code>str \| None</code></td>
+<td><code>None</code></td>
+<td>Optional description.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Output</strong></p>
+<table class="param-table">
+<thead>
+<tr class="header">
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>RelPy</code></td>
+<td>The same database object.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Example</strong></p>
+<div class="sourceCode" id="cb37"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb37-1"><a aria-hidden="true" href="#cb37-1" tabindex="-1"></a>db.create_view(</span>
+<span id="cb37-2"><a aria-hidden="true" href="#cb37-2" tabindex="-1"></a>    <span class="st">"active_users"</span>,</span>
+<span id="cb37-3"><a aria-hidden="true" href="#cb37-3" tabindex="-1"></a>    <span class="kw">lambda</span> db: db.query(<span class="st">"users"</span>).where(col(<span class="st">"status"</span>) <span class="op">==</span> <span class="st">"active"</span>),</span>
+<span id="cb37-4"><a aria-hidden="true" href="#cb37-4" tabindex="-1"></a>)</span></code></pre></div>
+<hr/>
+<h3 id="viewview_name"><code>view(view_name)</code></h3>
+<p>Evaluates and returns a view query.</p>
+<p><strong>Inputs</strong></p>
+<table class="param-table">
+<thead>
+<tr class="header">
+<th>Parameter</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>view_name</code></td>
+<td><code>str</code></td>
+<td>View name.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Output</strong></p>
+<table class="param-table">
+<thead>
+<tr class="header">
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>Query</code></td>
+<td>Query returned by the view builder.</td>
+</tr>
+</tbody>
+</table>
+<hr/>
+<h3 id="drop_viewview_name"><code>drop_view(view_name)</code></h3>
+<p>Drops a view.</p>
+<p><strong>Output</strong></p>
+<table class="param-table">
+<thead>
+<tr class="header">
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>RelPy</code></td>
+<td>The same database object.</td>
+</tr>
+</tbody>
+</table>
+<hr/>
+<h3 id="list_views"><code>list_views()</code></h3>
+<p>Lists view names.</p>
+<p><strong>Output</strong></p>
+<table class="param-table">
+<thead>
+<tr class="header">
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>list[str]</code></td>
+<td>View names.</td>
+</tr>
+</tbody>
+</table>
+<hr/>
+<h3 id="describe_viewview_name"><code>describe_view(view_name)</code></h3>
+<p>Describes one view.</p>
+<p><strong>Output</strong></p>
+<table class="param-table">
+<thead>
+<tr class="header">
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>dict[str, Any]</code></td>
+<td>View metadata.</td>
+</tr>
+</tbody>
+</table>
+<hr/>
+<h3 id="describe_views"><code>describe_views()</code></h3>
+<p>Describes all views.</p>
+<p><strong>Output</strong></p>
+<table class="param-table">
+<thead>
+<tr class="header">
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>dict[str, dict[str, Any]]</code></td>
+<td>Metadata for all views.</td>
+</tr>
+</tbody>
+</table>
+<hr/>
+<h2 id="index-functions">10. Index Functions</h2>
+<h3 id="create_indextable_name-columns-namenone-uniquefalse-nulls_distincttrue"><code>create_index(table_name, columns, name=None, unique=False, nulls_distinct=True)</code></h3>
+<p>Creates an index.</p>
+<p><strong>Inputs</strong></p>
+<table class="param-table">
+<colgroup>
+<col style="width: 25%"/>
+<col style="width: 25%"/>
+<col style="width: 25%"/>
+<col style="width: 25%"/>
+</colgroup>
+<thead>
+<tr class="header">
+<th>Parameter</th>
+<th>Type</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>table_name</code></td>
+<td><code>str</code></td>
+<td>required</td>
+<td>Target table.</td>
+</tr>
+<tr class="even">
+<td><code>columns</code></td>
+<td><code>str \| list[str] \| tuple[str, ...]</code></td>
+<td>required</td>
+<td>Indexed column or columns.</td>
+</tr>
+<tr class="odd">
+<td><code>name</code></td>
+<td><code>str \| None</code></td>
+<td><code>None</code></td>
+<td>Optional index name.</td>
+</tr>
+<tr class="even">
+<td><code>unique</code></td>
+<td><code>bool</code></td>
+<td><code>False</code></td>
+<td>Whether values must be unique.</td>
+</tr>
+<tr class="odd">
+<td><code>nulls_distinct</code></td>
+<td><code>bool</code></td>
+<td><code>True</code></td>
+<td>Whether nulls are distinct in unique indexes.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Output</strong></p>
+<table class="param-table">
+<thead>
+<tr class="header">
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>RelPy</code></td>
+<td>The same database object.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Example</strong></p>
+<div class="sourceCode" id="cb38"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb38-1"><a aria-hidden="true" href="#cb38-1" tabindex="-1"></a>db.create_index(<span class="st">"users"</span>, <span class="st">"email"</span>)</span>
+<span id="cb38-2"><a aria-hidden="true" href="#cb38-2" tabindex="-1"></a>db.create_index(<span class="st">"orders"</span>, [<span class="st">"customer_id"</span>, <span class="st">"status"</span>])</span></code></pre></div>
+<hr/>
+<h3 id="drop_indexindex_name"><code>drop_index(index_name)</code></h3>
+<p>Drops an index.</p>
+<p><strong>Inputs</strong></p>
+<table class="param-table">
+<thead>
+<tr class="header">
+<th>Parameter</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>index_name</code></td>
+<td><code>str</code></td>
+<td>Index name.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Output</strong></p>
+<table class="param-table">
+<thead>
+<tr class="header">
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>RelPy</code></td>
+<td>The same database object.</td>
+</tr>
+</tbody>
+</table>
+<hr/>
+<h3 id="list_indexestable_namenone"><code>list_indexes(table_name=None)</code></h3>
+<p>Lists indexes.</p>
+<p><strong>Inputs</strong></p>
+<table class="param-table">
+<thead>
+<tr class="header">
+<th>Parameter</th>
+<th>Type</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>table_name</code></td>
+<td><code>str \| None</code></td>
+<td><code>None</code></td>
+<td>Optional table filter.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Output</strong></p>
+<table class="param-table">
+<thead>
+<tr class="header">
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>list[str]</code></td>
+<td>Index names.</td>
+</tr>
+</tbody>
+</table>
+<hr/>
+<h3 id="describe_indexindex_name"><code>describe_index(index_name)</code></h3>
+<p>Describes one index.</p>
+<p><strong>Output</strong></p>
+<table class="param-table">
+<thead>
+<tr class="header">
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>dict[str, Any]</code></td>
+<td>Index metadata.</td>
+</tr>
+</tbody>
+</table>
+<hr/>
+<h3 id="describe_indexestable_namenone"><code>describe_indexes(table_name=None)</code></h3>
+<p>Describes all indexes, optionally filtered by table.</p>
+<p><strong>Output</strong></p>
+<table class="param-table">
+<thead>
+<tr class="header">
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>dict[str, dict[str, Any]]</code></td>
+<td>Index metadata.</td>
+</tr>
+</tbody>
+</table>
+<hr/>
+<h2 id="table-export-functions">11. Table Export Functions</h2>
+<p>These functions are methods on the <code>RelPy</code> object.</p>
+<p>They usually support: - whole table export - single column export - single row export through <code>where_key</code> - encrypted export through <code>decrypt=True</code></p>
+<h3 id="to_listtable_name-column_namenone-where_keynone-decryptfalse"><code>to_list(table_name, column_name=None, where_key=None, decrypt=False)</code></h3>
+<p>Exports table data as Python lists.</p>
+<p><strong>Inputs</strong></p>
+<table class="param-table">
+<colgroup>
+<col style="width: 25%"/>
+<col style="width: 25%"/>
+<col style="width: 25%"/>
+<col style="width: 25%"/>
+</colgroup>
+<thead>
+<tr class="header">
+<th>Parameter</th>
+<th>Type</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>table_name</code></td>
+<td><code>str</code></td>
+<td>required</td>
+<td>Table to export.</td>
+</tr>
+<tr class="even">
+<td><code>column_name</code></td>
+<td><code>str \| None</code></td>
+<td><code>None</code></td>
+<td>Optional column to export.</td>
+</tr>
+<tr class="odd">
+<td><code>where_key</code></td>
+<td><code>dict[str, Any] \| None</code></td>
+<td><code>None</code></td>
+<td>Optional primary-key lookup.</td>
+</tr>
+<tr class="even">
+<td><code>decrypt</code></td>
+<td><code>bool</code></td>
+<td><code>False</code></td>
+<td>Whether to decrypt encrypted values.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Output</strong></p>
+<table class="param-table">
+<colgroup>
+<col style="width: 50%"/>
+<col style="width: 50%"/>
+</colgroup>
+<thead>
+<tr class="header">
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>list[dict[str, Any]] \| list[Any]</code></td>
+<td>Exported rows or column values.</td>
+</tr>
+</tbody>
+</table>
+<hr/>
+<h3 id="to_jsontable_name-column_namenone-where_keynone-decryptfalse-..."><code>to_json(table_name, column_name=None, where_key=None, decrypt=False, ...)</code></h3>
+<p>Exports table data as JSON text.</p>
+<p><strong>Output</strong></p>
+<table class="param-table">
+<thead>
+<tr class="header">
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>str</code></td>
+<td>JSON text.</td>
+</tr>
+</tbody>
+</table>
+<hr/>
+<h3 id="to_pandastable_name-column_namenone-where_keynone-decryptfalse"><code>to_pandas(table_name, column_name=None, where_key=None, decrypt=False)</code></h3>
+<p>Exports table data to pandas.</p>
+<p><strong>Output</strong></p>
+<table class="param-table">
+<thead>
+<tr class="header">
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>pandas.DataFrame</code></td>
+<td>DataFrame containing exported data.</td>
+</tr>
+</tbody>
+</table>
+<hr/>
+<h3 id="to_numpytable_name-column_namenone-where_keynone-decryptfalse-dtypenone"><code>to_numpy(table_name, column_name=None, where_key=None, decrypt=False, dtype=None)</code></h3>
+<p>Exports table data to NumPy.</p>
+<p><strong>Output</strong></p>
+<table class="param-table">
+<thead>
+<tr class="header">
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>numpy.ndarray</code></td>
+<td>NumPy array.</td>
+</tr>
+</tbody>
+</table>
+<hr/>
+<h3 id="to_sqltable_name-rownone-where_keynone-decryptfalse"><code>to_sql(table_name, row=None, where_key=None, decrypt=False)</code></h3>
+<p>Exports table rows as SQL INSERT statements.</p>
+<p><strong>Inputs</strong></p>
+<table class="param-table">
+<colgroup>
+<col style="width: 25%"/>
+<col style="width: 25%"/>
+<col style="width: 25%"/>
+<col style="width: 25%"/>
+</colgroup>
+<thead>
+<tr class="header">
+<th>Parameter</th>
+<th>Type</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>table_name</code></td>
+<td><code>str</code></td>
+<td>required</td>
+<td>Source table.</td>
+</tr>
+<tr class="even">
+<td><code>row</code></td>
+<td><code>dict[str, Any] \| None</code></td>
+<td><code>None</code></td>
+<td>Optional explicit row.</td>
+</tr>
+<tr class="odd">
+<td><code>where_key</code></td>
+<td><code>dict[str, Any] \| None</code></td>
+<td><code>None</code></td>
+<td>Optional primary-key lookup.</td>
+</tr>
+<tr class="even">
+<td><code>decrypt</code></td>
+<td><code>bool</code></td>
+<td><code>False</code></td>
+<td>Required for encrypted plaintext export.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Output</strong></p>
+<table class="param-table">
+<thead>
+<tr class="header">
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>str</code></td>
+<td>SQL INSERT statements.</td>
+</tr>
+</tbody>
+</table>
+<hr/>
+<h3 id="to_ddl"><code>to_ddl()</code></h3>
+<p>Exports the schema as SQL DDL.</p>
+<p><strong>Inputs</strong></p>
+<p>None.</p>
+<p><strong>Output</strong></p>
+<table class="param-table">
+<thead>
+<tr class="header">
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>str</code></td>
+<td>SQL CREATE TABLE statements.</td>
+</tr>
+</tbody>
+</table>
+<hr/>
+<h3 id="print_tabletable_name-limit3-max_width24-decryptfalse"><code>print_table(table_name, limit=3, max_width=24, decrypt=False)</code></h3>
+<p>Prints a table preview.</p>
+<p><strong>Inputs</strong></p>
+<table class="param-table">
+<thead>
+<tr class="header">
+<th>Parameter</th>
+<th>Type</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>table_name</code></td>
+<td><code>str</code></td>
+<td>required</td>
+<td>Table to preview.</td>
+</tr>
+<tr class="even">
+<td><code>limit</code></td>
+<td><code>int</code></td>
+<td><code>3</code></td>
+<td>Number of rows to print.</td>
+</tr>
+<tr class="odd">
+<td><code>max_width</code></td>
+<td><code>int</code></td>
+<td><code>24</code></td>
+<td>Maximum cell width.</td>
+</tr>
+<tr class="even">
+<td><code>decrypt</code></td>
+<td><code>bool</code></td>
+<td><code>False</code></td>
+<td>Whether to decrypt encrypted values.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Output</strong></p>
+<table class="param-table">
+<thead>
+<tr class="header">
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>None</code></td>
+<td>Prints output to stdout.</td>
+</tr>
+</tbody>
+</table>
+<hr/>
+<h2 id="persistence-functions">12. Persistence Functions</h2>
+<h3 id="savefile_path-indent2"><code>save(file_path, indent=2)</code></h3>
+<p>Saves the database to a <code>.relpy.json</code> file.</p>
+<p><strong>Inputs</strong></p>
+<table class="param-table">
+<thead>
+<tr class="header">
+<th>Parameter</th>
+<th>Type</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>file_path</code></td>
+<td><code>str \| Path</code></td>
+<td>required</td>
+<td>Target file path.</td>
+</tr>
+<tr class="even">
+<td><code>indent</code></td>
+<td><code>int \| None</code></td>
+<td><code>2</code></td>
+<td>JSON indentation.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Output</strong></p>
+<table class="param-table">
+<thead>
+<tr class="header">
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>None</code></td>
+<td>Writes a file.</td>
+</tr>
+</tbody>
+</table>
+<hr/>
+<h3 id="loadfile_path-encryption_keynone"><code>load(file_path, encryption_key=None)</code></h3>
+<p>Loads a database from a <code>.relpy.json</code> file.</p>
+<p><strong>Inputs</strong></p>
+<table class="param-table">
+<colgroup>
+<col style="width: 25%"/>
+<col style="width: 25%"/>
+<col style="width: 25%"/>
+<col style="width: 25%"/>
+</colgroup>
+<thead>
+<tr class="header">
+<th>Parameter</th>
+<th>Type</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>file_path</code></td>
+<td><code>str \| Path</code></td>
+<td>required</td>
+<td>Source file path.</td>
+</tr>
+<tr class="even">
+<td><code>encryption_key</code></td>
+<td><code>bytes \| str \| None</code></td>
+<td><code>None</code></td>
+<td>Optional key for encrypted data.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Output</strong></p>
+<table class="param-table">
+<thead>
+<tr class="header">
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>RelPy</code></td>
+<td>Loaded database object.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Example</strong></p>
+<div class="sourceCode" id="cb39"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb39-1"><a aria-hidden="true" href="#cb39-1" tabindex="-1"></a>db <span class="op">=</span> RelPy.load(<span class="st">"database.relpy.json"</span>)</span>
+<span id="cb39-2"><a aria-hidden="true" href="#cb39-2" tabindex="-1"></a>db <span class="op">=</span> RelPy.load(<span class="st">"database.relpy.json"</span>, encryption_key<span class="op">=</span>key)</span></code></pre></div>
+<hr/>
+<h2 id="encryption-functions">13. Encryption Functions</h2>
+<h3 id="generate_encryption_key"><code>generate_encryption_key()</code></h3>
+<p>Generates a key for encrypted columns.</p>
+<p><strong>Inputs</strong></p>
+<p>None.</p>
+<p><strong>Output</strong></p>
+<table class="param-table">
+<thead>
+<tr class="header">
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>bytes</code></td>
+<td>Encryption key.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Example</strong></p>
+<div class="sourceCode" id="cb40"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb40-1"><a aria-hidden="true" href="#cb40-1" tabindex="-1"></a>key <span class="op">=</span> RelPy.generate_encryption_key()</span></code></pre></div>
+<hr/>
+<h3 id="set_encryption_keyencryption_key"><code>set_encryption_key(encryption_key)</code></h3>
+<p>Sets the encryption key on an existing database object.</p>
+<p><strong>Inputs</strong></p>
+<table class="param-table">
+<colgroup>
+<col style="width: 33%"/>
+<col style="width: 33%"/>
+<col style="width: 33%"/>
+</colgroup>
+<thead>
+<tr class="header">
+<th>Parameter</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>encryption_key</code></td>
+<td><code>bytes \| str</code></td>
+<td>Key generated by <code>generate_encryption_key()</code>.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Output</strong></p>
+<table class="param-table">
+<thead>
+<tr class="header">
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>None</code></td>
+<td>Updates the object state.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Example</strong></p>
+<div class="sourceCode" id="cb41"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb41-1"><a aria-hidden="true" href="#cb41-1" tabindex="-1"></a>db.set_encryption_key(key)</span></code></pre></div>
+<hr/>
+<h2 id="exceptions">14. Exceptions</h2>
+<p>RelPyDB defines a custom exception hierarchy.</p>
+<h3 id="base-exceptions">Base exceptions</h3>
+<table class="param-table">
+<thead>
+<tr class="header">
+<th>Exception</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>RelPyError</code></td>
+<td>Base exception for all RelPyDB errors.</td>
+</tr>
+<tr class="even">
+<td><code>RelPyValueError</code></td>
+<td>Base for RelPyDB value errors.</td>
+</tr>
+<tr class="odd">
+<td><code>RelPyTypeError</code></td>
+<td>Base for RelPyDB type errors.</td>
+</tr>
+<tr class="even">
+<td><code>RelPyLookupError</code></td>
+<td>Base for lookup errors.</td>
+</tr>
+<tr class="odd">
+<td><code>RelPyKeyError</code></td>
+<td>Base for key errors.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="specific-exceptions">Specific exceptions</h3>
+<table class="param-table">
+<colgroup>
+<col style="width: 50%"/>
+<col style="width: 50%"/>
+</colgroup>
+<thead>
+<tr class="header">
+<th>Exception</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>SchemaError</code></td>
+<td>Invalid schema operation.</td>
+</tr>
+<tr class="even">
+<td><code>TableNotFoundError</code></td>
+<td>Table does not exist.</td>
+</tr>
+<tr class="odd">
+<td><code>ColumnNotFoundError</code></td>
+<td>Column does not exist.</td>
+</tr>
+<tr class="even">
+<td><code>ConstraintError</code></td>
+<td>Relational constraint violation.</td>
+</tr>
+<tr class="odd">
+<td><code>QueryError</code></td>
+<td>Invalid query operation.</td>
+</tr>
+<tr class="even">
+<td><code>QueryTypeError</code></td>
+<td>Invalid query argument type.</td>
+</tr>
+<tr class="odd">
+<td><code>ViewError</code></td>
+<td>Invalid view operation.</td>
+</tr>
+<tr class="even">
+<td><code>RowNotFoundError</code></td>
+<td>Requested row does not exist.</td>
+</tr>
+<tr class="odd">
+<td><code>NoRowsFoundError</code></td>
+<td><code>one()</code> expected one row but found none.</td>
+</tr>
+<tr class="even">
+<td><code>MultipleRowsFoundError</code></td>
+<td><code>one()</code> expected one row but found multiple rows.</td>
+</tr>
+<tr class="odd">
+<td><code>EncryptionError</code></td>
+<td>Encryption/decryption error.</td>
+</tr>
+</tbody>
+</table>
+<hr/>
+<h2 id="minimal-end-to-end-example">15. Minimal End-to-End Example</h2>
+<div class="sourceCode" id="cb42"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb42-1"><a aria-hidden="true" href="#cb42-1" tabindex="-1"></a><span class="im">from</span> relpy <span class="im">import</span> RelPy, AutoNumber, col, count</span>
+<span id="cb42-2"><a aria-hidden="true" href="#cb42-2" tabindex="-1"></a></span>
+<span id="cb42-3"><a aria-hidden="true" href="#cb42-3" tabindex="-1"></a>db <span class="op">=</span> RelPy()</span>
+<span id="cb42-4"><a aria-hidden="true" href="#cb42-4" tabindex="-1"></a></span>
+<span id="cb42-5"><a aria-hidden="true" href="#cb42-5" tabindex="-1"></a>db.create_table(<span class="st">"users"</span>)</span>
+<span id="cb42-6"><a aria-hidden="true" href="#cb42-6" tabindex="-1"></a>db.add_column(<span class="st">"users"</span>, <span class="st">"id"</span>, AutoNumber, is_primary_key<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb42-7"><a aria-hidden="true" href="#cb42-7" tabindex="-1"></a>db.add_column(<span class="st">"users"</span>, <span class="st">"name"</span>, <span class="bu">str</span>, nullable<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb42-8"><a aria-hidden="true" href="#cb42-8" tabindex="-1"></a></span>
+<span id="cb42-9"><a aria-hidden="true" href="#cb42-9" tabindex="-1"></a>db.create_table(<span class="st">"orders"</span>)</span>
+<span id="cb42-10"><a aria-hidden="true" href="#cb42-10" tabindex="-1"></a>db.add_column(<span class="st">"orders"</span>, <span class="st">"id"</span>, AutoNumber, is_primary_key<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb42-11"><a aria-hidden="true" href="#cb42-11" tabindex="-1"></a>db.add_column(<span class="st">"orders"</span>, <span class="st">"user_id"</span>, <span class="bu">int</span>, nullable<span class="op">=</span><span class="va">False</span>, references<span class="op">=</span><span class="st">"users.id"</span>)</span>
+<span id="cb42-12"><a aria-hidden="true" href="#cb42-12" tabindex="-1"></a>db.add_column(<span class="st">"orders"</span>, <span class="st">"status"</span>, <span class="bu">str</span>, nullable<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb42-13"><a aria-hidden="true" href="#cb42-13" tabindex="-1"></a></span>
+<span id="cb42-14"><a aria-hidden="true" href="#cb42-14" tabindex="-1"></a>alice <span class="op">=</span> db.insert(<span class="st">"users"</span>, {<span class="st">"name"</span>: <span class="st">"Alice"</span>})</span>
+<span id="cb42-15"><a aria-hidden="true" href="#cb42-15" tabindex="-1"></a></span>
+<span id="cb42-16"><a aria-hidden="true" href="#cb42-16" tabindex="-1"></a>db.insert_many(<span class="st">"orders"</span>, [</span>
+<span id="cb42-17"><a aria-hidden="true" href="#cb42-17" tabindex="-1"></a>    {<span class="st">"user_id"</span>: alice[<span class="st">"id"</span>], <span class="st">"status"</span>: <span class="st">"paid"</span>},</span>
+<span id="cb42-18"><a aria-hidden="true" href="#cb42-18" tabindex="-1"></a>    {<span class="st">"user_id"</span>: alice[<span class="st">"id"</span>], <span class="st">"status"</span>: <span class="st">"paid"</span>},</span>
+<span id="cb42-19"><a aria-hidden="true" href="#cb42-19" tabindex="-1"></a>])</span>
+<span id="cb42-20"><a aria-hidden="true" href="#cb42-20" tabindex="-1"></a></span>
+<span id="cb42-21"><a aria-hidden="true" href="#cb42-21" tabindex="-1"></a>result <span class="op">=</span> (</span>
+<span id="cb42-22"><a aria-hidden="true" href="#cb42-22" tabindex="-1"></a>    db.query(<span class="st">"orders"</span>)</span>
+<span id="cb42-23"><a aria-hidden="true" href="#cb42-23" tabindex="-1"></a>      .join(<span class="st">"users"</span>)</span>
+<span id="cb42-24"><a aria-hidden="true" href="#cb42-24" tabindex="-1"></a>      .where(col(<span class="st">"orders.status"</span>) <span class="op">==</span> <span class="st">"paid"</span>)</span>
+<span id="cb42-25"><a aria-hidden="true" href="#cb42-25" tabindex="-1"></a>      .group_by(<span class="st">"users.name"</span>)</span>
+<span id="cb42-26"><a aria-hidden="true" href="#cb42-26" tabindex="-1"></a>      .aggregate(order_count<span class="op">=</span>count())</span>
+<span id="cb42-27"><a aria-hidden="true" href="#cb42-27" tabindex="-1"></a>      .to_list()</span>
+<span id="cb42-28"><a aria-hidden="true" href="#cb42-28" tabindex="-1"></a>)</span>
+<span id="cb42-29"><a aria-hidden="true" href="#cb42-29" tabindex="-1"></a></span>
+<span id="cb42-30"><a aria-hidden="true" href="#cb42-30" tabindex="-1"></a><span class="bu">print</span>(result)</span></code></pre></div>
+<p>Expected output:</p>
+<div class="sourceCode" id="cb43"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb43-1"><a aria-hidden="true" href="#cb43-1" tabindex="-1"></a>[</span>
+<span id="cb43-2"><a aria-hidden="true" href="#cb43-2" tabindex="-1"></a>    {</span>
+<span id="cb43-3"><a aria-hidden="true" href="#cb43-3" tabindex="-1"></a>        <span class="st">"users.name"</span>: <span class="st">"Alice"</span>,</span>
+<span id="cb43-4"><a aria-hidden="true" href="#cb43-4" tabindex="-1"></a>        <span class="st">"order_count"</span>: <span class="dv">2</span>,</span>
+<span id="cb43-5"><a aria-hidden="true" href="#cb43-5" tabindex="-1"></a>    }</span>
+<span id="cb43-6"><a aria-hidden="true" href="#cb43-6" tabindex="-1"></a>]</span></code></pre></div>
+<section class="doc-topic">
+<h2>Recommended explicit join syntax</h2>
+<p>For a single-column explicit join, prefer a tuple for <code>on</code>:</p>
+<pre><code>db.query("orders").inner_join(
+    "support_tickets",
+    on=("customer_id", "customer_id"),
+)</code></pre>
+<p>This means:</p>
+<pre><code>orders.customer_id = support_tickets.customer_id</code></pre>
+<p>Avoid documenting <code>on=["customer_id", "customer_id"]</code> as the main style. A list looks like a list of columns and becomes confusing when composite joins are introduced.</p>
+<p>For maximum clarity, use <code>left_on</code> and <code>right_on</code>:</p>
+<pre><code>db.query("orders").inner_join(
+    "support_tickets",
+    left_on="customer_id",
+    right_on="customer_id",
+)</code></pre>
+<p>For a composite join, use a list of pairs:</p>
+<pre><code>db.query("orders").inner_join(
+    "support_tickets",
+    on=[
+        ("customer_id", "customer_id"),
+        ("region_id", "region_id"),
+    ],
+)</code></pre>
+</section>
+<section class="doc-topic">
+<h2>Full join shortcuts example</h2>
+<p>The example below shows the shortcut methods that map directly to join methods.</p>
+<pre><code>from relpy import RelPy, AutoNumber
+
+db = RelPy()
+
+db.create_table("users")
+db.add_column("users", "id", AutoNumber, is_primary_key=True)
+db.add_column("users", "name", str, nullable=False)
+
+db.create_table("orders")
+db.add_column("orders", "id", AutoNumber, is_primary_key=True)
+db.add_column("orders", "user_id", int, nullable=True, references="users.id")
+db.add_column("orders", "amount", float, nullable=False)
+
+alice = db.insert("users", {"name": "Alice"})
+bob = db.insert("users", {"name": "Bob"})
+
+db.insert_many("orders", [
+    {"user_id": alice["id"], "amount": 120.0},
+    {"user_id": alice["id"], "amount": 80.0},
+])
+
+inner_rows = db.query("orders").inner_join("users").to_list()
+left_rows = db.query("orders").left_join("users").to_list()
+right_rows = db.query("orders").right_join("users").to_list()
+full_rows = db.query("orders").full_join("users").to_list()
+cross_rows = db.query("orders").cross_join("users").to_list()
+
+print(inner_rows)
+print(left_rows)
+print(right_rows)
+print(full_rows)
+print(cross_rows)</code></pre>
+<p>Use <code>inner_join</code> when you only want matching rows. Use <code>left_join</code> when every left-side row should appear. Use <code>right_join</code> when every right-side row should appear. Use <code>full_join</code> when unmatched rows from both sides should appear. Use <code>cross_join</code> when you want every combination of rows.</p>
+</section>
+</article>
+</section>
+</main>
+<footer class="footer"><div class="footer-inner"><div class="footer-brand">RelPyDB<small>Relational objects for Python</small></div><nav class="footer-links"><a href="../index.html">Home</a><a href="../installation.html">Installation</a><a href="../docs/start-here.html">Start Here</a><a href="../docs/index.html">Docs</a><a href="../ide.html">Online IDE</a><a href="https://github.com/mandelreouven2002/RelPyDB" rel="noreferrer" target="_blank">GitHub ↗</a></nav></div></footer>
+<script src="../script.js"></script></body></html>
