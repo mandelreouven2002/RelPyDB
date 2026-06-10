@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1" name="viewport"/><title>2. Why RelPyDB? - RelPyDB</title><link href="../styles.css" rel="stylesheet"/></head><body>
+<header class="topbar"><a class="brand" href="../index.html"><span class="brand-mark">Rp</span><span><strong>RelPyDB</strong><small>Relational Python</small></span></a><button aria-expanded="false" class="nav-toggle" type="button"><svg viewbox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"></path></svg><span class="sr-only">Menu</span></button><nav class="site-nav"><a href="../index.html">Home</a><a href="../installation.html">Installation</a><a href="../docs/start-here.html">Start Here</a><a class="active" href="../docs/index.html">Docs</a><a href="../ide.html">Online IDE</a><a href="https://github.com/mandelreouven2002/RelPyDB" rel="noreferrer" target="_blank">GitHub</a></nav></header>
+<main>
+<section class="docs-layout">
+<aside class="docs-sidebar"><div class="docs-sidebar-header"><span>Documentation</span><input id="docs-filter" placeholder="Filter docs..." type="search"/></div><nav class="docs-tree"><a class="" href="index.html">Docs Overview</a><a class="" href="start-here.html">0. Start Here</a><a class="" href="quickstart.html">1. 5-Minute Quickstart</a><a class="" href="tutorial-shop.html">2. Full Tutorial</a><a class="" href="recipes.html">3. Common Recipes</a><a class="active" href="why-relpy.html">4. Why RelPyDB?</a><a class="" href="alternatives.html">5. RelPyDB vs Alternatives</a><a class="" href="concepts.html">6. Concepts</a><a class="" href="tables-schema.html">7. Tables and Schema</a><a class="" href="data-operations.html">8. Data Operations</a><a class="" href="querying.html">9. Querying</a><a class="" href="joins.html">10. Joins</a><a class="" href="grouping.html">11. Grouping</a><a class="" href="views.html">12. Views</a><a class="" href="indexes.html">13. Indexes</a><a class="" href="exports.html">14. Exports</a><a class="" href="persistence.html">15. Persistence</a><a class="" href="encryption.html">16. Encryption</a><a class="" href="python-integration.html">17. Python Integration</a><a class="" href="capabilities.html">18. Full Capability Checklist</a><a class="" href="errors-limitations.html">19. Common Errors and Limitations</a><a class="" href="api-reference.html">20. API Reference</a><a class="" href="api-functions.html">21. Function Reference</a><a class="" href="examples.html">22. Examples</a></nav></aside>
+<article class="docs-content"><section class="page-title docs-page-title"><p class="eyebrow">Documentation</p><h1>2. Why RelPyDB?</h1><p>Where RelPyDB fits relative to dicts, pandas, SQLite, and ORMs — and when to reach for each.</p></section>
+<section class="doc-topic">
+<h2>The gap RelPyDB fills</h2>
+<p>Python has many ways to store and query structured data. Each solves a different problem:</p>
+<table class="param-table"><thead><tr><th>Tool</th><th>Strength</th><th>Gap</th></tr></thead><tbody>
+<tr><td>Plain dicts / lists</td><td>Zero setup. Pure Python.</td><td>No schema, no typed enforcement, no joins, no FK constraints.</td></tr>
+<tr><td>pandas</td><td>Excellent for tabular analytics and data transformation.</td><td>No schema, no foreign keys, relational joins require manual merge steps.</td></tr>
+<tr><td>SQLite / SQLAlchemy</td><td>Real SQL, file-backed, full relational model.</td><td>Requires separate process model (or ORM boilerplate), SQL strings, class declarations.</td></tr>
+<tr><td>DuckDB</td><td>Fastest in-process analytics for large datasets.</td><td>SQL-centric, not Python-native; less ergonomic for lightweight scripts or tests.</td></tr>
+<tr><td><strong>RelPyDB</strong></td><td>Full relational model (schema, FK, joins, grouping, indexes, encryption, persistence) directly in Python objects.</td><td>Slower than compiled engines on large analytical queries.</td></tr>
+</tbody></table>
+<p>RelPyDB is aimed at the cases where you want relational structure and correctness checks, but you want to stay inside Python without spinning up a server or writing SQL strings.</p>
+</section>
+<section class="doc-topic">
+<h2>Same task, four tools</h2>
+<p>Count confirmed players by game system from sessions + registrations. This is a real example from the RelPyDB benchmark.</p>
+<div class="comparison-grid">
+<div class="code-panel"><div class="panel-title">RelPyDB — 32 lines</div>
+<pre><code>db = RelPy()
+
+db.create_table("sessions")
+db.add_column("sessions", "id", AutoNumber, is_primary_key=True)
+db.add_column("sessions", "game_system", str, nullable=False)
+
+db.create_table("registrations")
+db.add_column("registrations", "id", AutoNumber, is_primary_key=True)
+db.add_column(
+    "registrations", "session_id", int,
+    nullable=False, references="sessions.id",
+)
+db.add_column("registrations", "status", str, nullable=False)
+
+sess1 = db.insert("sessions", {"game_system": "D&amp;D 5e"})
+sess2 = db.insert("sessions", {"game_system": "Pathfinder"})
+
+db.insert("registrations", {"session_id": sess1["id"], "status": "confirmed"})
+db.insert("registrations", {"session_id": sess1["id"], "status": "confirmed"})
+db.insert("registrations", {"session_id": sess2["id"], "status": "waitlist"})
+
+result = (
+    db.query("registrations")
+      .join("sessions")
+      .where(col("registrations.status") == "confirmed")
+      .group_by("sessions.game_system")
+      .aggregate(total_players=count())
+      .to_list()
+)
+</code></pre></div>
+<div class="code-panel"><div class="panel-title">SQLAlchemy ORM — 44 lines</div>
+<pre><code>Base = declarative_base()
+
+class GameSession(Base):
+    __tablename__ = "sessions"
+    id          = Column(Integer, primary_key=True, autoincrement=True)
+    game_system = Column(String, nullable=False)
+
+class Registration(Base):
+    __tablename__ = "registrations"
+    id         = Column(Integer, primary_key=True, autoincrement=True)
+    session_id = Column(Integer, ForeignKey("sessions.id"))
+    status     = Column(String, nullable=False)
+
+engine     = create_engine("sqlite:///:memory:")
+Base.metadata.create_all(engine)
+DbSession  = sessionmaker(bind=engine)
+orm_session = DbSession()
+
+sess1 = GameSession(game_system="D&amp;D 5e")
+sess2 = GameSession(game_system="Pathfinder")
+orm_session.add_all([sess1, sess2])
+orm_session.commit()
+
+orm_session.add_all([
+    Registration(session_id=sess1.id, status="confirmed"),
+    Registration(session_id=sess1.id, status="confirmed"),
+    Registration(session_id=sess2.id, status="waitlist"),
+])
+orm_session.commit()
+
+result = (
+    orm_session.query(
+        GameSession.game_system,
+        func.count(Registration.id).label("total_players"),
+    )
+    .join(Registration, Registration.session_id == GameSession.id)
+    .filter(Registration.status == "confirmed")
+    .group_by(GameSession.game_system)
+    .all()
+)
+</code></pre></div>
+</div>
+<h3>All four tools produce the same output</h3>
+<table class="data-table"><thead><tr><th>game_system</th><th>total_players</th></tr></thead><tbody>
+<tr><td>D&amp;D 5e</td><td>2</td></tr>
+</tbody></table>
+</section>
+<section class="doc-topic">
+<h2>Performance — benchmark results</h2>
+<p>These numbers are from a live benchmark run on a dataset of 200 customers, 200 orders, and 250 support tickets (10 queries × 30 iterations). RelPyDB is a pure-Python in-memory library; SQLite and DuckDB are compiled engines. The comparison is useful for understanding relative behavior, not absolute production throughput.</p>
+<table class="data-table"><thead><tr><th>Query</th><th>SQLAlchemy/SQLite</th><th>DuckDB</th><th>RelPyDB</th></tr></thead><tbody>
+<tr><td>Revenue by region &amp; category (4 joins)</td><td>0.28 ms</td><td>1.02 ms</td><td>12.82 ms</td></tr>
+<tr><td>Top customers by paid amount</td><td>0.12 ms</td><td>0.68 ms</td><td>1.77 ms</td></tr>
+<tr><td>Supplier category performance</td><td>0.26 ms</td><td>0.89 ms</td><td>9.77 ms</td></tr>
+<tr><td>Sales rep monthly performance</td><td>0.12 ms</td><td>0.62 ms</td><td>1.57 ms</td></tr>
+<tr><td>Payment method stats</td><td>0.08 ms</td><td>0.39 ms</td><td><strong>0.24 ms</strong></td></tr>
+<tr><td>Support tickets by category/status</td><td>0.12 ms</td><td>0.57 ms</td><td>1.82 ms</td></tr>
+<tr><td>Active customer revenue by region/tier</td><td>0.11 ms</td><td>0.72 ms</td><td>2.27 ms</td></tr>
+<tr><td>Monthly category revenue</td><td>0.28 ms</td><td>0.74 ms</td><td>6.98 ms</td></tr>
+</tbody></table>
+<div class="callout">RelPyDB's advantage is ergonomics and zero setup, not raw speed. For queries involving many cross-product joins on large datasets, SQLite or DuckDB will always be faster. RelPyDB outperforms both engines on startup time (8.95 ms vs 13 ms for SQLite and 206 ms for DuckDB) for the same schema.</div>
+</section>
+<section class="doc-topic">
+<h2>When to use RelPyDB</h2>
+<ul class="note-list">
+<li>You need a relational model (schema, FK, joins) but don't want to spin up a database server.</li>
+<li>You're writing tests and need a fast, resettable in-memory relational fixture.</li>
+<li>You're building a small tool, CLI, or script that processes structured JSON from an API.</li>
+<li>You want encrypted column storage without an external secrets manager.</li>
+<li>You want save/load of the full relational state to a single JSON file.</li>
+</ul>
+<h3>When to use something else</h3>
+<ul class="note-list">
+<li><strong>Large datasets (&gt; 100 000 rows)</strong> — DuckDB or SQLite will be significantly faster.</li>
+<li><strong>Concurrent writes</strong> — RelPyDB is single-process in-memory. Use PostgreSQL or SQLite with WAL.</li>
+<li><strong>Analytical workloads on DataFrames you already have</strong> — pandas is more ergonomic for pure tabular work.</li>
+</ul>
+</section>
+<div class="doc-nav">
+<a class="button secondary" href="quickstart.html">← 0. Quickstart</a>
+<a class="button teal" href="concepts.html">3. Concepts →</a>
+</div>
+</article>
+</section>
+</main>
+<footer class="footer"><div class="footer-inner"><div class="footer-brand">RelPyDB<small>Relational objects for Python</small></div><nav class="footer-links"><a href="../index.html">Home</a><a href="../installation.html">Installation</a><a href="../docs/start-here.html">Start Here</a><a href="../docs/index.html">Docs</a><a href="../ide.html">Online IDE</a><a href="https://github.com/mandelreouven2002/RelPyDB" rel="noreferrer" target="_blank">GitHub ↗</a></nav></div></footer>
+<script src="../script.js"></script></body></html>

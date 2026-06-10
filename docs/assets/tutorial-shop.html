@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1" name="viewport"/><meta content="RelPyDB documentation" name="description"/><title>1. Full Tutorial - RelPyDB</title><link href="../styles.css" rel="stylesheet"/></head><body><header class="topbar"><a class="brand" href="../index.html"><span class="brand-mark">Rp</span><span><strong>RelPyDB</strong><small>Relational Python</small></span></a><button aria-expanded="false" class="nav-toggle" type="button"><svg viewbox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"></path></svg><span class="sr-only">Menu</span></button><nav class="site-nav"><a href="../index.html">Home</a><a href="../installation.html">Installation</a><a href="../docs/start-here.html">Start Here</a><a class="active" href="../docs/index.html">Docs</a><a href="../ide.html">Online IDE</a><a href="https://github.com/mandelreouven2002/RelPyDB" rel="noreferrer" target="_blank">GitHub</a></nav></header><main><section class="docs-layout"><aside class="docs-sidebar"><div class="docs-sidebar-header"><span>Documentation</span><input id="docs-filter" placeholder="Filter docs..." type="search"/></div><nav class="docs-tree"><a class="" href="index.html">Docs Overview</a><a class="" href="start-here.html">0. Start Here</a><a class="" href="quickstart.html">1. 5-Minute Quickstart</a><a class="active" href="tutorial-shop.html">2. Full Tutorial</a><a class="" href="recipes.html">3. Common Recipes</a><a class="" href="why-relpy.html">4. Why RelPyDB?</a><a class="" href="alternatives.html">5. RelPyDB vs Alternatives</a><a class="" href="concepts.html">6. Concepts</a><a class="" href="tables-schema.html">7. Tables and Schema</a><a class="" href="data-operations.html">8. Data Operations</a><a class="" href="querying.html">9. Querying</a><a class="" href="joins.html">10. Joins</a><a class="" href="grouping.html">11. Grouping</a><a class="" href="views.html">12. Views</a><a class="" href="indexes.html">13. Indexes</a><a class="" href="exports.html">14. Exports</a><a class="" href="persistence.html">15. Persistence</a><a class="" href="encryption.html">16. Encryption</a><a class="" href="python-integration.html">17. Python Integration</a><a class="" href="capabilities.html">18. Full Capability Checklist</a><a class="" href="errors-limitations.html">19. Common Errors and Limitations</a><a class="" href="api-reference.html">20. API Reference</a><a class="" href="api-functions.html">21. Function Reference</a><a class="" href="examples.html">22. Examples</a></nav></aside><article class="docs-content"><section class="page-title docs-page-title"><p class="eyebrow">Documentation</p><h1>1. Full Tutorial</h1><p>Developer-focused documentation with concepts, function details, examples, outputs and SQL comparisons.</p></section>
+<section class="doc-topic"><h2>Full tutorial: a small shop database</h2><p>This tutorial builds a realistic mini-domain: users, products, orders and order items. It demonstrates primary keys, foreign keys, joins, grouping, indexes, persistence, SQL export and encrypted email.</p></section>
+<section class="doc-topic"><h2>1. Create schema</h2><pre><code>from relpy import RelPy, AutoNumber, col
+from relpy import count, sum_, avg
+
+key = RelPy.generate_encryption_key()
+db = RelPy(encryption_key=key)
+
+# Users
+_db = db.create_table("users")
+db.add_column("users", "id", AutoNumber, is_primary_key=True)
+db.add_column("users", "name", str, nullable=False)
+db.add_column("users", "email", str, nullable=False, is_encrypted=True)
+
+# Products
+db.create_table("products")
+db.add_column("products", "id", AutoNumber, is_primary_key=True)
+db.add_column("products", "name", str, nullable=False)
+db.add_column("products", "price", float, nullable=False)
+
+# Orders
+db.create_table("orders")
+db.add_column("orders", "id", AutoNumber, is_primary_key=True)
+db.add_column("orders", "user_id", int, nullable=False, references="users.id", on_delete="CASCADE")
+db.add_column("orders", "status", str, nullable=False)
+
+# Order items - composite primary key
+db.create_table("order_items")
+db.add_column("order_items", "order_id", int, nullable=False, references="orders.id", on_delete="CASCADE")
+db.add_column("order_items", "product_id", int, nullable=False, references="products.id")
+db.add_column("order_items", "quantity", int, nullable=False)
+db.set_primary_key("order_items", ["order_id", "product_id"])</code></pre><div class="callout"><strong>Why this matters:</strong> RelPyDB stores schema separately from data, so constraints are known before data is inserted.</div></section>
+<section class="doc-topic"><h2>2. Insert rows</h2><pre><code>alice = db.insert("users", {"name": "Alice", "email": "alice@example.com"})
+bob = db.insert("users", {"name": "Bob", "email": "bob@example.com"})
+
+keyboard = db.insert("products", {"name": "Keyboard", "price": 120.0})
+mouse = db.insert("products", {"name": "Mouse", "price": 80.0})
+
+order1 = db.insert("orders", {"user_id": alice["id"], "status": "paid"})
+order2 = db.insert("orders", {"user_id": bob["id"], "status": "pending"})
+
+db.insert("order_items", {"order_id": order1["id"], "product_id": keyboard["id"], "quantity": 1})
+db.insert("order_items", {"order_id": order1["id"], "product_id": mouse["id"], "quantity": 2})
+db.insert("order_items", {"order_id": order2["id"], "product_id": mouse["id"], "quantity": 1})</code></pre><p>Foreign keys are validated on insert. A row that references a missing <code>users.id</code>, <code>orders.id</code> or <code>products.id</code> will fail.</p></section>
+<section class="doc-topic"><h2>3. Query one table</h2><div class="comparison-grid"><div><pre><code>paid_orders = (
+    db.query("orders")
+      .where(col("status") == "paid")
+      .to_list()
+)</code></pre></div><div><pre><code>SELECT *
+FROM orders
+WHERE status = 'paid';</code></pre></div></div><div class="code-panel"><div class="panel-title">Output</div><pre><code>[{"id": 1, "user_id": 1, "status": "paid"}]</code></pre></div></section>
+<section class="doc-topic"><h2>4. Join tables</h2><pre><code>rows = (
+    db.query("orders")
+      .join("users")
+      .where(col("orders.status") == "paid")
+      .select("orders.id", "users.name", "orders.status")
+      .to_list(decrypt=True)
+)</code></pre><p>Because <code>orders.user_id</code> references <code>users.id</code>, RelPyDB can infer the join automatically.</p><div class="code-panel"><div class="panel-title">Output</div><pre><code>[{"orders.id": 1, "users.name": "Alice", "orders.status": "paid"}]</code></pre></div></section>
+<section class="doc-topic"><h2>5. Group and aggregate</h2><pre><code>summary = (
+    db.query("orders")
+      .group_by("status")
+      .aggregate(
+          order_count=count(),
+      )
+      .order_by("status")
+      .to_list()
+)</code></pre><div class="code-panel"><div class="panel-title">Output</div><pre><code>[{"status": "paid", "order_count": 1}, {"status": "pending", "order_count": 1}]</code></pre></div></section>
+<section class="doc-topic"><h2>6. Index encrypted email and query naturally</h2><pre><code>db.create_index("users", "email")
+
+user = (
+    db.query("users")
+      .where(col("email") == "alice@example.com")
+      .one(decrypt=True)
+)</code></pre><p>The email is stored encrypted, but equality lookup can use a blind index.</p></section>
+<section class="doc-topic"><h2>7. Save, load and export SQL</h2><pre><code>db.save("shop.relpy.json")
+
+loaded_db = RelPy.load("shop.relpy.json", encryption_key=key)
+print(loaded_db.to_list("users"))
+print(loaded_db.to_list("users", decrypt=True))
+print(loaded_db.to_sql("users", decrypt=True))</code></pre><div class="callout warning"><strong>Important:</strong> the key is never saved in the JSON file. Keep it separately.</div></section>
+</article></section></main><footer class="footer"><div class="footer-inner"><div class="footer-brand">RelPyDB<small>Relational objects for Python</small></div><nav class="footer-links"><a href="../index.html">Home</a><a href="../installation.html">Installation</a><a href="../docs/start-here.html">Start Here</a><a href="../docs/index.html">Docs</a><a href="../ide.html">Online IDE</a><a href="https://github.com/mandelreouven2002/RelPyDB" rel="noreferrer" target="_blank">GitHub ↗</a></nav></div></footer><script src="../script.js"></script></body></html>

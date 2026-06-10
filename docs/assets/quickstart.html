@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1" name="viewport"/><meta content="RelPyDB documentation" name="description"/><title>1. 5-Minute Quickstart - RelPyDB</title><link href="../styles.css" rel="stylesheet"/></head><body><header class="topbar"><a class="brand" href="../index.html"><span class="brand-mark">Rp</span><span><strong>RelPyDB</strong><small>Relational Python</small></span></a><button aria-expanded="false" class="nav-toggle" type="button"><svg viewbox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"></path></svg><span class="sr-only">Menu</span></button><nav class="site-nav"><a href="../index.html">Home</a><a href="../installation.html">Installation</a><a href="../docs/start-here.html">Start Here</a><a class="active" href="../docs/index.html">Docs</a><a href="../ide.html">Online IDE</a><a href="https://github.com/mandelreouven2002/RelPyDB" rel="noreferrer" target="_blank">GitHub</a></nav></header><main><section class="docs-layout"><aside class="docs-sidebar"><div class="docs-sidebar-header"><span>Documentation</span><input id="docs-filter" placeholder="Filter docs..." type="search"/></div><nav class="docs-tree"><a class="" href="index.html">Docs Overview</a><a class="" href="start-here.html">0. Start Here</a><a class="active" href="quickstart.html">1. 5-Minute Quickstart</a><a class="" href="tutorial-shop.html">2. Full Tutorial</a><a class="" href="recipes.html">3. Common Recipes</a><a class="" href="why-relpy.html">4. Why RelPyDB?</a><a class="" href="alternatives.html">5. RelPyDB vs Alternatives</a><a class="" href="concepts.html">6. Concepts</a><a class="" href="tables-schema.html">7. Tables and Schema</a><a class="" href="data-operations.html">8. Data Operations</a><a class="" href="querying.html">9. Querying</a><a class="" href="joins.html">10. Joins</a><a class="" href="grouping.html">11. Grouping</a><a class="" href="views.html">12. Views</a><a class="" href="indexes.html">13. Indexes</a><a class="" href="exports.html">14. Exports</a><a class="" href="persistence.html">15. Persistence</a><a class="" href="encryption.html">16. Encryption</a><a class="" href="python-integration.html">17. Python Integration</a><a class="" href="capabilities.html">18. Full Capability Checklist</a><a class="" href="errors-limitations.html">19. Common Errors and Limitations</a><a class="" href="api-reference.html">20. API Reference</a><a class="" href="api-functions.html">21. Function Reference</a><a class="" href="examples.html">22. Examples</a></nav></aside><article class="docs-content"><section class="page-title docs-page-title"><p class="eyebrow">Documentation</p><h1>1. 5-Minute Quickstart</h1><p>Create your first table, insert one row with insert, add more rows with insert_many, query, save and load.</p></section>
+<section class="doc-topic"><h2>Quickstart in five minutes</h2><p>This page is the shortest runnable path through RelPyDB. It creates a relational object, defines schema, inserts one row with <code>insert</code>, adds more rows with <code>insert_many</code>, queries rows, and saves the object to disk.</p><ol class="sequence"><li>Install from GitHub.</li><li>Create a database object.</li><li>Create typed tables.</li><li>Insert dictionaries as rows with <code>insert</code> or <code>insert_many</code>.</li><li>Query with <code>col</code> and terminal methods.</li><li>Save and load the object.</li></ol></section>
+<section class="doc-topic"><h2>Install from GitHub</h2><pre><code>python -m pip install git+https://github.com/mandelreouven2002/RelPyDB.git</code></pre><p class="muted">For now, GitHub is the only supported installation method.</p></section>
+<section class="doc-topic"><h2>Complete first script</h2><pre><code>from relpy import RelPy, AutoNumber, col
+
+# 1. Create an empty relational object.
+db = RelPy()
+
+# 2. Define a users table.
+db.create_table("users")
+db.add_column("users", "id", AutoNumber, is_primary_key=True)
+db.add_column("users", "name", str, nullable=False)
+db.add_column("users", "status", str, nullable=False, default="active")
+
+# 3. Insert one row.
+db.insert("users", {"name": "Alice"})
+
+# 4. Insert many rows efficiently.
+db.insert_many("users", [
+    {"name": "Bob", "status": "inactive"},
+    {"name": "Carol"},
+    {"name": "Dana"},
+])
+
+# 5. Query rows.
+active_users = (
+    db.query("users")
+      .where(col("status") == "active")
+      .select("id", "name")
+      .to_list()
+)
+
+print(active_users)
+
+# 6. Save the relational object.
+db.save("quickstart.relpy.json")
+
+# 7. Load it again.
+loaded_db = RelPy.load("quickstart.relpy.json")
+print(loaded_db.to_list("users"))</code></pre><div class="code-panel"><div class="panel-title">Output</div><pre><code>[{"id": 1, "name": "Alice"}, {"id": 3, "name": "Carol"}, {"id": 4, "name": "Dana"}]
+[{"id": 1, "name": "Alice", "status": "active"}, {"id": 2, "name": "Bob", "status": "inactive"}, {"id": 3, "name": "Carol", "status": "active"}, {"id": 4, "name": "Dana", "status": "active"}]</code></pre></div></section>
+<section class="doc-topic"><h2>Why <code>insert_many</code> matters</h2><p>Use <code>insert</code> when you add a single row. Use <code>insert_many</code> when you already have a list of dictionaries, such as JSON data, CSV rows, generated test data, or API results.</p><table class="param-table"><thead><tr><th>Function</th><th>Best for</th><th>Input shape</th></tr></thead><tbody><tr><td><code>insert</code></td><td>One row</td><td><code>{"name": "Alice"}</code></td></tr><tr><td><code>insert_many</code></td><td>Many rows</td><td><code>[{"name": "Alice"}, {"name": "Bob"}]</code></td></tr></tbody></table><pre><code>users_from_api = [
+    {"name": "Alice"},
+    {"name": "Bob"},
+    {"name": "Carol"},
+]
+
+db.insert_many("users", users_from_api)</code></pre></section>
+<section class="doc-topic"><h2>What each line means</h2><table class="param-table"><thead><tr><th>Line</th><th>Meaning</th></tr></thead><tbody><tr><td><code>RelPy()</code></td><td>Creates the in-memory relational object.</td></tr><tr><td><code>create_table</code></td><td>Creates an empty relation with a name.</td></tr><tr><td><code>add_column</code></td><td>Adds schema: type, nullable rules, primary key flags, defaults and metadata.</td></tr><tr><td><code>AutoNumber</code></td><td>Creates an auto-incrementing integer primary key.</td></tr><tr><td><code>insert</code></td><td>Validates and stores one row.</td></tr><tr><td><code>insert_many</code></td><td>Validates and stores a list of rows efficiently.</td></tr><tr><td><code>query</code></td><td>Starts a chainable query builder.</td></tr><tr><td><code>where</code></td><td>Filters rows.</td></tr><tr><td><code>select</code></td><td>Projects specific columns.</td></tr><tr><td><code>to_list</code></td><td>Executes the query and returns Python dictionaries.</td></tr><tr><td><code>save/load</code></td><td>Serializes and restores the object.</td></tr></tbody></table></section>
+</article></section></main><footer class="footer"><div class="footer-inner"><div class="footer-brand">RelPyDB<small>Relational objects for Python</small></div><nav class="footer-links"><a href="../index.html">Home</a><a href="../installation.html">Installation</a><a href="../docs/start-here.html">Start Here</a><a href="../docs/index.html">Docs</a><a href="../ide.html">Online IDE</a><a href="https://github.com/mandelreouven2002/RelPyDB" rel="noreferrer" target="_blank">GitHub ↗</a></nav></div></footer><script src="../script.js"></script></body></html>

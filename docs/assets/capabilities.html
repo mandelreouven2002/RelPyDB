@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1" name="viewport"/><title>15. Full Capability Checklist - RelPyDB</title><link href="../styles.css" rel="stylesheet"/></head><body>
+<header class="topbar"><a class="brand" href="../index.html"><span class="brand-mark">Rp</span><span><strong>RelPyDB</strong><small>Relational Python</small></span></a><button aria-expanded="false" class="nav-toggle" type="button"><svg viewbox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"></path></svg><span class="sr-only">Menu</span></button><nav class="site-nav"><a href="../index.html">Home</a><a href="../installation.html">Installation</a><a href="../docs/start-here.html">Start Here</a><a class="active" href="../docs/index.html">Docs</a><a href="../ide.html">Online IDE</a><a href="https://github.com/mandelreouven2002/RelPyDB" rel="noreferrer" target="_blank">GitHub</a></nav></header>
+<main>
+<section class="docs-layout">
+<aside class="docs-sidebar"><div class="docs-sidebar-header"><span>Documentation</span><input id="docs-filter" placeholder="Filter docs..." type="search"/></div><nav class="docs-tree"><a class="" href="index.html">Docs Overview</a><a class="" href="start-here.html">0. Start Here</a><a class="" href="quickstart.html">1. 5-Minute Quickstart</a><a class="" href="tutorial-shop.html">2. Full Tutorial</a><a class="" href="recipes.html">3. Common Recipes</a><a class="" href="why-relpy.html">4. Why RelPyDB?</a><a class="" href="alternatives.html">5. RelPyDB vs Alternatives</a><a class="" href="concepts.html">6. Concepts</a><a class="" href="tables-schema.html">7. Tables and Schema</a><a class="" href="data-operations.html">8. Data Operations</a><a class="" href="querying.html">9. Querying</a><a class="" href="joins.html">10. Joins</a><a class="" href="grouping.html">11. Grouping</a><a class="" href="views.html">12. Views</a><a class="" href="indexes.html">13. Indexes</a><a class="" href="exports.html">14. Exports</a><a class="" href="persistence.html">15. Persistence</a><a class="" href="encryption.html">16. Encryption</a><a class="" href="python-integration.html">17. Python Integration</a><a class="active" href="capabilities.html">18. Full Capability Checklist</a><a class="" href="errors-limitations.html">19. Common Errors and Limitations</a><a class="" href="api-reference.html">20. API Reference</a><a class="" href="api-functions.html">21. Function Reference</a><a class="" href="examples.html">22. Examples</a></nav></aside>
+<article class="docs-content"><section class="page-title docs-page-title"><p class="eyebrow">Documentation</p><h1>15. Full Capability Checklist</h1><p>Every supported feature of RelPyDB in one place — use it as a reference map or integration test checklist.</p></section>
+<section class="doc-topic">
+<h2>Schema</h2>
+<table class="param-table"><thead><tr><th>Feature</th><th>API</th><th>Notes</th></tr></thead><tbody>
+<tr><td>Create table</td><td><code>create_table(name)</code></td><td></td></tr>
+<tr><td>Add column with type</td><td><code>add_column(table, col, type)</code></td><td>Supports <code>int, float, str, bool, bytes, dict, list, AutoNumber</code></td></tr>
+<tr><td>Nullable / default</td><td><code>nullable=False, default=...</code></td><td></td></tr>
+<tr><td>AutoNumber PK</td><td><code>add_column(..., AutoNumber, is_primary_key=True)</code></td><td>Sequence continues after load</td></tr>
+<tr><td>Composite PK</td><td><code>set_primary_key(table, [col1, col2])</code></td><td></td></tr>
+<tr><td>Foreign key</td><td><code>references="table.column", on_delete=...</code></td><td>Supports RESTRICT, CASCADE, SET NULL</td></tr>
+<tr><td>PII marker</td><td><code>is_pii=True</code></td><td>Metadata only; no runtime effect</td></tr>
+<tr><td>Encrypted column</td><td><code>is_encrypted=True</code></td><td>Fernet encryption; blind index for equality search</td></tr>
+<tr><td>Schema inspection</td><td><code>describe_table, describe_schema</code></td><td></td></tr>
+</tbody></table>
+</section>
+<section class="doc-topic">
+<h2>Data operations</h2>
+<table class="param-table"><thead><tr><th>Feature</th><th>API</th><th>Notes</th></tr></thead><tbody>
+<tr><td>Insert one row</td><td><code>insert(table, dict)</code></td><td>Returns plaintext row with generated ID</td></tr>
+<tr><td>Batch insert</td><td><code>insert_many(table, list[dict])</code></td><td>Rebuilds indexes once after batch</td></tr>
+<tr><td>Update with filter</td><td><code>update(table, values, where=lambda)</code></td><td></td></tr>
+<tr><td>Update entire table</td><td><code>update(table, values, allow_all=True)</code></td><td>Explicit safety flag required</td></tr>
+<tr><td>Delete with filter</td><td><code>delete(table, where=lambda)</code></td><td>Applies FK on_delete rules</td></tr>
+<tr><td>Delete entire table</td><td><code>delete(table, allow_all=True)</code></td><td>Explicit safety flag required</td></tr>
+<tr><td>Rollback on failure</td><td>Automatic</td><td>Failed insert_many / update / delete does not partially commit</td></tr>
+</tbody></table>
+</section>
+<section class="doc-topic">
+<h2>Querying</h2>
+<table class="param-table"><thead><tr><th>Feature</th><th>API</th></tr></thead><tbody>
+<tr><td>Filter</td><td><code>.where(col("x") == v)</code></td></tr>
+<tr><td>Project columns</td><td><code>.select("col1", "col2")</code></td></tr>
+<tr><td>Sort ascending / descending</td><td><code>.order_by("col", descending=True)</code></td></tr>
+<tr><td>Multi-column sort</td><td><code>.order_by(("col1","asc"),("col2","desc"))</code></td></tr>
+<tr><td>Limit / offset</td><td><code>.limit(n).offset(n)</code></td></tr>
+<tr><td>Distinct</td><td><code>.distinct()</code></td></tr>
+<tr><td>Equality, comparison, LIKE, IN, BETWEEN, NULL checks</td><td><code>col(...).like(), .in_(), .between(), .is_null()</code></td></tr>
+<tr><td>Logical AND / OR / NOT</td><td><code>&amp;, |, ~, AND(), OR(), NOT()</code></td></tr>
+</tbody></table>
+</section>
+<section class="doc-topic">
+<h2>Joins</h2>
+<table class="param-table"><thead><tr><th>Join type</th><th>API</th></tr></thead><tbody>
+<tr><td>Inner (default)</td><td><code>.join("t") / .inner_join("t")</code></td></tr>
+<tr><td>Left outer</td><td><code>.left_join("t")</code></td></tr>
+<tr><td>Right outer</td><td><code>.right_join("t")</code></td></tr>
+<tr><td>Full outer</td><td><code>.full_join("t")</code></td></tr>
+<tr><td>Cross (Cartesian)</td><td><code>.cross_join("t")</code></td></tr>
+<tr><td>Natural</td><td><code>.natural_join("t")</code></td></tr>
+<tr><td>FK inference</td><td>Automatic when FK defined in schema</td></tr>
+<tr><td>Explicit columns</td><td><code>on=("left_col","right_col")</code></td></tr>
+<tr><td>Chained joins</td><td>Multiple <code>.join()</code> calls</td></tr>
+</tbody></table>
+</section>
+<section class="doc-topic">
+<h2>Grouping &amp; aggregation</h2>
+<table class="param-table"><thead><tr><th>Feature</th><th>API</th></tr></thead><tbody>
+<tr><td>Group by single column</td><td><code>.group_by("col")</code></td></tr>
+<tr><td>Group by multiple columns</td><td><code>.group_by("col1", "col2")</code></td></tr>
+<tr><td>COUNT</td><td><code>count() / count("col")</code></td></tr>
+<tr><td>SUM</td><td><code>sum_("col")</code></td></tr>
+<tr><td>AVG</td><td><code>avg("col")</code></td></tr>
+<tr><td>MIN / MAX</td><td><code>min_("col") / max_("col")</code></td></tr>
+<tr><td>Filter on aggregated value</td><td><code>.having(col("alias") &gt; n)</code></td></tr>
+</tbody></table>
+</section>
+<section class="doc-topic">
+<h2>Indexes</h2>
+<table class="param-table"><thead><tr><th>Feature</th><th>API</th></tr></thead><tbody>
+<tr><td>Single-column index</td><td><code>create_index(table, "col")</code></td></tr>
+<tr><td>Composite index</td><td><code>create_index(table, ["col1","col2"])</code></td></tr>
+<tr><td>Unique index</td><td><code>create_index(table, "col", unique=True)</code></td></tr>
+<tr><td>Blind index (encrypted column)</td><td>Automatic when column is <code>is_encrypted=True</code></td></tr>
+<tr><td>Incremental update</td><td>After every insert / update / delete</td></tr>
+<tr><td>Rebuild after load</td><td>Automatic on <code>RelPy.load()</code></td></tr>
+</tbody></table>
+</section>
+<section class="doc-topic">
+<h2>Exports</h2>
+<table class="param-table"><thead><tr><th>Format</th><th>Function</th></tr></thead><tbody>
+<tr><td>Python list of dicts</td><td><code>to_list()</code></td></tr>
+<tr><td>JSON string</td><td><code>to_json()</code></td></tr>
+<tr><td>pandas DataFrame</td><td><code>to_pandas()</code></td></tr>
+<tr><td>NumPy array</td><td><code>to_numpy()</code></td></tr>
+<tr><td>SQL INSERT statements</td><td><code>to_sql()</code></td></tr>
+<tr><td>SQL DDL (CREATE TABLE)</td><td><code>to_ddl()</code></td></tr>
+<tr><td>Pretty-print to stdout</td><td><code>print_table()</code></td></tr>
+</tbody></table>
+<p>All export functions support <code>column_name=</code>, <code>where_key=</code>, and <code>decrypt=True</code> parameters.</p>
+</section>
+<section class="doc-topic">
+<h2>Persistence</h2>
+<table class="param-table"><thead><tr><th>Feature</th><th>Notes</th></tr></thead><tbody>
+<tr><td>Save full state to JSON</td><td>Schema, data, indexes, AutoNumber sequences, ciphertext</td></tr>
+<tr><td>Load and continue mutating</td><td>AutoNumber sequence, indexes, and row positions restored</td></tr>
+<tr><td>Views not persisted</td><td>Re-register views after load</td></tr>
+<tr><td>Encryption key not saved</td><td>Pass <code>encryption_key=</code> to <code>RelPy.load()</code></td></tr>
+</tbody></table>
+</section>
+<section class="doc-topic">
+<h2>Encryption</h2>
+<table class="param-table"><thead><tr><th>Feature</th><th>Notes</th></tr></thead><tbody>
+<tr><td>Fernet symmetric encryption</td><td>Industry-standard AES-128 CBC + HMAC</td></tr>
+<tr><td>Per-column encryption</td><td><code>is_encrypted=True</code> on <code>add_column</code></td></tr>
+<tr><td>Masked exports by default</td><td>Shows <code>[ENCRYPTED]</code> without a key</td></tr>
+<tr><td>Equality search on ciphertext</td><td>Blind index (HMAC hash of plaintext)</td></tr>
+<tr><td>Key never written to disk</td><td>Verified at save/load time</td></tr>
+</tbody></table>
+</section>
+<div class="doc-nav">
+<a class="button secondary" href="python-integration.html">← 14. Python Integration</a>
+<a class="button teal" href="errors-limitations.html">16. Errors &amp; Limitations →</a>
+</div>
+</article>
+</section>
+</main>
+<footer class="footer"><div class="footer-inner"><div class="footer-brand">RelPyDB<small>Relational objects for Python</small></div><nav class="footer-links"><a href="../index.html">Home</a><a href="../installation.html">Installation</a><a href="../docs/start-here.html">Start Here</a><a href="../docs/index.html">Docs</a><a href="../ide.html">Online IDE</a><a href="https://github.com/mandelreouven2002/RelPyDB" rel="noreferrer" target="_blank">GitHub ↗</a></nav></div></footer>
+<script src="../script.js"></script></body></html>

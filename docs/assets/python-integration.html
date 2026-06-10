@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1" name="viewport"/><meta content="RelPyDB documentation" name="description"/><title>14. Python Integration - RelPyDB</title><link href="../styles.css" rel="stylesheet"/></head><body><header class="topbar"><a class="brand" href="../index.html"><span class="brand-mark">Rp</span><span><strong>RelPyDB</strong><small>Relational Python</small></span></a><button aria-expanded="false" class="nav-toggle" type="button"><svg viewbox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"></path></svg><span class="sr-only">Menu</span></button><nav class="site-nav"><a href="../index.html">Home</a><a href="../installation.html">Installation</a><a href="../docs/start-here.html">Start Here</a><a class="active" href="../docs/index.html">Docs</a><a href="../ide.html">Online IDE</a><a href="https://github.com/mandelreouven2002/RelPyDB" rel="noreferrer" target="_blank">GitHub</a></nav></header><main><section class="docs-layout"><aside class="docs-sidebar"><div class="docs-sidebar-header"><span>Documentation</span><input id="docs-filter" placeholder="Filter docs..." type="search"/></div><nav class="docs-tree"><a class="" href="index.html">Docs Overview</a><a class="" href="start-here.html">0. Start Here</a><a class="" href="quickstart.html">1. 5-Minute Quickstart</a><a class="" href="tutorial-shop.html">2. Full Tutorial</a><a class="" href="recipes.html">3. Common Recipes</a><a class="" href="why-relpy.html">4. Why RelPyDB?</a><a class="" href="alternatives.html">5. RelPyDB vs Alternatives</a><a class="" href="concepts.html">6. Concepts</a><a class="" href="tables-schema.html">7. Tables and Schema</a><a class="" href="data-operations.html">8. Data Operations</a><a class="" href="querying.html">9. Querying</a><a class="" href="joins.html">10. Joins</a><a class="" href="grouping.html">11. Grouping</a><a class="" href="views.html">12. Views</a><a class="" href="indexes.html">13. Indexes</a><a class="" href="exports.html">14. Exports</a><a class="" href="persistence.html">15. Persistence</a><a class="" href="encryption.html">16. Encryption</a><a class="active" href="python-integration.html">17. Python Integration</a><a class="" href="capabilities.html">18. Full Capability Checklist</a><a class="" href="errors-limitations.html">19. Common Errors and Limitations</a><a class="" href="api-reference.html">20. API Reference</a><a class="" href="api-functions.html">21. Function Reference</a><a class="" href="examples.html">22. Examples</a></nav></aside><article class="docs-content"><section class="page-title docs-page-title"><p class="eyebrow">Documentation</p><h1>14. Python Integration</h1><p>Use RelPyDB together with normal Python loops, functions, tests, pandas, NumPy and files.</p></section><section class="doc-topic"><h2>Python-first mental model</h2><p>RelPyDB is designed to be used from normal Python code. You can build rows in loops, wrap database creation inside functions, use list comprehensions, export to pandas/NumPy, save with <code>pathlib</code>, and combine it with testing tools.</p><div class="callout"><strong>Good rule:</strong> use RelPyDB for relational structure, and use regular Python for application logic around it.</div></section><section class="doc-topic"><h2>Using RelPyDB inside functions</h2><p>Put schema creation in one function and data loading in another. This keeps examples, tests and scripts easy to read.</p><div class="comparison-grid"><div class="code-panel"><div class="panel-title">Python function</div><pre><code>from relpy import RelPy, AutoNumber, col
+
+def build_user_db() -&gt; RelPy:
+    db = RelPy()
+    db.create_table("users")
+    db.add_column("users", "id", AutoNumber, is_primary_key=True)
+    db.add_column("users", "name", str, nullable=False)
+    db.add_column("users", "age", int, nullable=False)
+    return db
+
+def active_adults(db: RelPy):
+    return (
+        db.query("users")
+          .where(col("age") &gt;= 18)
+          .order_by("name")
+          .to_list()
+    )</code></pre></div><div class="code-panel"><div class="panel-title">Why this is useful</div><pre><code># Reuse in tests
+# Reuse in scripts
+# Reuse in tutorials
+# Keep schema setup separate
+# Keep queries readable</code></pre></div></div></section><section class="doc-topic"><h2>Building rows with loops</h2><p>RelPyDB works naturally with loops. This is useful when reading from files, APIs, forms, generated data, or test fixtures.</p><div class="side-by-side"><div class="code-panel"><div class="panel-title">Loop input</div><pre><code>raw_users = [
+    ("Alice", 24),
+    ("Bob", 17),
+    ("Dana", 31),
+]
+
+for name, age in raw_users:
+    db.insert("users", {
+        "name": name,
+        "age": age,
+    })</code></pre></div><div class="code-panel"><div class="panel-title">Query after loop</div><pre><code>adults = (
+    db.query("users")
+      .where(col("age") &gt;= 18)
+      .pluck("name")
+)
+
+print(adults)
+# ["Alice", "Dana"]</code></pre></div></div></section><section class="doc-topic"><h2>Using list comprehensions and Python transformations</h2><p>Use <code>to_list()</code> when you want native Python values. Then use normal Python transformations.</p><div class="comparison-grid"><div class="code-panel"><div class="panel-title">Export to Python</div><pre><code>rows = db.query("users").to_list()
+
+names = [row["name"].upper() for row in rows]
+ages = [row["age"] for row in rows]
+average_age = sum(ages) / len(ages)</code></pre></div><div class="code-panel"><div class="panel-title">When to prefer RelPyDB methods</div><pre><code># Better as RelPyDB query:
+db.query("users").where(col("age") &gt;= 18)
+
+# Better as Python transformation:
+[row["name"].upper() for row in rows]</code></pre></div></div></section><section class="doc-topic"><h2>Integration with pandas</h2><p>Use <code>to_pandas()</code> when you want analysis, plotting, CSV exports or notebook exploration.</p><div class="side-by-side"><div class="code-panel"><div class="panel-title">RelPyDB to pandas</div><pre><code>df = db.to_pandas("users")
+
+print(df)
+print(df.describe())</code></pre></div><div class="code-panel"><div class="panel-title">Typical pandas continuation</div><pre><code>adults_df = df[df["age"] &gt;= 18]
+counts = adults_df.groupby("status").size()</code></pre></div></div><div class="callout"><strong>Tip:</strong> use RelPyDB to enforce relational rules first. Use pandas when you want analysis-oriented operations.</div></section><section class="doc-topic"><h2>Integration with NumPy</h2><p>Use <code>to_numpy()</code> for numerical pipelines. For one column, pass <code>column_name</code> to get a 1D array.</p><pre><code>amounts = db.to_numpy("orders", column_name="amount", dtype=float)
+
+print(amounts.mean())
+print(amounts.max())</code></pre></section><section class="doc-topic"><h2>Integration with JSON and files</h2><p><code>to_json()</code> is public export. <code>save()</code> is full RelPyDB persistence. They serve different goals.</p><div class="comparison-grid"><div class="code-panel"><div class="panel-title">Public JSON export</div><pre><code>json_text = db.to_json("users", indent=2)
+Path("users_export.json").write_text(json_text)</code></pre></div><div class="code-panel"><div class="panel-title">RelPyDB object persistence</div><pre><code>db.save("database.relpy.json")
+loaded = RelPy.load("database.relpy.json")</code></pre></div></div></section><section class="doc-topic"><h2>Integration with tests</h2><p>A common pattern is to create a small in-memory database inside a test.</p><pre><code>def test_paid_orders_are_returned():
+    db = build_shop_db()
+
+    result = (
+        db.query("orders")
+          .where(col("status") == "paid")
+          .count()
+    )
+
+    assert result == 2</code></pre></section><section class="doc-topic"><h2>Integration with dataclasses</h2><p>You can convert application objects into rows before insert, and export rows back into dataclasses.</p><pre><code>from dataclasses import dataclass, asdict
+
+@dataclass
+class UserInput:
+    name: str
+    age: int
+
+user = UserInput("Alice", 24)
+db.insert("users", asdict(user))
+
+rows = db.to_list("users")</code></pre></section><section class="doc-topic"><h2>Integration checklist</h2><table class="param-table"><thead><tr><th>Goal</th><th>Recommended function</th><th>Why</th></tr></thead><tbody><tr><td>Use rows in Python logic</td><td><code>to_list()</code></td><td>Native dictionaries and lists.</td></tr><tr><td>Analyze in notebooks</td><td><code>to_pandas()</code></td><td>DataFrame workflows.</td></tr><tr><td>Numerical processing</td><td><code>to_numpy()</code></td><td>Arrays and vector operations.</td></tr><tr><td>Send public data</td><td><code>to_json()</code></td><td>Text format, masks encrypted values by default.</td></tr><tr><td>Restore RelPyDB object later</td><td><code>save()</code> / <code>load()</code></td><td>Schema, data, indexes and internal row ids.</td></tr><tr><td>Move data to SQL table</td><td><code>to_sql()</code></td><td>Generates <code>INSERT INTO</code> statements.</td></tr></tbody></table></section></article></section></main><footer class="footer"><div class="footer-inner"><div class="footer-brand">RelPyDB<small>Relational objects for Python</small></div><nav class="footer-links"><a href="../index.html">Home</a><a href="../installation.html">Installation</a><a href="../docs/start-here.html">Start Here</a><a href="../docs/index.html">Docs</a><a href="../ide.html">Online IDE</a><a href="https://github.com/mandelreouven2002/RelPyDB" rel="noreferrer" target="_blank">GitHub ↗</a></nav></div></footer><script src="../script.js"></script></body></html>

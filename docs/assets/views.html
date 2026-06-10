@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1" name="viewport"/><title>9. Views - RelPyDB</title><link href="../styles.css" rel="stylesheet"/></head><body>
+<header class="topbar"><a class="brand" href="../index.html"><span class="brand-mark">Rp</span><span><strong>RelPyDB</strong><small>Relational Python</small></span></a><button aria-expanded="false" class="nav-toggle" type="button"><svg viewbox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"></path></svg><span class="sr-only">Menu</span></button><nav class="site-nav"><a href="../index.html">Home</a><a href="../installation.html">Installation</a><a href="../docs/start-here.html">Start Here</a><a class="active" href="../docs/index.html">Docs</a><a href="../ide.html">Online IDE</a><a href="https://github.com/mandelreouven2002/RelPyDB" rel="noreferrer" target="_blank">GitHub</a></nav></header>
+<main>
+<section class="docs-layout">
+<aside class="docs-sidebar"><div class="docs-sidebar-header"><span>Documentation</span><input id="docs-filter" placeholder="Filter docs..." type="search"/></div><nav class="docs-tree"><a class="" href="index.html">Docs Overview</a><a class="" href="start-here.html">0. Start Here</a><a class="" href="quickstart.html">1. 5-Minute Quickstart</a><a class="" href="tutorial-shop.html">2. Full Tutorial</a><a class="" href="recipes.html">3. Common Recipes</a><a class="" href="why-relpy.html">4. Why RelPyDB?</a><a class="" href="alternatives.html">5. RelPyDB vs Alternatives</a><a class="" href="concepts.html">6. Concepts</a><a class="" href="tables-schema.html">7. Tables and Schema</a><a class="" href="data-operations.html">8. Data Operations</a><a class="" href="querying.html">9. Querying</a><a class="" href="joins.html">10. Joins</a><a class="" href="grouping.html">11. Grouping</a><a class="active" href="views.html">12. Views</a><a class="" href="indexes.html">13. Indexes</a><a class="" href="exports.html">14. Exports</a><a class="" href="persistence.html">15. Persistence</a><a class="" href="encryption.html">16. Encryption</a><a class="" href="python-integration.html">17. Python Integration</a><a class="" href="capabilities.html">18. Full Capability Checklist</a><a class="" href="errors-limitations.html">19. Common Errors and Limitations</a><a class="" href="api-reference.html">20. API Reference</a><a class="" href="api-functions.html">21. Function Reference</a><a class="" href="examples.html">22. Examples</a></nav></aside>
+<article class="docs-content"><section class="page-title docs-page-title"><p class="eyebrow">Documentation</p><h1>9. Views</h1><p>Named, reusable query definitions stored on the database object.</p></section>
+<section class="doc-topic">
+<h2>What is a view?</h2>
+<p>A view is a named query stored on the database object. It is defined as a Python lambda (or any callable) that receives the <code>db</code> object and returns a <code>Query</code>. The query is re-executed every time you call <code>db.view("name").to_list()</code>.</p>
+<div class="callout">Views are <strong>not persisted</strong> to the <code>.relpy.json</code> file because they contain Python callables. Re-register views after loading a database from disk.</div>
+</section>
+<section class="doc-topic">
+<h2>create_view</h2>
+<pre><code>from relpy import RelPy, AutoNumber, col
+
+db = RelPy()
+# ... (table setup omitted for brevity)
+
+db.create_view(
+    "paid_orders",
+    lambda db: (
+        db.query("orders")
+          .where(col("status") == "paid")
+          .select("id", "amount", "user_id")
+    ),
+)
+</code></pre>
+</section>
+<section class="doc-topic">
+<h2>Using a view</h2>
+<pre><code># query the view like any table
+rows = db.view("paid_orders").to_list()
+
+# chain further operations
+total = db.view("paid_orders").sum("amount")
+
+# filter on top of the view
+large_paid = (
+    db.view("paid_orders")
+      .where(col("amount") &gt; 100)
+      .to_list()
+)
+</code></pre>
+</section>
+<section class="doc-topic">
+<h2>View management</h2>
+<table class="param-table"><thead><tr><th>Function</th><th>Returns</th><th>Description</th></tr></thead><tbody>
+<tr><td><code>db.create_view(name, callable)</code></td><td><code>self</code></td><td>Registers a named view.</td></tr>
+<tr><td><code>db.view(name)</code></td><td><code>Query</code></td><td>Executes the view's callable and returns its <code>Query</code>.</td></tr>
+<tr><td><code>db.drop_view(name)</code></td><td><code>self</code></td><td>Removes a view from the database.</td></tr>
+<tr><td><code>db.list_views()</code></td><td><code>list[str]</code></td><td>Names of all registered views.</td></tr>
+<tr><td><code>db.describe_view(name)</code></td><td><code>dict</code></td><td>Metadata for one view.</td></tr>
+<tr><td><code>db.describe_views()</code></td><td><code>list[dict]</code></td><td>Metadata for all views.</td></tr>
+</tbody></table>
+</section>
+<section class="doc-topic">
+<h2>View with join and aggregation</h2>
+<pre><code>db.create_view(
+    "revenue_by_city",
+    lambda db: (
+        db.query("orders")
+          .join("users")
+          .where(col("orders.status") == "paid")
+          .group_by("users.city")
+          .aggregate(
+              orders=count(),
+              revenue=sum_("orders.amount"),
+          )
+          .order_by("revenue", descending=True)
+    ),
+)
+
+# Later in your code — re-execute without rewriting the query
+summary = db.view("revenue_by_city").to_list()
+</code></pre>
+</section>
+<div class="doc-nav">
+<a class="button secondary" href="grouping.html">← 8. Grouping</a>
+<a class="button teal" href="indexes.html">10. Indexes →</a>
+</div>
+</article>
+</section>
+</main>
+<footer class="footer"><div class="footer-inner"><div class="footer-brand">RelPyDB<small>Relational objects for Python</small></div><nav class="footer-links"><a href="../index.html">Home</a><a href="../installation.html">Installation</a><a href="../docs/start-here.html">Start Here</a><a href="../docs/index.html">Docs</a><a href="../ide.html">Online IDE</a><a href="https://github.com/mandelreouven2002/RelPyDB" rel="noreferrer" target="_blank">GitHub ↗</a></nav></div></footer>
+<script src="../script.js"></script></body></html>

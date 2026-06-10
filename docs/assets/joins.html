@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1" name="viewport"/><title>7. Joins - RelPyDB</title><link href="../styles.css" rel="stylesheet"/></head><body>
+<header class="topbar"><a class="brand" href="../index.html"><span class="brand-mark">Rp</span><span><strong>RelPyDB</strong><small>Relational Python</small></span></a><button aria-expanded="false" class="nav-toggle" type="button"><svg viewbox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"></path></svg><span class="sr-only">Menu</span></button><nav class="site-nav"><a href="../index.html">Home</a><a href="../installation.html">Installation</a><a href="../docs/start-here.html">Start Here</a><a class="active" href="../docs/index.html">Docs</a><a href="../ide.html">Online IDE</a><a href="https://github.com/mandelreouven2002/RelPyDB" rel="noreferrer" target="_blank">GitHub</a></nav></header>
+<main>
+<section class="docs-layout">
+<aside class="docs-sidebar"><div class="docs-sidebar-header"><span>Documentation</span><input id="docs-filter" placeholder="Filter docs..." type="search"/></div><nav class="docs-tree"><a class="" href="index.html">Docs Overview</a><a class="" href="start-here.html">0. Start Here</a><a class="" href="quickstart.html">1. 5-Minute Quickstart</a><a class="" href="tutorial-shop.html">2. Full Tutorial</a><a class="" href="recipes.html">3. Common Recipes</a><a class="" href="why-relpy.html">4. Why RelPyDB?</a><a class="" href="alternatives.html">5. RelPyDB vs Alternatives</a><a class="" href="concepts.html">6. Concepts</a><a class="" href="tables-schema.html">7. Tables and Schema</a><a class="" href="data-operations.html">8. Data Operations</a><a class="" href="querying.html">9. Querying</a><a class="active" href="joins.html">10. Joins</a><a class="" href="grouping.html">11. Grouping</a><a class="" href="views.html">12. Views</a><a class="" href="indexes.html">13. Indexes</a><a class="" href="exports.html">14. Exports</a><a class="" href="persistence.html">15. Persistence</a><a class="" href="encryption.html">16. Encryption</a><a class="" href="python-integration.html">17. Python Integration</a><a class="" href="capabilities.html">18. Full Capability Checklist</a><a class="" href="errors-limitations.html">19. Common Errors and Limitations</a><a class="" href="api-reference.html">20. API Reference</a><a class="" href="api-functions.html">21. Function Reference</a><a class="" href="examples.html">22. Examples</a></nav></aside>
+<article class="docs-content"><section class="page-title docs-page-title"><p class="eyebrow">Documentation</p><h1>7. Joins</h1><p>Combine rows from multiple tables using foreign keys or explicit column mappings.</p></section>
+<section class="doc-topic">
+<h2>Setup — two related tables</h2>
+<p>The examples on this page use a small <code>users</code> + <code>orders</code> schema with a foreign key relationship.</p>
+<pre><code>from relpy import RelPy, AutoNumber, col
+
+db = RelPy()
+
+db.create_table("users")
+db.add_column("users", "id",   AutoNumber, is_primary_key=True)
+db.add_column("users", "name", str, nullable=False)
+db.add_column("users", "city", str, nullable=False)
+
+db.create_table("orders")
+db.add_column("orders", "id",      AutoNumber, is_primary_key=True)
+db.add_column("orders", "user_id", int, nullable=False, references="users.id")
+db.add_column("orders", "amount",  float, nullable=False)
+db.add_column("orders", "status",  str, nullable=False)
+
+db.insert("users", {"name": "Alice", "city": "Tel Aviv"})   # id=1
+db.insert("users", {"name": "Bob",   "city": "Haifa"})      # id=2
+db.insert("users", {"name": "Carol", "city": "Jerusalem"})  # id=3
+
+db.insert("orders", {"user_id": 1, "amount": 120.0, "status": "paid"})
+db.insert("orders", {"user_id": 1, "amount":  80.0, "status": "paid"})
+db.insert("orders", {"user_id": 2, "amount": 200.0, "status": "pending"})
+# Carol has no orders
+</code></pre>
+</section>
+<section class="doc-topic">
+<h2>Automatic FK join</h2>
+<p>When a foreign key exists between two tables, RelPyDB can infer the join column automatically.</p>
+<div class="comparison-grid">
+<div class="code-panel"><div class="panel-title">RelPyDB — FK inferred</div>
+<pre><code>result = (
+    db.query("orders")
+      .join("users")
+      .select(
+          "orders.id",
+          "users.name",
+          "orders.amount",
+          "orders.status",
+      )
+      .to_list()
+)
+</code></pre></div>
+<div class="code-panel"><div class="panel-title">SQL equivalent</div>
+<pre><code>SELECT
+  orders.id,
+  users.name,
+  orders.amount,
+  orders.status
+FROM orders
+JOIN users
+  ON orders.user_id = users.id;
+</code></pre></div>
+</div>
+<div class="code-panel"><div class="panel-title">Output — 3 rows (only users with orders)</div>
+<table class="data-table"><thead><tr><th>orders.id</th><th>users.name</th><th>orders.amount</th><th>orders.status</th></tr></thead><tbody>
+<tr><td>1</td><td>Alice</td><td>120.0</td><td>paid</td></tr>
+<tr><td>2</td><td>Alice</td><td>80.0</td><td>paid</td></tr>
+<tr><td>3</td><td>Bob</td><td>200.0</td><td>pending</td></tr>
+</tbody></table></div>
+</section>
+<section class="doc-topic">
+<h2>Explicit join columns</h2>
+<pre><code># using on=
+db.query("orders").join("users", on=("user_id", "id"))
+
+# using left_on / right_on
+db.query("orders").join("users", left_on="user_id", right_on="id")
+</code></pre>
+<p>Use these when the foreign key doesn't exist in the schema, or when joining on a non-FK column.</p>
+</section>
+<section class="doc-topic">
+<h2>Join types</h2>
+<table class="param-table"><thead><tr><th>method= value</th><th>Shortcut</th><th>Behaviour</th></tr></thead><tbody>
+<tr><td><code>"inner"</code> (default)</td><td><code>inner_join("users")</code></td><td>Only rows with a match on both sides.</td></tr>
+<tr><td><code>"left"</code></td><td><code>left_join("users")</code></td><td>All rows from the left table; <code>None</code> for unmatched right columns.</td></tr>
+<tr><td><code>"right"</code></td><td><code>right_join("users")</code></td><td>All rows from the right table; <code>None</code> for unmatched left columns.</td></tr>
+<tr><td><code>"full"</code></td><td><code>full_join("users")</code></td><td>All rows from both sides; <code>None</code> where there is no match.</td></tr>
+<tr><td><code>"cross"</code></td><td><code>cross_join("users")</code></td><td>Cartesian product — every left row combined with every right row.</td></tr>
+<tr><td><code>"natural"</code></td><td><code>natural_join("users")</code></td><td>Joins on all columns with the same name in both tables.</td></tr>
+</tbody></table>
+<h3>LEFT JOIN example — include users with no orders</h3>
+<div class="comparison-grid">
+<div class="code-panel"><div class="panel-title">RelPyDB</div>
+<pre><code>result = (
+    db.query("users")
+      .left_join("orders")
+      .select(
+          "users.name",
+          "orders.amount",
+          "orders.status",
+      )
+      .to_list()
+)
+</code></pre></div>
+<div class="code-panel"><div class="panel-title">SQL equivalent</div>
+<pre><code>SELECT
+  users.name,
+  orders.amount,
+  orders.status
+FROM users
+LEFT JOIN orders
+  ON orders.user_id = users.id;
+</code></pre></div>
+</div>
+<div class="code-panel"><div class="panel-title">Output — Carol appears with None values</div>
+<table class="data-table"><thead><tr><th>users.name</th><th>orders.amount</th><th>orders.status</th></tr></thead><tbody>
+<tr><td>Alice</td><td>120.0</td><td>paid</td></tr>
+<tr><td>Alice</td><td>80.0</td><td>paid</td></tr>
+<tr><td>Bob</td><td>200.0</td><td>pending</td></tr>
+<tr><td>Carol</td><td>None</td><td>None</td></tr>
+</tbody></table></div>
+</section>
+<section class="doc-topic">
+<h2>Chained joins</h2>
+<p>You can chain multiple <code>.join()</code> calls to bring in more than two tables.</p>
+<pre><code># three-table join: order_items → orders → products
+result = (
+    db.query("order_items")
+      .join("orders")
+      .join("products")
+      .select(
+          "orders.id",
+          "products.name",
+          "order_items.quantity",
+          "order_items.price",
+      )
+      .to_list()
+)
+</code></pre>
+</section>
+<section class="doc-topic">
+<h2>Filtering a join result</h2>
+<div class="comparison-grid">
+<div class="code-panel"><div class="panel-title">RelPyDB</div>
+<pre><code>paid_orders = (
+    db.query("orders")
+      .join("users")
+      .where(col("orders.status") == "paid")
+      .select(
+          "users.name",
+          "orders.amount",
+      )
+      .order_by("orders.amount", descending=True)
+      .to_list()
+)
+</code></pre></div>
+<div class="code-panel"><div class="panel-title">SQL equivalent</div>
+<pre><code>SELECT users.name, orders.amount
+FROM orders
+JOIN users
+  ON orders.user_id = users.id
+WHERE orders.status = 'paid'
+ORDER BY orders.amount DESC;
+</code></pre></div>
+</div>
+<div class="code-panel"><div class="panel-title">Output</div>
+<table class="data-table"><thead><tr><th>users.name</th><th>orders.amount</th></tr></thead><tbody>
+<tr><td>Alice</td><td>120.0</td></tr>
+<tr><td>Alice</td><td>80.0</td></tr>
+</tbody></table></div>
+</section>
+<div class="doc-nav">
+<a class="button secondary" href="querying.html">← 6. Querying</a>
+<a class="button teal" href="grouping.html">8. Grouping →</a>
+</div>
+</article>
+</section>
+</main>
+<footer class="footer"><div class="footer-inner"><div class="footer-brand">RelPyDB<small>Relational objects for Python</small></div><nav class="footer-links"><a href="../index.html">Home</a><a href="../installation.html">Installation</a><a href="../docs/start-here.html">Start Here</a><a href="../docs/index.html">Docs</a><a href="../ide.html">Online IDE</a><a href="https://github.com/mandelreouven2002/RelPyDB" rel="noreferrer" target="_blank">GitHub ↗</a></nav></div></footer>
+<script src="../script.js"></script></body></html>

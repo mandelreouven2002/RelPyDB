@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1" name="viewport"/><title>8. Grouping &amp; Aggregation - RelPyDB</title><link href="../styles.css" rel="stylesheet"/></head><body>
+<header class="topbar"><a class="brand" href="../index.html"><span class="brand-mark">Rp</span><span><strong>RelPyDB</strong><small>Relational Python</small></span></a><button aria-expanded="false" class="nav-toggle" type="button"><svg viewbox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"></path></svg><span class="sr-only">Menu</span></button><nav class="site-nav"><a href="../index.html">Home</a><a href="../installation.html">Installation</a><a href="../docs/start-here.html">Start Here</a><a class="active" href="../docs/index.html">Docs</a><a href="../ide.html">Online IDE</a><a href="https://github.com/mandelreouven2002/RelPyDB" rel="noreferrer" target="_blank">GitHub</a></nav></header>
+<main>
+<section class="docs-layout">
+<aside class="docs-sidebar"><div class="docs-sidebar-header"><span>Documentation</span><input id="docs-filter" placeholder="Filter docs..." type="search"/></div><nav class="docs-tree"><a class="" href="index.html">Docs Overview</a><a class="" href="start-here.html">0. Start Here</a><a class="" href="quickstart.html">1. 5-Minute Quickstart</a><a class="" href="tutorial-shop.html">2. Full Tutorial</a><a class="" href="recipes.html">3. Common Recipes</a><a class="" href="why-relpy.html">4. Why RelPyDB?</a><a class="" href="alternatives.html">5. RelPyDB vs Alternatives</a><a class="" href="concepts.html">6. Concepts</a><a class="" href="tables-schema.html">7. Tables and Schema</a><a class="" href="data-operations.html">8. Data Operations</a><a class="" href="querying.html">9. Querying</a><a class="" href="joins.html">10. Joins</a><a class="active" href="grouping.html">11. Grouping</a><a class="" href="views.html">12. Views</a><a class="" href="indexes.html">13. Indexes</a><a class="" href="exports.html">14. Exports</a><a class="" href="persistence.html">15. Persistence</a><a class="" href="encryption.html">16. Encryption</a><a class="" href="python-integration.html">17. Python Integration</a><a class="" href="capabilities.html">18. Full Capability Checklist</a><a class="" href="errors-limitations.html">19. Common Errors and Limitations</a><a class="" href="api-reference.html">20. API Reference</a><a class="" href="api-functions.html">21. Function Reference</a><a class="" href="examples.html">22. Examples</a></nav></aside>
+<article class="docs-content"><section class="page-title docs-page-title"><p class="eyebrow">Documentation</p><h1>8. Grouping &amp; Aggregation</h1><p>Summarise rows into groups and compute aggregate statistics.</p></section>
+<section class="doc-topic">
+<h2>group_by + aggregate</h2>
+<p>Once you call <code>.group_by()</code>, the query switches into grouped mode. You must follow it with <code>.aggregate()</code> before calling any terminal method.</p>
+<div class="comparison-grid">
+<div class="code-panel"><div class="panel-title">RelPyDB</div>
+<pre><code>from relpy import RelPy, AutoNumber, col, count, sum_, avg
+
+result = (
+    db.query("orders")
+      .group_by("status")
+      .aggregate(
+          order_count=count(),
+          total=sum_("amount"),
+          average=avg("amount"),
+      )
+      .to_list()
+)
+</code></pre></div>
+<div class="code-panel"><div class="panel-title">SQL equivalent</div>
+<pre><code>SELECT
+  status,
+  COUNT(*)         AS order_count,
+  SUM(amount)      AS total,
+  AVG(amount)      AS average
+FROM orders
+GROUP BY status;
+</code></pre></div>
+</div>
+<div class="code-panel"><div class="panel-title">Output</div>
+<table class="data-table"><thead><tr><th>status</th><th>order_count</th><th>total</th><th>average</th></tr></thead><tbody>
+<tr><td>paid</td><td>2</td><td>200.0</td><td>100.0</td></tr>
+<tr><td>pending</td><td>1</td><td>200.0</td><td>200.0</td></tr>
+</tbody></table></div>
+</section>
+<section class="doc-topic">
+<h2>Aggregate functions</h2>
+<table class="param-table"><thead><tr><th>Function</th><th>Import</th><th>SQL</th><th>Description</th></tr></thead><tbody>
+<tr><td><code>count()</code></td><td><code>from relpy import count</code></td><td><code>COUNT(*)</code></td><td>Count all rows in group.</td></tr>
+<tr><td><code>count("col")</code></td><td><code>from relpy import count</code></td><td><code>COUNT(col)</code></td><td>Count non-None values in column.</td></tr>
+<tr><td><code>sum_("col")</code></td><td><code>from relpy import sum_</code></td><td><code>SUM(col)</code></td><td>Sum of values. (Trailing underscore avoids shadowing Python's <code>sum</code>.)</td></tr>
+<tr><td><code>avg("col")</code></td><td><code>from relpy import avg</code></td><td><code>AVG(col)</code></td><td>Mean of values.</td></tr>
+<tr><td><code>min_("col")</code></td><td><code>from relpy import min_</code></td><td><code>MIN(col)</code></td><td>Smallest value.</td></tr>
+<tr><td><code>max_("col")</code></td><td><code>from relpy import max_</code></td><td><code>MAX(col)</code></td><td>Largest value.</td></tr>
+</tbody></table>
+</section>
+<section class="doc-topic">
+<h2>Multi-column group_by</h2>
+<div class="comparison-grid">
+<div class="code-panel"><div class="panel-title">RelPyDB</div>
+<pre><code>result = (
+    db.query("orders")
+      .join("users")
+      .group_by("users.city", "orders.status")
+      .aggregate(
+          orders=count(),
+          revenue=sum_("orders.amount"),
+      )
+      .order_by("revenue", descending=True)
+      .to_list()
+)
+</code></pre></div>
+<div class="code-panel"><div class="panel-title">SQL equivalent</div>
+<pre><code>SELECT
+  users.city,
+  orders.status,
+  COUNT(*)          AS orders,
+  SUM(orders.amount) AS revenue
+FROM orders
+JOIN users
+  ON orders.user_id = users.id
+GROUP BY users.city, orders.status
+ORDER BY revenue DESC;
+</code></pre></div>
+</div>
+<div class="code-panel"><div class="panel-title">Output (example)</div>
+<table class="data-table"><thead><tr><th>users.city</th><th>orders.status</th><th>orders</th><th>revenue</th></tr></thead><tbody>
+<tr><td>Haifa</td><td>pending</td><td>1</td><td>200.0</td></tr>
+<tr><td>Tel Aviv</td><td>paid</td><td>2</td><td>200.0</td></tr>
+</tbody></table></div>
+</section>
+<section class="doc-topic">
+<h2>having — filter groups</h2>
+<p><code>having()</code> filters the grouped result, like <code>WHERE</code> but applied after aggregation.</p>
+<div class="comparison-grid">
+<div class="code-panel"><div class="panel-title">RelPyDB</div>
+<pre><code>result = (
+    db.query("orders")
+      .group_by("status")
+      .aggregate(
+          order_count=count(),
+          total=sum_("amount"),
+      )
+      .having(col("total") &gt; 150)
+      .to_list()
+)
+</code></pre></div>
+<div class="code-panel"><div class="panel-title">SQL equivalent</div>
+<pre><code>SELECT
+  status,
+  COUNT(*) AS order_count,
+  SUM(amount) AS total
+FROM orders
+GROUP BY status
+HAVING SUM(amount) &gt; 150;
+</code></pre></div>
+</div>
+<div class="code-panel"><div class="panel-title">Output — only groups with total &gt; 150</div>
+<table class="data-table"><thead><tr><th>status</th><th>order_count</th><th>total</th></tr></thead><tbody>
+<tr><td>paid</td><td>2</td><td>200.0</td></tr>
+<tr><td>pending</td><td>1</td><td>200.0</td></tr>
+</tbody></table></div>
+</section>
+<section class="doc-topic">
+<h2>Real benchmark result — confirmed registrations by game system</h2>
+<p>This query was run in the RelPyDB benchmark against 10 000 registration records across 120 sessions. The same query ran in DuckDB, SQLAlchemy, pandas, NumPy, and Python loops — all returned identical results.</p>
+<pre><code>result = (
+    db.query("registrations")
+      .join("sessions")
+      .where(
+          (col("registrations.status")     == "confirmed") &amp;
+          (col("registrations.checked_in") == True)
+      )
+      .group_by("sessions.game_system")
+      .aggregate(
+          checked_in_players=count(),
+          ticket_revenue=sum_("registrations.price"),
+          average_ticket=avg("registrations.price"),
+      )
+      .order_by("checked_in_players", descending=True)
+      .to_list()
+)
+</code></pre>
+<div class="code-panel"><div class="panel-title">Output — top 5 game systems</div>
+<table class="data-table"><thead><tr><th>game_system</th><th>checked_in_players</th><th>ticket_revenue</th><th>average_ticket</th></tr></thead><tbody>
+<tr><td>Mork Borg</td><td>1 079</td><td>54 035.0</td><td>50.08</td></tr>
+<tr><td>Call of Cthulhu</td><td>923</td><td>45 020.0</td><td>48.78</td></tr>
+<tr><td>D&amp;D 5e</td><td>854</td><td>41 905.0</td><td>49.07</td></tr>
+<tr><td>Blades in the Dark</td><td>693</td><td>33 895.0</td><td>48.91</td></tr>
+<tr><td>Pathfinder</td><td>597</td><td>29 590.0</td><td>49.56</td></tr>
+</tbody></table></div>
+</section>
+<div class="doc-nav">
+<a class="button secondary" href="joins.html">← 7. Joins</a>
+<a class="button teal" href="views.html">9. Views →</a>
+</div>
+</article>
+</section>
+</main>
+<footer class="footer"><div class="footer-inner"><div class="footer-brand">RelPyDB<small>Relational objects for Python</small></div><nav class="footer-links"><a href="../index.html">Home</a><a href="../installation.html">Installation</a><a href="../docs/start-here.html">Start Here</a><a href="../docs/index.html">Docs</a><a href="../ide.html">Online IDE</a><a href="https://github.com/mandelreouven2002/RelPyDB" rel="noreferrer" target="_blank">GitHub ↗</a></nav></div></footer>
+<script src="../script.js"></script></body></html>
