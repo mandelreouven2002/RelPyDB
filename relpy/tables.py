@@ -327,6 +327,7 @@ class RelPy(IndexMixin, PersistenceMixin, EncryptionMixin):
         self.indexes: dict[str, IndexDef] = {}
         self._next_row_id: dict[str, int] = {}
         self._row_positions: dict[str, dict[int, int]] = {}
+        self._primary_key_lookup: dict[str, dict[tuple[Any, ...], dict[str, Any]]] = {}
 
         self._encryption_key = None
         self._fernet = None
@@ -368,6 +369,7 @@ class RelPy(IndexMixin, PersistenceMixin, EncryptionMixin):
         self.schema[table_name] = TableDef(name=table_name)
         self.data[table_name] = []
         self._initialize_index_storage_for_table(table_name)
+        self._primary_key_lookup[table_name] = {}
 
         return self
 
@@ -667,6 +669,7 @@ class RelPy(IndexMixin, PersistenceMixin, EncryptionMixin):
 
         if is_primary_key:
             table_ref.primary_key = [column_name]
+            self._refresh_primary_key_lookup(table_name)
 
         # ---------------------------------------------------------------------
         # Save AutoNumber sequence metadata
@@ -819,6 +822,7 @@ class RelPy(IndexMixin, PersistenceMixin, EncryptionMixin):
             table_ref.columns[column].is_primary_key = True
 
         table_ref.primary_key = columns
+        self._refresh_primary_key_lookup(table_name)
 
         return self
 
@@ -1379,25 +1383,104 @@ class RelPy(IndexMixin, PersistenceMixin, EncryptionMixin):
         """
         Checks whether a value exists in the target side of a foreign key.
 
-        Args:
-            target_table:
-                Referenced table.
+        Fast path:
+            If the foreign key references the target table's single-column
+            primary key, this method uses RelPy's primary-key lookup cache.
 
-            target_column:
-                Referenced column.
-
-            value:
-                Value to search for.
-
-        Returns:
-            True if the value exists, False otherwise.
+        Fallback:
+            If the target column is not the primary key, this method scans the
+            target table.
         """
+
+        target_primary_key = self.schema[target_table].primary_key
+
+        if target_primary_key == [target_column]:
+            lookup = self._primary_key_lookup_for_table(target_table)
+            return (value,) in lookup
 
         for row in self.data[target_table]:
             if row.get(target_column) == value:
                 return True
 
         return False
+
+    def _primary_key_lookup_for_table(
+        self,
+        table_name: str,
+    ) -> dict[tuple[Any, ...], dict[str, Any]]:
+        """
+        Returns the primary-key lookup cache for a table.
+
+        The cache maps:
+            primary-key tuple -> stored row
+
+        It is rebuilt lazily when missing.
+        """
+
+        if not hasattr(self, "_primary_key_lookup"):
+            self._primary_key_lookup = {}
+
+        if table_name not in self._primary_key_lookup:
+            self._refresh_primary_key_lookup(table_name)
+
+        return self._primary_key_lookup[table_name]
+
+    def _refresh_primary_key_lookup(self, table_name: str) -> None:
+        """
+        Rebuilds the primary-key lookup cache for one table.
+        """
+
+        if not hasattr(self, "_primary_key_lookup"):
+            self._primary_key_lookup = {}
+
+        primary_key = self.schema[table_name].primary_key
+
+        if not primary_key:
+            self._primary_key_lookup[table_name] = {}
+            return
+
+        lookup: dict[tuple[Any, ...], dict[str, Any]] = {}
+
+        for row in self.data[table_name]:
+            key = self._primary_key_tuple(table_name, row)
+
+            if key is None:
+                continue
+
+            lookup[key] = row
+
+        self._primary_key_lookup[table_name] = lookup
+
+    def _refresh_all_primary_key_lookups(self) -> None:
+        """
+        Rebuilds primary-key lookup caches for all tables.
+        """
+
+        if not hasattr(self, "_primary_key_lookup"):
+            self._primary_key_lookup = {}
+
+        for table_name in self.schema.keys():
+            self._refresh_primary_key_lookup(table_name)
+
+    def _add_row_to_primary_key_lookup(
+        self,
+        table_name: str,
+        row: dict[str, Any],
+    ) -> None:
+        """
+        Adds one stored row to the primary-key lookup cache.
+        """
+
+        primary_key = self.schema[table_name].primary_key
+
+        if not primary_key:
+            return
+
+        lookup = self._primary_key_lookup_for_table(table_name)
+        key = self._primary_key_tuple(table_name, row)
+
+        if key is not None:
+            lookup[key] = row
 
     def _is_value_compatible(self, value: Any, expected_type: type) -> bool:
         """
@@ -1984,8 +2067,14 @@ class RelPy(IndexMixin, PersistenceMixin, EncryptionMixin):
         """
         Inserts a new row into a table.
 
-        Encrypted columns are validated as plaintext first, then encrypted before
-        the row is stored in self.data.
+        Optimized behavior:
+        - Validates the plaintext row before storage.
+        - Encrypts encrypted columns only after validation.
+        - Updates existing indexes incrementally instead of rebuilding all table
+          indexes after every insert.
+        - Updates the primary-key lookup cache incrementally.
+
+        For loading many rows, prefer insert_many().
         """
 
         self._validate_existing_table(table_name)
@@ -2016,24 +2105,33 @@ class RelPy(IndexMixin, PersistenceMixin, EncryptionMixin):
             row=normalized_row,
         )
 
-        old_rows = copy.deepcopy(self.data[table_name])
         old_next_row_id = self._next_row_id[table_name]
         old_auto_sequences = dict(self.schema[table_name].auto_sequences)
+        row_was_appended = False
 
         try:
-            # Commit AutoNumber sequence updates only after all validation succeeded.
             for column_name, sequence_value in pending_auto_sequences.items():
                 self.schema[table_name].auto_sequences[column_name] = sequence_value
 
             self._attach_row_id(table_name, storage_row)
             self.data[table_name].append(storage_row)
-            self._rebuild_table_indexes(table_name)
+            row_was_appended = True
+
+            row_id = storage_row[INTERNAL_ROW_ID]
+            self._row_positions[table_name][row_id] = len(self.data[table_name]) - 1
+
+            self._add_row_to_table_indexes(table_name, storage_row)
+            self._add_row_to_primary_key_lookup(table_name, storage_row)
 
         except Exception:
-            self.data[table_name] = old_rows
+            if row_was_appended:
+                self.data[table_name].pop()
+
             self._next_row_id[table_name] = old_next_row_id
             self.schema[table_name].auto_sequences = old_auto_sequences
+            self._refresh_row_positions(table_name)
             self._rebuild_table_indexes(table_name)
+            self._refresh_primary_key_lookup(table_name)
             raise
 
         return self._stored_row_to_python_dict(
@@ -2042,6 +2140,145 @@ class RelPy(IndexMixin, PersistenceMixin, EncryptionMixin):
             decrypt=True,
         )
 
+    def insert_many(
+        self,
+        table_name: str,
+        rows: list[dict[str, Any]] | tuple[dict[str, Any], ...],
+    ) -> list[dict[str, Any]]:
+        """
+        Inserts many rows into a table in one batch.
+
+        This is much faster than calling insert() in a loop because it:
+        - validates all rows first,
+        - commits AutoNumber sequences once,
+        - appends all rows in one batch,
+        - rebuilds indexes once,
+        - refreshes row positions once,
+        - refreshes the primary-key lookup once.
+
+        Example:
+            db.insert_many("registrations", registration_rows)
+        """
+
+        self._validate_existing_table(table_name)
+
+        if not isinstance(rows, (list, tuple)):
+            raise TypeError("rows must be a list or tuple of dictionaries.")
+
+        if not rows:
+            return []
+
+        for index, row in enumerate(rows):
+            self._validate_row_dict(row, f"rows[{index}]")
+
+        table_ref = self.schema[table_name]
+        working_auto_sequences = dict(table_ref.auto_sequences)
+        normalized_rows: list[dict[str, Any]] = []
+
+        for input_row in rows:
+            self._validate_known_columns(
+                table_name=table_name,
+                values=input_row,
+                context="insert_many",
+            )
+
+            complete_row: dict[str, Any] = {}
+
+            for column_name, column_def in table_ref.columns.items():
+                if column_name in input_row:
+                    value = input_row[column_name]
+
+                    if column_def.is_auto_number and value is not None:
+                        if not self._is_value_compatible(value, int):
+                            raise TypeError(
+                                f"AutoNumber column '{table_name}.{column_name}' "
+                                f"must receive an int value, got {type(value).__name__}."
+                            )
+
+                        working_auto_sequences[column_name] = max(
+                            working_auto_sequences.get(column_name, 0),
+                            value,
+                        )
+
+                    complete_row[column_name] = self._clone_default(value)
+                    continue
+
+                if column_def.is_auto_number:
+                    next_value = working_auto_sequences.get(column_name, 0) + 1
+                    working_auto_sequences[column_name] = next_value
+                    complete_row[column_name] = next_value
+                    continue
+
+                if column_def.has_default:
+                    complete_row[column_name] = self._clone_default(column_def.default)
+                    continue
+
+                if column_def.nullable:
+                    complete_row[column_name] = None
+                    continue
+
+                raise ValueError(
+                    f"Missing required value for non-nullable column "
+                    f"'{table_name}.{column_name}'."
+                )
+
+            self._validate_complete_row_against_schema(
+                table_name=table_name,
+                row=complete_row,
+            )
+
+            self._validate_foreign_keys_for_row(
+                table_name=table_name,
+                row=complete_row,
+            )
+
+            normalized_rows.append(complete_row)
+
+        self._validate_primary_keys_for_batch(
+            table_name=table_name,
+            candidate_rows=normalized_rows,
+        )
+
+        storage_rows = [
+            self._encrypt_row_for_storage(
+                table_name=table_name,
+                row=row,
+            )
+            for row in normalized_rows
+        ]
+
+        old_rows = list(self.data[table_name])
+        old_next_row_id = self._next_row_id[table_name]
+        old_auto_sequences = dict(table_ref.auto_sequences)
+
+        try:
+            table_ref.auto_sequences = working_auto_sequences
+
+            for storage_row in storage_rows:
+                self._attach_row_id(table_name, storage_row)
+
+            self.data[table_name].extend(storage_rows)
+            self._refresh_row_positions(table_name)
+            self._rebuild_table_indexes(table_name)
+            self._refresh_primary_key_lookup(table_name)
+
+        except Exception:
+            self.data[table_name] = old_rows
+            self._next_row_id[table_name] = old_next_row_id
+            table_ref.auto_sequences = old_auto_sequences
+            self._refresh_row_positions(table_name)
+            self._rebuild_table_indexes(table_name)
+            self._refresh_primary_key_lookup(table_name)
+            raise
+
+        return [
+            self._stored_row_to_python_dict(
+                storage_row,
+                table_name=table_name,
+                decrypt=True,
+            )
+            for storage_row in storage_rows
+        ]
 
     def update(
         self,
@@ -2130,6 +2367,7 @@ class RelPy(IndexMixin, PersistenceMixin, EncryptionMixin):
                 self.data[table_name][row_index] = candidate_storage_row
 
             self._rebuild_table_indexes(table_name)
+            self._refresh_primary_key_lookup(table_name)
 
         except Exception:
             self.data[table_name] = old_rows
@@ -2139,6 +2377,7 @@ class RelPy(IndexMixin, PersistenceMixin, EncryptionMixin):
 
             self._row_positions[table_name] = old_row_positions
             self._rebuild_table_indexes(table_name)
+            self._refresh_primary_key_lookup(table_name)
             raise
 
         return len(updated_rows_by_index)
@@ -2221,6 +2460,7 @@ class RelPy(IndexMixin, PersistenceMixin, EncryptionMixin):
             # Rebuild all indexes because delete may affect multiple tables.
             # This also refreshes row_id -> position mappings.
             self._rebuild_all_indexes()
+            self._refresh_all_primary_key_lookups()
 
         except Exception:
             # Rollback all affected data and index storage metadata.
@@ -2230,6 +2470,7 @@ class RelPy(IndexMixin, PersistenceMixin, EncryptionMixin):
 
             # Restore index maps to match the restored data.
             self._rebuild_all_indexes()
+            self._refresh_all_primary_key_lookups()
 
             raise
 
@@ -2484,22 +2725,12 @@ class RelPy(IndexMixin, PersistenceMixin, EncryptionMixin):
         """
         Validates that a candidate row does not violate primary key rules.
 
-        Rules:
-        - Primary key values cannot contain None.
-        - Primary key values must be unique.
+        Fast path:
+            For insert-like operations, this uses the primary-key lookup cache.
 
-        Args:
-            table_name:
-                Target table.
-
-            candidate_row:
-                Row to check.
-
-            ignore_row_index:
-                Optional row index to ignore.
-
-                This is useful for update(), where a row should not conflict
-                with itself.
+        Fallback:
+            For update() with ignore_row_index, this scans so the row does not
+            conflict with itself.
         """
 
         key = self._primary_key_tuple(table_name, candidate_row)
@@ -2513,8 +2744,18 @@ class RelPy(IndexMixin, PersistenceMixin, EncryptionMixin):
                 f"Candidate key: {key}."
             )
 
+        if ignore_row_index is None:
+            lookup = self._primary_key_lookup_for_table(table_name)
+
+            if key in lookup:
+                raise ValueError(
+                    f"Duplicate primary key in table '{table_name}': {key}."
+                )
+
+            return
+
         for row_index, existing_row in enumerate(self.data[table_name]):
-            if ignore_row_index is not None and row_index == ignore_row_index:
+            if row_index == ignore_row_index:
                 continue
 
             existing_key = self._primary_key_tuple(table_name, existing_row)
@@ -2523,6 +2764,42 @@ class RelPy(IndexMixin, PersistenceMixin, EncryptionMixin):
                 raise ValueError(
                     f"Duplicate primary key in table '{table_name}': {key}."
                 )
+
+    def _validate_primary_keys_for_batch(
+        self,
+        table_name: str,
+        candidate_rows: list[dict[str, Any]],
+    ) -> None:
+        """
+        Validates primary-key uniqueness for a batch before committing it.
+        """
+
+        primary_key = self.schema[table_name].primary_key
+
+        if not primary_key:
+            return
+
+        existing_lookup = self._primary_key_lookup_for_table(table_name)
+        seen_keys: set[tuple[Any, ...]] = set()
+
+        for candidate_row in candidate_rows:
+            key = self._primary_key_tuple(table_name, candidate_row)
+
+            if key is None:
+                continue
+
+            if any(value is None for value in key):
+                raise ValueError(
+                    f"Primary key for table '{table_name}' cannot contain None. "
+                    f"Candidate key: {key}."
+                )
+
+            if key in existing_lookup or key in seen_keys:
+                raise ValueError(
+                    f"Duplicate primary key in table '{table_name}': {key}."
+                )
+
+            seen_keys.add(key)
 
     def _validate_foreign_keys_for_row(
         self,
@@ -3131,53 +3408,27 @@ class RelPy(IndexMixin, PersistenceMixin, EncryptionMixin):
             where_key: dict[str, Any],
     ) -> dict[str, Any]:
         """
-        Finds a stored row by primary key.
-
-        Args:
-            table_name:
-                Name of the table.
-
-            where_key:
-                Primary key selector.
-
-        Returns:
-            The stored row dictionary.
-
-        Raises:
-            KeyError:
-                If no row matches the primary key.
-
-            RuntimeError:
-                If multiple rows match the primary key.
-                This should not happen if primary key validation works correctly.
+        Finds a stored row by primary key using the primary-key lookup cache.
         """
 
         self._validate_existing_table(table_name)
         self._validate_where_key(table_name, where_key)
 
         table_ref = self.schema[table_name]
+        key = tuple(
+            where_key[column_name]
+            for column_name in table_ref.primary_key
+        )
 
-        matching_rows: list[dict[str, Any]] = []
+        lookup = self._primary_key_lookup_for_table(table_name)
+        row = lookup.get(key)
 
-        for row in self.data[table_name]:
-            if all(
-                    row[column_name] == where_key[column_name]
-                    for column_name in table_ref.primary_key
-            ):
-                matching_rows.append(row)
-
-        if not matching_rows:
+        if row is None:
             raise KeyError(
                 f"No row found in table '{table_name}' for primary key {where_key}."
             )
 
-        if len(matching_rows) > 1:
-            raise RuntimeError(
-                f"Data integrity error: multiple rows found in table "
-                f"'{table_name}' for primary key {where_key}."
-            )
-
-        return matching_rows[0]
+        return row
 
     def _primary_key_label(
             self,
@@ -3760,7 +4011,7 @@ class RelPy(IndexMixin, PersistenceMixin, EncryptionMixin):
 
         for column_index, header in enumerate(headers):
             values = [row[column_index] for row in formatted_rows]
-            width = max(len(header), *(len(value) for value in values))
+            width = max([len(header), *(len(value) for value in values)])
             widths.append(width)
 
         top_border = self._table_border("┌", "┬", "┐", widths)

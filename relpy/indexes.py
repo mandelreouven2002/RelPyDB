@@ -270,7 +270,7 @@ class IndexMixin:
         """
 
         return {
-            key: copy.deepcopy(value)
+            key: value
             for key, value in row.items()
             if key != INTERNAL_ROW_ID
         }
@@ -345,6 +345,53 @@ class IndexMixin:
 
         for index_def in self.indexes.values():
             self._rebuild_index(index_def)
+
+    def _add_row_to_table_indexes(
+        self,
+        table_name: str,
+        row: dict[str, Any],
+    ) -> None:
+        """
+        Adds one newly inserted stored row to all indexes of a table.
+
+        This is much cheaper than rebuilding all table indexes after every
+        insert(). If a unique index is violated, the caller is expected to roll
+        back the row append and rebuild indexes.
+        """
+
+        if not hasattr(self, "indexes"):
+            return
+
+        self._ensure_table_row_ids(table_name)
+        row_id = self._row_id_from_row(row)
+
+        for index_def in self.indexes.values():
+            if index_def.table_name != table_name:
+                continue
+
+            key = self._index_key_from_row(
+                index_def=index_def,
+                row=row,
+            )
+
+            row_ids = index_def.index_map.setdefault(key, set())
+            row_ids.add(row_id)
+
+            if self._violates_unique_index(
+                index_def=index_def,
+                key=key,
+                row_ids=row_ids,
+            ):
+                row_ids.remove(row_id)
+
+                if not row_ids:
+                    del index_def.index_map[key]
+
+                raise ConstraintError(
+                    f"Unique index '{index_def.name}' violation on table "
+                    f"'{index_def.table_name}' for columns "
+                    f"{list(index_def.columns)!r}."
+                )
 
     def _lookup_indexed_row_ids(
         self,

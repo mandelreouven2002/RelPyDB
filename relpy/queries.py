@@ -1258,7 +1258,7 @@ class Query:
                 if isinstance(condition, Condition):
                     keep = condition(query_row)
                 else:
-                    keep = condition(copy.deepcopy(query_row))
+                    keep = condition(dict(query_row))
 
                     if type(keep) is not bool:
                         raise TypeError(
@@ -1663,7 +1663,7 @@ class Query:
 
         if self.source_rows is not None:
             return [
-                copy.deepcopy(row)
+                dict(row)
                 for row in self.source_rows
             ]
 

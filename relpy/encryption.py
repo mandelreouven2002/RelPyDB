@@ -279,8 +279,20 @@ class EncryptionMixin:
         """
         Returns a row suitable for query predicates/order/group calculations.
 
-        Encrypted payloads are decrypted if a key is available.
+        Fast path:
+            If the row has no encrypted payloads, returns the row itself.
+
+        Encrypted path:
+            If encrypted payloads are present, returns a decrypted copy.
         """
+
+        has_encrypted_value = any(
+            self._is_encrypted_payload(value)
+            for value in row.values()
+        )
+
+        if not has_encrypted_value:
+            return row
 
         query_row = {}
 

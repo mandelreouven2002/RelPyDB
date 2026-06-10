@@ -133,6 +133,7 @@ class PersistenceMixin:
 
         db._load_indexes_from_payload(indexes_payload)
         db._rebuild_all_indexes()
+        db._refresh_all_primary_key_lookups()
 
         return db
 
