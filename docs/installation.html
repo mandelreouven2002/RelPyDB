@@ -1,0 +1,41 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="description" content="Install RelPyDB from GitHub"><title>Installation - RelPyDB</title><link rel="stylesheet" href="styles.css"></head><body><header class="topbar"><a class="brand" href="index.html"><span class="brand-mark">Rp</span><span><strong>RelPyDB</strong><small>Relational Python</small></span></a><button class="nav-toggle" type="button" aria-expanded="false"><svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"></path></svg><span class="sr-only">Menu</span></button><nav class="site-nav"><a href="index.html">Home</a><a class="active" href="installation.html">Installation</a><a href="docs/start-here.html">Start Here</a><a href="docs/index.html">Docs</a><a href="ide.html">Online IDE</a><a href="https://github.com/mandelreouven2002/RelPyDB" target="_blank" rel="noreferrer">GitHub</a></nav></header><main>
+<section class="page-title"><p class="eyebrow">Installation</p><h1>Install RelPyDB</h1><p>RelPyDB is installed directly from GitHub. PyPI publication is planned for a future release.</p></section>
+<section class="section"><div class="grid two">
+
+<article class="doc-topic"><h2>Install from GitHub</h2>
+<p>Use <code>pip</code> with the repository URL:</p>
+<pre><code>python -m pip install git+https://github.com/mandelreouven2002/RelPyDB.git</code></pre>
+<div class="callout"><strong>Note:</strong> If you use a virtual environment, activate it before running this command.</div>
+</article>
+
+<article class="doc-topic"><h2>Install into a virtual environment</h2>
+<p>Best practice for any Python project:</p>
+<pre><code># Create and activate a virtual environment
+python -m venv .venv
+source .venv/bin/activate   # macOS / Linux
+.venv\Scripts\activate     # Windows
+
+# Install RelPyDB
+pip install git+https://github.com/mandelreouven2002/RelPyDB.git</code></pre>
+</article>
+
+<article class="doc-topic"><h2>Verify the installation</h2>
+<p>Run this one-liner to confirm RelPyDB imported correctly:</p>
+<pre><code>python -c "from relpy import RelPy; db = RelPy(); print('RelPyDB ready')"</code></pre>
+<div class="code-panel" style="margin-top:12px"><div class="panel-title">Expected output</div><pre><code>RelPyDB ready</code></pre></div>
+</article>
+
+<article class="doc-topic"><h2>Optional dependencies</h2>
+<p>RelPyDB's core has no required dependencies beyond the Python standard library. Some export functions require optional packages:</p>
+<table class="param-table"><thead><tr><th>Feature</th><th>Package</th><th>Install</th></tr></thead><tbody>
+<tr><td><code>to_pandas</code></td><td>pandas</td><td><code>pip install pandas</code></td></tr>
+<tr><td><code>to_numpy</code></td><td>numpy</td><td><code>pip install numpy</code></td></tr>
+<tr><td>Encrypted columns</td><td>cryptography</td><td><code>pip install cryptography</code></td></tr>
+</tbody></table>
+<p>Calling an export function without its package raises a descriptive <code>ImportError</code>.</p>
+</article>
+
+</div>
+<div class="callout" style="margin-top:24px"><strong>Ready?</strong> Continue to the <a href="docs/start-here.html">Start Here</a> to run your first table in five minutes, or jump to the <a href="docs/index.html">full documentation</a>.</div>
+</section>
+</main><footer class="footer"><div class="footer-inner"><div class="footer-brand">RelPyDB<small>Relational objects for Python</small></div><nav class="footer-links"><a href="index.html">Home</a><a href="installation.html">Installation</a><a href="docs/start-here.html">Start Here</a><a href="docs/index.html">Docs</a><a href="ide.html">Online IDE</a><a href="https://github.com/mandelreouven2002/RelPyDB" target="_blank" rel="noreferrer">GitHub ↗</a></nav></div></footer><script src="script.js"></script></body></html>
