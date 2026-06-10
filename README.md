@@ -7,6 +7,8 @@ It lets you define relational tables, columns, primary keys, foreign keys, index
 RelPyDB is not a replacement for PostgreSQL, SQLite, DuckDB, or any production database engine.  
 It is designed for developers who want a lightweight relational object model inside Python.
 
+For the library's website, [click here!](https://mandelreouven2002.github.io/RelPyDB/)
+
 > Status: Alpha  
 > The API may still change before version 1.0.0.
 
@@ -162,7 +164,7 @@ python db.to_list("users", column_name="email") db.to_list("users", where_key={"
 
 ## Documentation
 
-Full documentation is available in the documentation site and in the docs/ folder.
+Full documentation is available in the [documentation site](https://mandelreouven2002.github.io/RelPyDB/).
 
 Recommended reading order:
 
