@@ -1,79 +1,269 @@
 # RelPyDB
 
-RelPyDB is an in-memory relational data modeling and query library for Python.
+RelPyDB is a Python-native in-memory relational data modeling and query library.
 
-It supports:
+It lets you define relational tables, columns, primary keys, foreign keys, indexes, joins, grouped queries, exports, persistence, and encrypted columns directly inside Python code.
 
-- Tables and columns
-- Primary keys
-- Foreign keys
-- Insert, update, delete
-- Query API
-- Where conditions
-- Joins
-- Group by
-- Having
-- Views
-- Indexes
-- Persistence with save/load
-- JSON / pandas / NumPy exports
-- SQL DDL export
+RelPyDB is not a replacement for PostgreSQL, SQLite, DuckDB, or any production database engine.  
+It is designed for developers who want a lightweight relational object model inside Python.
+
+> Status: Alpha  
+> The API may still change before version 1.0.0.
+
+---
+
+## Why RelPyDB?
+
+Python has dictionaries, lists, pandas, SQLAlchemy, SQLite, and DuckDB.  
+RelPyDB sits in a different place:
+
+- More structured than plain dict / list
+- More relational than pandas
+- Lighter than SQLAlchemy
+- Python-native, without writing SQL
+- Useful for prototypes, local data workflows, teaching, testing, JSON normalization, and relational modeling
+
+RelPyDB is especially useful when you want to model data relationally but still stay inside normal Python code.
+
+---
 
 ## Installation
 
-Download the library, and then:
+RelPyDB is currently installed directly from GitHub.
 
-```bash
-pip install relpydb
-```
+bash python -m pip install git+https://github.com/mandelreouven2002/RelPyDB.git 
 
-For local development:
+For development:
 
-```bash
-pip install -e .
-```
+bash git clone https://github.com/mandelreouven2002/RelPyDB.git cd RelPyDB python -m pip install -e ".[dev,bench]" 
 
-## Example
+---
 
-```python
-from relpy import RelPy, AutoNumber, col, count, sum_
+## Quickstart
 
-db = RelPy()
+python from relpy import RelPy, AutoNumber, col, count  db = RelPy()  db.create_table("users") db.add_column("users", "id", AutoNumber, is_primary_key=True) db.add_column("users", "name", str, nullable=False)  db.create_table("orders") db.add_column("orders", "id", AutoNumber, is_primary_key=True) db.add_column("orders", "user_id", int, nullable=False, references="users.id") db.add_column("orders", "status", str, nullable=False)  alice = db.insert("users", {"name": "Alice"})  db.insert_many("orders", [     {"user_id": alice["id"], "status": "paid"},     {"user_id": alice["id"], "status": "paid"}, ])  result = (     db.query("orders")       .join("users")       .where(col("orders.status") == "paid")       .group_by("users.name")       .aggregate(order_count=count())       .to_list() )  print(result) 
 
-db.create_table("users")
-db.add_column("users", "id", AutoNumber, is_primary_key=True)
-db.add_column("users", "name", str, nullable=False)
+Expected result:
 
-db.create_table("orders")
-db.add_column("orders", "id", AutoNumber, is_primary_key=True)
-db.add_column("orders", "user_id", int, nullable=False, references="users.id")
-db.add_column("orders", "amount", float, nullable=False)
-db.add_column("orders", "status", str, nullable=False)
+python [     {         "users.name": "Alice",         "order_count": 2,     } ] 
 
-alice = db.insert("users", {"name": "Alice"})
+---
 
-db.insert("orders", {
-    "user_id": alice["id"],
-    "amount": 120.0,
-    "status": "paid",
-})
+## Core Features
 
-result = (
-    db.query("orders")
-      .join("users")
-      .where(col("orders.status") == "paid")
-      .group_by("users.name")
-      .aggregate(
-          order_count=count(),
-          total_amount=sum_("orders.amount"),
-      )
-      .to_list()
-)
+RelPyDB currently supports:
 
-print(result)
+- In-memory relational tables
+- Typed columns
+- Primary keys
+- Composite primary keys
+- Foreign keys
+- RESTRICT, CASCADE, and SET NULL delete behavior
+- insert, insert_many, update, and delete
+- Query builder API
+- where, select, order_by, limit, offset, and distinct
+- Column conditions with col
+- Logical conditions with AND, OR, NOT, &, |, and ~
+- Joins
+- Join shortcuts: inner_join, left_join, right_join, full_join, cross_join, natural_join
+- Grouping and aggregation
+- Views
+- Indexes
+- Encrypted columns
+- Blind indexes for encrypted equality lookup
+- Export to list, JSON, pandas, NumPy, SQL, and DDL
+- Pretty table previews with print_table
+- Save/load persistence with .relpy.json files
+- Benchmark and compatibility examples
 
-db.save("example.relpy.json")
+---
 
-loaded_db = RelPy.load("example.relpy.json")
-print(loaded_db.query("users").to_list())
-```
+## Query Example
+
+python from relpy import col  active_users = (     db.query("users")       .where(col("status") == "active")       .select("id", "name")       .order_by("name")       .to_list() ) 
+
+SQL equivalent:
+
+sql SELECT id, name FROM users WHERE status = 'active' ORDER BY name; 
+
+---
+
+## Join Example
+
+python result = (     db.query("orders")       .join("users")       .select("orders.id", "users.name", "orders.status")       .to_list() ) 
+
+RelPyDB can infer joins automatically from declared foreign keys.  
+You can also provide explicit join columns:
+
+python db.query("orders").join("users", on=("user_id", "id")) 
+
+---
+
+## Grouping Example
+
+python from relpy import count, sum_  result = (     db.query("orders")       .group_by("status")       .aggregate(           order_count=count(),           total_amount=sum_("amount"),       )       .having(col("order_count") >= 2)       .to_list() ) 
+
+---
+
+## Persistence
+
+RelPyDB databases can be saved and loaded as local JSON files.
+
+python db.save("database.relpy.json")  loaded_db = RelPy.load("database.relpy.json") 
+
+After loading, the database remains usable:
+
+python loaded_db.insert("users", {"name": "Bob"}) 
+
+Persistence stores schema, data, primary keys, foreign keys, indexes, AutoNumber sequences, and encrypted ciphertext.
+
+Views are currently not persisted because they may contain Python callables or lambdas.
+
+---
+
+## Encrypted Columns
+
+RelPyDB supports encrypted columns.
+
+python key = RelPy.generate_encryption_key()  db = RelPy(encryption_key=key)  db.create_table("users") db.add_column("users", "id", AutoNumber, is_primary_key=True) db.add_column("users", "email", str, nullable=False, is_encrypted=True)  db.insert("users", {"email": "alice@example.com"}) 
+
+Normal exports mask encrypted values:
+
+python db.to_list("users") 
+
+python [     {"id": 1, "email": "[ENCRYPTED]"} ] 
+
+Use decrypt=True to explicitly decrypt:
+
+python db.to_list("users", decrypt=True) 
+
+Encryption keys are never saved inside .relpy.json files.
+
+---
+
+## Exports
+
+RelPyDB supports several export formats:
+
+python db.to_list("users") db.to_json("users") db.to_pandas("users") db.to_numpy("users") db.to_sql("users") db.to_ddl() db.print_table("users") 
+
+Most table exports support:
+
+- Whole table export
+- Single column export
+- Single row export with where_key
+- Encrypted export with decrypt=True
+
+Example:
+
+python db.to_list("users", column_name="email") db.to_list("users", where_key={"id": 1}) 
+
+---
+
+## Documentation
+
+Full documentation is available in the documentation site and in the docs/ folder.
+
+Recommended reading order:
+
+1. Quickstart
+2. Full Tutorial
+3. Querying
+4. Joins
+5. Grouping
+6. Exports
+7. Persistence
+8. Encryption
+9. API Reference
+10. Full Capability Checklist
+
+Markdown docs:
+
+text docs/ ├── QUICKSTART.md ├── FULL_TUTORIAL.md ├── API_REFERENCE.md ├── FUNCTIONS_REFERENCE.md ├── FULL_CAPABILITY_CHECKLIST.md └── EXAMPLES.md 
+
+---
+
+## Benchmarks
+
+RelPyDB includes benchmark scripts that compare it with:
+
+- SQLAlchemy / SQLite
+- DuckDB
+- pandas
+- NumPy
+- Pure Python loops
+
+Benchmarks currently test:
+
+- Build time
+- Query time
+- Joins
+- Grouping
+- Persistence
+- JSON ingestion
+- Multi-database logical workflows
+- General public API smoke tests
+
+Important note:
+
+RelPyDB is a Python-native in-memory relational object library.  
+It is not intended to outperform analytical engines like DuckDB.
+
+---
+
+## Current Limitations
+
+RelPyDB is currently in alpha.
+
+Known limitations:
+
+- Not a production database engine
+- Not a multi-user database server
+- Not a full SQL engine
+- Not designed for large-scale analytical workloads
+- Views are not persisted
+- Some encrypted operations are limited to equality lookup
+- API may change before version 1.0.0
+
+---
+
+## Roadmap
+
+Planned improvements include:
+
+- Larger test suite
+- GitHub Actions CI
+- More complete edge-case coverage
+- More documentation examples
+- More performance optimization
+- Better developer tooling
+- More stable public API before 1.0.0
+
+---
+
+## Project Status
+
+Recommended versioning direction:
+
+text 0.1.x - initial alpha fixes 0.2.x - performance and persistence improvements 0.3.x - encryption and developer experience improvements 0.4.x - stronger tests and API cleanup 1.0.0 - stable public API 
+
+---
+
+## Contributing
+
+Contributions, issues, suggestions, and examples are welcome.
+
+Good first contributions:
+
+- Documentation improvements
+- More examples
+- More tests
+- Benchmark scenarios
+- Bug reports
+- Edge-case behavior checks
+
+---
+
+## License
+
+MIT License.
