@@ -12,6 +12,8 @@ For the library's website, [click here!](https://mandelreouven2002.github.io/Rel
 > Status: Alpha  
 > The API may still change before version 1.0.0.
 
+RelPyDB is an open-source experiment, and I’d love your help shaping it. If you find the concept interesting, please consider dropping a Star on the GitHub repository. If you try it out, let me know what feels clear, what’s confusing, or feel free to open an issue to contribute. RelPyDB is still early, but that is exactly why your feedback is so valuable right now.
+
 ---
 
 ## Why RelPyDB?
