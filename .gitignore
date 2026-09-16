@@ -1,0 +1,41 @@
+# Byte-compiled / optimized
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Compiled C extensions (built locally by `pip install .`)
+*.so
+*.pyd
+*.o
+*.obj
+
+# Build / packaging artifacts
+build/
+dist/
+*.egg-info/
+.eggs/
+wheels/
+pip-wheel-metadata/
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# Test / coverage
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+
+# Editors / OS
+.idea/
+.vscode/
+*.swp
+.DS_Store
+
+# RelPyDB local data / persistence files
+*.relpy.json
+*.db
+relpy_benchmark_out/

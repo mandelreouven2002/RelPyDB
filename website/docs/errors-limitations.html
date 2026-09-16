@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1" name="viewport"/><title>21. Common Errors and Limitations - RelPyDB</title><link href="../styles.css" rel="stylesheet"/></head><body>
+<header class="topbar"><a class="brand" href="../index.html"><span class="brand-mark">Rp</span><span><strong>RelPyDB</strong><small>Relational Python</small></span></a><button aria-expanded="false" class="nav-toggle" type="button"><svg viewbox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"></path></svg><span class="sr-only">Menu</span></button><nav class="site-nav"><a href="../index.html">Home</a><a href="../installation.html">Installation</a><a href="../docs/start-here.html">Start Here</a><a class="active" href="../docs/index.html">Docs</a><a href="../ide.html">Online IDE</a><a href="https://github.com/mandelreouven2002/RelPyDB" rel="noreferrer" target="_blank">GitHub</a></nav></header>
+<main>
+<section class="docs-layout">
+<aside class="docs-sidebar"><div class="docs-sidebar-header"><span>Documentation</span><input id="docs-filter" placeholder="Filter docs..." type="search"/></div><nav class="docs-tree"><a class="" href="index.html">Docs Overview</a><a class="" href="start-here.html">0. Start Here</a><a class="" href="quickstart.html">1. 5-Minute Quickstart</a><a class="" href="tutorial-shop.html">2. Full Tutorial</a><a class="" href="recipes.html">3. Common Recipes</a><a class="" href="why-relpy.html">4. Why RelPyDB?</a><a class="" href="alternatives.html">5. RelPyDB vs Alternatives</a><a class="" href="concepts.html">6. Concepts</a><a class="" href="tables-schema.html">7. Tables and Schema</a><a class="" href="data-operations.html">8. Data Operations</a><a class="" href="querying.html">9. Querying</a><a class="" href="joins.html">10. Joins</a><a class="" href="grouping.html">11. Grouping</a><a class="" href="views.html">12. Views</a><a class="" href="indexes.html">13. Indexes</a><a class="" href="exports.html">14. Exports</a><a class="" href="persistence.html">15. Persistence</a><a class="" href="encryption.html">16. Encryption</a><a class="" href="databases.html">17. Databases and Backends</a><a class="" href="server.html">18. Server and Remote Client</a><a class="" href="python-integration.html">19. Python Integration</a><a class="" href="capabilities.html">20. Full Capability Checklist</a><a class="active" href="errors-limitations.html">21. Common Errors and Limitations</a><a class="" href="api-reference.html">22. API Reference</a><a class="" href="api-functions.html">23. Function Reference</a><a class="" href="examples.html">24. Examples</a></nav></aside>
+<article class="docs-content"><section class="page-title docs-page-title"><p class="eyebrow">Documentation</p><h1>21. Common Errors and Limitations</h1><p>Exception types, what triggers them, and known constraints you should be aware of.</p></section>
+<section class="doc-topic">
+<h2>Exception hierarchy</h2>
+<p>Every named exception below inherits from <code>RelPyError</code>. But not every invalid operation raises one of these — several common mistakes raise Python's built-in <code>ValueError</code> or <code>TypeError</code> instead. The table after this one lists those explicitly, since <code>except RelPyError</code> alone will not catch them.</p>
+<pre><code>from relpy import (
+    RelPyError,
+    SchemaError,
+    TableNotFoundError,
+    ColumnNotFoundError,
+    ConstraintError,
+    QueryError,
+    QueryTypeError,
+    ViewError,
+    NoRowsFoundError,
+    MultipleRowsFoundError,
+    EncryptionError,
+)
+</code></pre>
+</section>
+<section class="doc-topic">
+<h2>Error reference — verified RelPyError subclasses</h2>
+<table class="param-table"><thead><tr><th>Exception</th><th>Triggered by</th></tr></thead><tbody>
+<tr><td><code>TableNotFoundError</code></td><td>Querying, inserting into, or calling <code>add_column</code> on a table name that does not exist.</td></tr>
+<tr><td><code>ColumnNotFoundError</code></td><td>Referencing a column that isn't defined in the schema, in <code>where()</code>, <code>select()</code>, <code>group_by()</code>, <code>join()</code>, <code>pluck()</code>, or an export function.</td></tr>
+<tr><td><code>SchemaError</code></td><td>Index name conflicts, a small number of schema-definition rules (for example, an encrypted column also marked as a primary key or foreign key), and corrupted or invalid persistence files.</td></tr>
+<tr><td><code>ConstraintError</code></td><td>Violating a unique index.</td></tr>
+<tr><td><code>NoRowsFoundError</code></td><td>Calling <code>.one()</code> when the query returns zero rows.</td></tr>
+<tr><td><code>MultipleRowsFoundError</code></td><td>Calling <code>.one()</code> when the query returns more than one row.</td></tr>
+<tr><td><code>EncryptionError</code></td><td>Calling an export with <code>decrypt=True</code> with no key loaded, or loading a persistence file with the wrong encryption key.</td></tr>
+</tbody></table>
+<div class="callout warning"><strong><code>ConstraintError</code> is narrower than its name suggests.</strong> It is raised only for unique-index violations. Duplicate primary keys, <code>NOT NULL</code> violations, and foreign key violations all raise plain <code>ValueError</code> — see the table below.</div>
+</section>
+<section class="doc-topic">
+<h2>Error reference — plain Python exceptions</h2>
+<p>These are common, expected mistakes, but RelPyDB currently signals them with Python's built-in exception types rather than a <code>RelPyError</code> subclass:</p>
+<table class="param-table"><thead><tr><th>Exception</th><th>Triggered by</th></tr></thead><tbody>
+<tr><td><code>ValueError</code></td><td>Duplicate primary keys; <code>NOT NULL</code> violations; foreign key violations on <code>insert()</code> or a <code>RESTRICT</code> delete; calling <code>update()</code>/<code>delete()</code> with no <code>where</code> and without <code>allow_all=True</code>; updating a primary key or <code>AutoNumber</code> column; calling <code>db.view()</code> / <code>drop_view()</code> / <code>describe_view()</code> with a name that was never registered; most other argument validation.</td></tr>
+<tr><td><code>TypeError</code></td><td>Using Python's <code>and</code> / <code>or</code> / <code>not</code> on a <code>Condition</code> instead of <code>&amp;</code> / <code>|</code> / <code>~</code>; passing a value of the wrong type to a schema or query builder method.</td></tr>
+</tbody></table>
+<p>If you want a single block that catches anything RelPyDB can raise for bad input, catch <code>(RelPyError, ValueError, TypeError)</code> rather than relying on <code>RelPyError</code> alone.</p>
+</section>
+<section class="doc-topic">
+<h2>Common mistakes and fixes</h2>
+<h3>Using Python <code>and</code> in a condition</h3>
+<div class="comparison-grid">
+<div class="code-panel"><div class="panel-title">❌ Wrong — raises TypeError</div>
+<pre><code>db.query("users").where(
+    col("age") &gt;= 18 and col("status") == "active"
+)
+</code></pre></div>
+<div class="code-panel"><div class="panel-title">✓ Correct</div>
+<pre><code>db.query("users").where(
+    (col("age") &gt;= 18) &amp;
+    (col("status") == "active")
+)
+</code></pre></div>
+</div>
+<h3>Calling <code>.one()</code> on a query with multiple rows</h3>
+<div class="comparison-grid">
+<div class="code-panel"><div class="panel-title">❌ Wrong — raises MultipleRowsFoundError</div>
+<pre><code>user = db.query("users").one()
+# Raises if there is more than one user
+</code></pre></div>
+<div class="code-panel"><div class="panel-title">✓ Correct</div>
+<pre><code>user = (
+    db.query("users")
+      .where(col("id") == 1)
+      .one()
+)
+</code></pre></div>
+</div>
+<h3>Deleting all rows without the safety flag</h3>
+<div class="comparison-grid">
+<div class="code-panel"><div class="panel-title">❌ Wrong — raises ValueError</div>
+<pre><code>db.delete("users")
+</code></pre></div>
+<div class="code-panel"><div class="panel-title">✓ Correct</div>
+<pre><code>db.delete("users", allow_all=True)
+</code></pre></div>
+</div>
+<h3>Decrypting without loading a key</h3>
+<div class="comparison-grid">
+<div class="code-panel"><div class="panel-title">❌ Wrong — raises EncryptionError</div>
+<pre><code>db = RelPy.load("database.relpy.json")
+db.to_list("users", decrypt=True)
+# No key loaded!
+</code></pre></div>
+<div class="code-panel"><div class="panel-title">✓ Correct</div>
+<pre><code>db = RelPy.load(
+    "database.relpy.json",
+    encryption_key=my_key,
+)
+db.to_list("users", decrypt=True)
+</code></pre></div>
+</div>
+</section>
+<section class="doc-topic"><h2>Connectivity and server errors</h2><p>When you use a SQL backend, a remote client, or the server, RelPyDB adds a small family of exceptions. They all inherit from <code>BackendError</code>, which inherits from <code>RelPyError</code>, so <code>except RelPyError</code> still catches every one.</p><pre><code>from relpy import (
+    BackendError,
+    BackendConfigurationError,
+    BackendNotAvailableError,
+    BackendConnectionError,
+    BackendOperationError,
+    RemoteError,
+    ServerError,
+)
+</code></pre><table class="param-table"><thead><tr><th>Exception</th><th>Triggered by</th></tr></thead><tbody><tr><td><code>BackendConfigurationError</code></td><td>An unknown backend name, or a missing/invalid <code>url</code> or <code>path</code> (also raised for <code>connect("remote")</code> without a url).</td></tr><tr><td><code>BackendNotAvailableError</code></td><td>A required library or database driver is not installed. The message names exactly what to <code>pip install</code>.</td></tr><tr><td><code>BackendConnectionError</code></td><td>The database or the RelPyDB server cannot be reached.</td></tr><tr><td><code>BackendOperationError</code></td><td>A backend operation (DDL, DML, reflection or raw SQL) failed.</td></tr><tr><td><code>RemoteError</code></td><td>A remote server returned an error, or authentication failed (for example a wrong or missing token).</td></tr></tbody></table><pre><code>from relpy import RelPy, BackendConnectionError
+
+try:
+    db = RelPy(backend="postgres", url="postgresql+psycopg://bad-host/db")
+except BackendConnectionError as exc:
+    print("Could not connect:", exc)
+</code></pre></section>
+<section class="doc-topic">
+<h2>Known limitations</h2>
+<ul class="note-list">
+<li><strong>No concurrent writes.</strong> RelPyDB is a single-process in-memory object. It is not safe for multi-threaded mutation without external locking.</li>
+<li><strong>Views are not persisted.</strong> Views contain Python callables and cannot be serialised. Re-register them after <code>RelPy.load()</code>.</li>
+<li><strong>No subquery support.</strong> Nested queries are not supported in the current query builder. Use views or Python variables to chain results.</li>
+<li><strong>Performance degrades on very large datasets.</strong> The library is optimised for clarity and correctness, not compiled-engine throughput. For &gt;500 000 rows or heavy analytical queries, DuckDB or SQLite will be substantially faster.</li>
+<li><strong>AutoNumber values can be set manually, with no duplicate protection beyond the primary key check.</strong> Passing an explicit value for an <code>AutoNumber</code> column in <code>insert()</code> is accepted silently, and the sequence continues counting up from it afterward. It is only rejected (with a <code>ValueError</code>) if it collides with an existing row's primary key.</li>
+<li><strong>Primary keys and AutoNumber columns cannot be changed by update().</strong> Including a primary key or <code>AutoNumber</code> column in the values passed to <code>update()</code> raises <code>ValueError</code>; it does not silently ignore the change.</li>
+<li><strong>Encryption at rest is logical for SQL backends.</strong> Encrypted columns protect RelPyDB's own in-memory and JSON storage; values mirrored to an external SQL database are stored as their decrypted logical values.</li><li><strong>Reflected databases are lossy in two known ways.</strong> Reflected integer primary keys come back as plain <code>int</code> (not <code>AutoNumber</code>), and <code>dict</code>/<code>list</code> columns (stored as JSON) come back as JSON text on a freshly reflected connection.</li><li><strong>A remote client caches a local mirror.</strong> Call <code>reload()</code> to see changes made by other clients.</li></ul>
+</section>
+<section class="doc-topic">
+<h2>Catching errors gracefully</h2>
+<p>Foreign key violations raise <code>ValueError</code>, not a <code>RelPyError</code> subclass — so a robust handler needs both:</p>
+<pre><code>from relpy import RelPyError, TableNotFoundError
+
+try:
+    db.insert("orders", {"user_id": 9999, "amount": 50.0})
+except TableNotFoundError as e:
+    print(f"Table missing: {e}")
+except ValueError as e:
+    print(f"Invalid row (e.g. a foreign key violation): {e}")
+except RelPyError as e:
+    print(f"Other RelPyDB error: {e}")
+</code></pre>
+</section>
+<div class="doc-nav"><a class="button secondary" href="capabilities.html">← 20. Full Capability Checklist</a><a class="button teal" href="api-reference.html">22. API Reference →</a></div>
+</article>
+</section>
+</main>
+<footer class="footer"><div class="footer-inner"><div class="footer-brand">RelPyDB<small>Relational objects for Python</small></div><nav class="footer-links"><a href="../index.html">Home</a><a href="../installation.html">Installation</a><a href="../docs/start-here.html">Start Here</a><a href="../docs/index.html">Docs</a><a href="../ide.html">Online IDE</a><a href="https://github.com/mandelreouven2002/RelPyDB" rel="noreferrer" target="_blank">GitHub ↗</a></nav></div></footer>
+<script src="../script.js"></script></body></html>

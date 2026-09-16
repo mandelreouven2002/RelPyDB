@@ -1,0 +1,3391 @@
+{
+  "environment": {
+    "timestamp": "2026-09-15 20:21:59",
+    "python": "3.12.3",
+    "implementation": "CPython",
+    "platform": "Linux-6.18.44-fc-v33-x86_64-with-glibc2.39",
+    "processor": "x86_64",
+    "cpu_count": 1,
+    "relpy_version": "2.0.0",
+    "libraries": {
+      "numpy": "2.4.4",
+      "pandas": "3.0.2",
+      "duckdb": "1.5.5",
+      "sqlalchemy": "2.0.53",
+      "sqlite3": "3.45.1"
+    },
+    "total_ram_gb": 4.2
+  },
+  "config": {
+    "sizes": [
+      1000,
+      10000
+    ],
+    "repeats": 3,
+    "warmup": 2,
+    "systems": [
+      "relpy",
+      "pandas",
+      "sqlite",
+      "duckdb",
+      "sqlalchemy",
+      "python"
+    ]
+  },
+  "correctness": [
+    {
+      "mismatches": [],
+      "checked": 102
+    },
+    {
+      "mismatches": [],
+      "checked": 102
+    }
+  ],
+  "query_matrix": [
+    {
+      "size": 1000,
+      "results": {
+        "filter_eq_str": {
+          "relpy": {
+            "ok": true,
+            "n_out": 130,
+            "best_ms": 0.724,
+            "median_ms": 0.7811,
+            "mean_ms": 0.7681,
+            "stdev_ms": 0.0321,
+            "p95_ms": 0.7994,
+            "samples_ms": [
+              0.724,
+              0.7994,
+              0.7811
+            ]
+          },
+          "pandas": {
+            "ok": true,
+            "n_out": 130,
+            "best_ms": 0.5999,
+            "median_ms": 0.6079,
+            "mean_ms": 0.6112,
+            "stdev_ms": 0.0108,
+            "p95_ms": 0.6257,
+            "samples_ms": [
+              0.6079,
+              0.6257,
+              0.5999
+            ]
+          },
+          "sqlite": {
+            "ok": true,
+            "n_out": 130,
+            "best_ms": 0.1424,
+            "median_ms": 0.1467,
+            "mean_ms": 0.1455,
+            "stdev_ms": 0.0023,
+            "p95_ms": 0.1475,
+            "samples_ms": [
+              0.1467,
+              0.1424,
+              0.1475
+            ]
+          },
+          "duckdb": {
+            "ok": true,
+            "n_out": 130,
+            "best_ms": 0.8357,
+            "median_ms": 1.0425,
+            "mean_ms": 0.9754,
+            "stdev_ms": 0.0988,
+            "p95_ms": 1.0479,
+            "samples_ms": [
+              1.0425,
+              1.0479,
+              0.8357
+            ]
+          },
+          "sqlalchemy": {
+            "ok": true,
+            "n_out": 130,
+            "best_ms": 0.4734,
+            "median_ms": 0.4768,
+            "mean_ms": 0.4794,
+            "stdev_ms": 0.0062,
+            "p95_ms": 0.488,
+            "samples_ms": [
+              0.4734,
+              0.488,
+              0.4768
+            ]
+          },
+          "python": {
+            "ok": true,
+            "n_out": 130,
+            "best_ms": 0.0685,
+            "median_ms": 0.0717,
+            "mean_ms": 0.0767,
+            "stdev_ms": 0.0095,
+            "p95_ms": 0.09,
+            "samples_ms": [
+              0.0685,
+              0.0717,
+              0.09
+            ]
+          }
+        },
+        "filter_gt": {
+          "relpy": {
+            "ok": true,
+            "n_out": 514,
+            "best_ms": 1.3625,
+            "median_ms": 1.372,
+            "mean_ms": 1.3717,
+            "stdev_ms": 0.0075,
+            "p95_ms": 1.3808,
+            "samples_ms": [
+              1.3808,
+              1.3625,
+              1.372
+            ]
+          },
+          "pandas": {
+            "ok": true,
+            "n_out": 514,
+            "best_ms": 0.5379,
+            "median_ms": 0.5671,
+            "mean_ms": 0.5575,
+            "stdev_ms": 0.0139,
+            "p95_ms": 0.5676,
+            "samples_ms": [
+              0.5671,
+              0.5379,
+              0.5676
+            ]
+          },
+          "sqlite": {
+            "ok": true,
+            "n_out": 514,
+            "best_ms": 0.2194,
+            "median_ms": 0.2198,
+            "mean_ms": 0.2215,
+            "stdev_ms": 0.0026,
+            "p95_ms": 0.2252,
+            "samples_ms": [
+              0.2198,
+              0.2194,
+              0.2252
+            ]
+          },
+          "duckdb": {
+            "ok": true,
+            "n_out": 514,
+            "best_ms": 0.8235,
+            "median_ms": 0.83,
+            "mean_ms": 0.8421,
+            "stdev_ms": 0.022,
+            "p95_ms": 0.873,
+            "samples_ms": [
+              0.8235,
+              0.873,
+              0.83
+            ]
+          },
+          "sqlalchemy": {
+            "ok": true,
+            "n_out": 514,
+            "best_ms": 0.5973,
+            "median_ms": 0.6124,
+            "mean_ms": 0.6217,
+            "stdev_ms": 0.0246,
+            "p95_ms": 0.6554,
+            "samples_ms": [
+              0.6554,
+              0.5973,
+              0.6124
+            ]
+          },
+          "python": {
+            "ok": true,
+            "n_out": 514,
+            "best_ms": 0.0919,
+            "median_ms": 0.0955,
+            "mean_ms": 0.0958,
+            "stdev_ms": 0.0033,
+            "p95_ms": 0.1,
+            "samples_ms": [
+              0.1,
+              0.0955,
+              0.0919
+            ]
+          }
+        },
+        "filter_between": {
+          "relpy": {
+            "ok": true,
+            "n_out": 143,
+            "best_ms": 0.8103,
+            "median_ms": 0.8274,
+            "mean_ms": 0.8389,
+            "stdev_ms": 0.0292,
+            "p95_ms": 0.8789,
+            "samples_ms": [
+              0.8274,
+              0.8103,
+              0.8789
+            ]
+          },
+          "pandas": {
+            "ok": true,
+            "n_out": 143,
+            "best_ms": 0.5745,
+            "median_ms": 0.6075,
+            "mean_ms": 0.6091,
+            "stdev_ms": 0.0289,
+            "p95_ms": 0.6452,
+            "samples_ms": [
+              0.6452,
+              0.5745,
+              0.6075
+            ]
+          },
+          "sqlite": {
+            "ok": true,
+            "n_out": 143,
+            "best_ms": 0.1235,
+            "median_ms": 0.1403,
+            "mean_ms": 0.1381,
+            "stdev_ms": 0.0111,
+            "p95_ms": 0.1504,
+            "samples_ms": [
+              0.1504,
+              0.1403,
+              0.1235
+            ]
+          },
+          "duckdb": {
+            "ok": true,
+            "n_out": 143,
+            "best_ms": 0.6791,
+            "median_ms": 0.6811,
+            "mean_ms": 0.6857,
+            "stdev_ms": 0.0079,
+            "p95_ms": 0.6968,
+            "samples_ms": [
+              0.6968,
+              0.6791,
+              0.6811
+            ]
+          },
+          "sqlalchemy": {
+            "ok": true,
+            "n_out": 143,
+            "best_ms": 0.4391,
+            "median_ms": 0.4514,
+            "mean_ms": 0.453,
+            "stdev_ms": 0.012,
+            "p95_ms": 0.4684,
+            "samples_ms": [
+              0.4514,
+              0.4391,
+              0.4684
+            ]
+          },
+          "python": {
+            "ok": true,
+            "n_out": 143,
+            "best_ms": 0.077,
+            "median_ms": 0.0788,
+            "mean_ms": 0.0784,
+            "stdev_ms": 0.001,
+            "p95_ms": 0.0793,
+            "samples_ms": [
+              0.0793,
+              0.077,
+              0.0788
+            ]
+          }
+        },
+        "filter_or": {
+          "relpy": {
+            "ok": true,
+            "n_out": 181,
+            "best_ms": 0.8645,
+            "median_ms": 0.9195,
+            "mean_ms": 0.91,
+            "stdev_ms": 0.0339,
+            "p95_ms": 0.9461,
+            "samples_ms": [
+              0.9461,
+              0.9195,
+              0.8645
+            ]
+          },
+          "pandas": {
+            "ok": true,
+            "n_out": 181,
+            "best_ms": 0.6869,
+            "median_ms": 0.729,
+            "mean_ms": 0.7516,
+            "stdev_ms": 0.064,
+            "p95_ms": 0.8388,
+            "samples_ms": [
+              0.8388,
+              0.729,
+              0.6869
+            ]
+          },
+          "sqlite": {
+            "ok": true,
+            "n_out": 181,
+            "best_ms": 0.1547,
+            "median_ms": 0.1569,
+            "mean_ms": 0.1725,
+            "stdev_ms": 0.0237,
+            "p95_ms": 0.2059,
+            "samples_ms": [
+              0.2059,
+              0.1547,
+              0.1569
+            ]
+          },
+          "duckdb": {
+            "ok": true,
+            "n_out": 181,
+            "best_ms": 0.7946,
+            "median_ms": 0.8691,
+            "mean_ms": 0.8479,
+            "stdev_ms": 0.0379,
+            "p95_ms": 0.8799,
+            "samples_ms": [
+              0.8799,
+              0.7946,
+              0.8691
+            ]
+          },
+          "sqlalchemy": {
+            "ok": true,
+            "n_out": 181,
+            "best_ms": 0.5351,
+            "median_ms": 0.5692,
+            "mean_ms": 0.558,
+            "stdev_ms": 0.0163,
+            "p95_ms": 0.5699,
+            "samples_ms": [
+              0.5351,
+              0.5699,
+              0.5692
+            ]
+          },
+          "python": {
+            "ok": true,
+            "n_out": 181,
+            "best_ms": 0.0955,
+            "median_ms": 0.0984,
+            "mean_ms": 0.1098,
+            "stdev_ms": 0.0182,
+            "p95_ms": 0.1355,
+            "samples_ms": [
+              0.0984,
+              0.1355,
+              0.0955
+            ]
+          }
+        },
+        "filter_in": {
+          "relpy": {
+            "ok": true,
+            "n_out": 367,
+            "best_ms": 1.154,
+            "median_ms": 1.1681,
+            "mean_ms": 1.17,
+            "stdev_ms": 0.0139,
+            "p95_ms": 1.188,
+            "samples_ms": [
+              1.154,
+              1.1681,
+              1.188
+            ]
+          },
+          "pandas": {
+            "ok": true,
+            "n_out": 367,
+            "best_ms": 0.5462,
+            "median_ms": 0.5723,
+            "mean_ms": 0.5657,
+            "stdev_ms": 0.014,
+            "p95_ms": 0.5785,
+            "samples_ms": [
+              0.5723,
+              0.5462,
+              0.5785
+            ]
+          },
+          "sqlite": {
+            "ok": true,
+            "n_out": 367,
+            "best_ms": 0.2527,
+            "median_ms": 0.256,
+            "mean_ms": 0.2565,
+            "stdev_ms": 0.0033,
+            "p95_ms": 0.2608,
+            "samples_ms": [
+              0.2527,
+              0.256,
+              0.2608
+            ]
+          },
+          "duckdb": {
+            "ok": true,
+            "n_out": 367,
+            "best_ms": 0.7714,
+            "median_ms": 0.827,
+            "mean_ms": 0.8234,
+            "stdev_ms": 0.0411,
+            "p95_ms": 0.8718,
+            "samples_ms": [
+              0.7714,
+              0.827,
+              0.8718
+            ]
+          },
+          "sqlalchemy": {
+            "ok": true,
+            "n_out": 367,
+            "best_ms": 0.693,
+            "median_ms": 0.7101,
+            "mean_ms": 0.7053,
+            "stdev_ms": 0.0088,
+            "p95_ms": 0.7129,
+            "samples_ms": [
+              0.693,
+              0.7129,
+              0.7101
+            ]
+          },
+          "python": {
+            "ok": true,
+            "n_out": 367,
+            "best_ms": 0.0937,
+            "median_ms": 0.0956,
+            "mean_ms": 0.0962,
+            "stdev_ms": 0.0023,
+            "p95_ms": 0.0992,
+            "samples_ms": [
+              0.0992,
+              0.0956,
+              0.0937
+            ]
+          }
+        },
+        "filter_complex": {
+          "relpy": {
+            "ok": true,
+            "n_out": 482,
+            "best_ms": 1.3666,
+            "median_ms": 1.44,
+            "mean_ms": 1.4278,
+            "stdev_ms": 0.0458,
+            "p95_ms": 1.4769,
+            "samples_ms": [
+              1.4769,
+              1.44,
+              1.3666
+            ]
+          },
+          "pandas": {
+            "ok": true,
+            "n_out": 482,
+            "best_ms": 0.7411,
+            "median_ms": 0.7915,
+            "mean_ms": 0.7831,
+            "stdev_ms": 0.0314,
+            "p95_ms": 0.8165,
+            "samples_ms": [
+              0.7411,
+              0.7915,
+              0.8165
+            ]
+          },
+          "sqlite": {
+            "ok": true,
+            "n_out": 482,
+            "best_ms": 0.2434,
+            "median_ms": 0.2453,
+            "mean_ms": 0.2586,
+            "stdev_ms": 0.0202,
+            "p95_ms": 0.2872,
+            "samples_ms": [
+              0.2453,
+              0.2434,
+              0.2872
+            ]
+          },
+          "duckdb": {
+            "ok": true,
+            "n_out": 482,
+            "best_ms": 0.7709,
+            "median_ms": 0.8354,
+            "mean_ms": 0.8274,
+            "stdev_ms": 0.0433,
+            "p95_ms": 0.8759,
+            "samples_ms": [
+              0.8759,
+              0.8354,
+              0.7709
+            ]
+          },
+          "sqlalchemy": {
+            "ok": true,
+            "n_out": 482,
+            "best_ms": 0.7495,
+            "median_ms": 0.7574,
+            "mean_ms": 0.7683,
+            "stdev_ms": 0.0213,
+            "p95_ms": 0.7981,
+            "samples_ms": [
+              0.7495,
+              0.7574,
+              0.7981
+            ]
+          },
+          "python": {
+            "ok": true,
+            "n_out": 482,
+            "best_ms": 0.1017,
+            "median_ms": 0.1069,
+            "mean_ms": 0.1066,
+            "stdev_ms": 0.0039,
+            "p95_ms": 0.1113,
+            "samples_ms": [
+              0.1113,
+              0.1069,
+              0.1017
+            ]
+          }
+        },
+        "count_gt": {
+          "relpy": {
+            "ok": true,
+            "n_out": 1,
+            "best_ms": 0.0865,
+            "median_ms": 0.0875,
+            "mean_ms": 0.0891,
+            "stdev_ms": 0.003,
+            "p95_ms": 0.0932,
+            "samples_ms": [
+              0.0875,
+              0.0865,
+              0.0932
+            ]
+          },
+          "pandas": {
+            "ok": true,
+            "n_out": 1,
+            "best_ms": 0.2211,
+            "median_ms": 0.2377,
+            "mean_ms": 0.2327,
+            "stdev_ms": 0.0082,
+            "p95_ms": 0.2393,
+            "samples_ms": [
+              0.2393,
+              0.2377,
+              0.2211
+            ]
+          },
+          "sqlite": {
+            "ok": true,
+            "n_out": 1,
+            "best_ms": 0.0716,
+            "median_ms": 0.0736,
+            "mean_ms": 0.0788,
+            "stdev_ms": 0.0087,
+            "p95_ms": 0.0911,
+            "samples_ms": [
+              0.0736,
+              0.0716,
+              0.0911
+            ]
+          },
+          "duckdb": {
+            "ok": true,
+            "n_out": 1,
+            "best_ms": 0.6132,
+            "median_ms": 0.6358,
+            "mean_ms": 0.6576,
+            "stdev_ms": 0.0476,
+            "p95_ms": 0.7237,
+            "samples_ms": [
+              0.6132,
+              0.7237,
+              0.6358
+            ]
+          },
+          "sqlalchemy": {
+            "ok": true,
+            "n_out": 1,
+            "best_ms": 0.4844,
+            "median_ms": 0.4908,
+            "mean_ms": 0.4898,
+            "stdev_ms": 0.004,
+            "p95_ms": 0.4942,
+            "samples_ms": [
+              0.4844,
+              0.4942,
+              0.4908
+            ]
+          },
+          "python": {
+            "ok": true,
+            "n_out": 1,
+            "best_ms": 0.0588,
+            "median_ms": 0.0616,
+            "mean_ms": 0.062,
+            "stdev_ms": 0.0028,
+            "p95_ms": 0.0656,
+            "samples_ms": [
+              0.0588,
+              0.0656,
+              0.0616
+            ]
+          }
+        },
+        "sum_active_score": {
+          "relpy": {
+            "ok": true,
+            "n_out": 1,
+            "best_ms": 0.0914,
+            "median_ms": 0.0917,
+            "mean_ms": 0.1001,
+            "stdev_ms": 0.0122,
+            "p95_ms": 0.1173,
+            "samples_ms": [
+              0.1173,
+              0.0914,
+              0.0917
+            ]
+          },
+          "pandas": {
+            "ok": true,
+            "n_out": 1,
+            "best_ms": 0.4138,
+            "median_ms": 0.429,
+            "mean_ms": 0.4289,
+            "stdev_ms": 0.0122,
+            "p95_ms": 0.4438,
+            "samples_ms": [
+              0.429,
+              0.4138,
+              0.4438
+            ]
+          },
+          "sqlite": {
+            "ok": true,
+            "n_out": 1,
+            "best_ms": 0.0901,
+            "median_ms": 0.0928,
+            "mean_ms": 0.0945,
+            "stdev_ms": 0.0045,
+            "p95_ms": 0.1007,
+            "samples_ms": [
+              0.1007,
+              0.0901,
+              0.0928
+            ]
+          },
+          "duckdb": {
+            "ok": true,
+            "n_out": 1,
+            "best_ms": 0.7465,
+            "median_ms": 0.7514,
+            "mean_ms": 0.771,
+            "stdev_ms": 0.0313,
+            "p95_ms": 0.8152,
+            "samples_ms": [
+              0.7514,
+              0.7465,
+              0.8152
+            ]
+          },
+          "sqlalchemy": {
+            "ok": true,
+            "n_out": 1,
+            "best_ms": 0.4314,
+            "median_ms": 0.4534,
+            "mean_ms": 0.4517,
+            "stdev_ms": 0.0159,
+            "p95_ms": 0.4702,
+            "samples_ms": [
+              0.4534,
+              0.4314,
+              0.4702
+            ]
+          },
+          "python": {
+            "ok": true,
+            "n_out": 1,
+            "best_ms": 0.0709,
+            "median_ms": 0.0727,
+            "mean_ms": 0.0724,
+            "stdev_ms": 0.0012,
+            "p95_ms": 0.0738,
+            "samples_ms": [
+              0.0738,
+              0.0727,
+              0.0709
+            ]
+          }
+        },
+        "avg_age": {
+          "relpy": {
+            "ok": true,
+            "n_out": 1,
+            "best_ms": 0.0562,
+            "median_ms": 0.0591,
+            "mean_ms": 0.0651,
+            "stdev_ms": 0.0106,
+            "p95_ms": 0.08,
+            "samples_ms": [
+              0.0562,
+              0.08,
+              0.0591
+            ]
+          },
+          "pandas": {
+            "ok": true,
+            "n_out": 1,
+            "best_ms": 0.1815,
+            "median_ms": 0.1861,
+            "mean_ms": 0.196,
+            "stdev_ms": 0.0174,
+            "p95_ms": 0.2205,
+            "samples_ms": [
+              0.2205,
+              0.1815,
+              0.1861
+            ]
+          },
+          "sqlite": {
+            "ok": true,
+            "n_out": 1,
+            "best_ms": 0.0716,
+            "median_ms": 0.0727,
+            "mean_ms": 0.0801,
+            "stdev_ms": 0.0113,
+            "p95_ms": 0.096,
+            "samples_ms": [
+              0.0716,
+              0.096,
+              0.0727
+            ]
+          },
+          "duckdb": {
+            "ok": true,
+            "n_out": 1,
+            "best_ms": 0.6423,
+            "median_ms": 0.6802,
+            "mean_ms": 0.6764,
+            "stdev_ms": 0.0264,
+            "p95_ms": 0.7067,
+            "samples_ms": [
+              0.6802,
+              0.7067,
+              0.6423
+            ]
+          },
+          "sqlalchemy": {
+            "ok": true,
+            "n_out": 1,
+            "best_ms": 0.3724,
+            "median_ms": 0.3821,
+            "mean_ms": 0.3806,
+            "stdev_ms": 0.0062,
+            "p95_ms": 0.3874,
+            "samples_ms": [
+              0.3821,
+              0.3874,
+              0.3724
+            ]
+          },
+          "python": {
+            "ok": true,
+            "n_out": 1,
+            "best_ms": 0.086,
+            "median_ms": 0.0864,
+            "mean_ms": 0.087,
+            "stdev_ms": 0.0011,
+            "p95_ms": 0.0885,
+            "samples_ms": [
+              0.0864,
+              0.086,
+              0.0885
+            ]
+          }
+        },
+        "minmax_score": {
+          "relpy": {
+            "ok": true,
+            "n_out": 2,
+            "best_ms": 0.077,
+            "median_ms": 0.0799,
+            "mean_ms": 0.0801,
+            "stdev_ms": 0.0026,
+            "p95_ms": 0.0833,
+            "samples_ms": [
+              0.0833,
+              0.0799,
+              0.077
+            ]
+          },
+          "pandas": {
+            "ok": true,
+            "n_out": 2,
+            "best_ms": 0.2623,
+            "median_ms": 0.2726,
+            "mean_ms": 0.6126,
+            "stdev_ms": 0.4881,
+            "p95_ms": 1.3028,
+            "samples_ms": [
+              0.2623,
+              0.2726,
+              1.3028
+            ]
+          },
+          "sqlite": {
+            "ok": true,
+            "n_out": 2,
+            "best_ms": 0.1027,
+            "median_ms": 0.104,
+            "mean_ms": 0.1051,
+            "stdev_ms": 0.0025,
+            "p95_ms": 0.1086,
+            "samples_ms": [
+              0.104,
+              0.1027,
+              0.1086
+            ]
+          },
+          "duckdb": {
+            "ok": true,
+            "n_out": 2,
+            "best_ms": 0.6458,
+            "median_ms": 0.6555,
+            "mean_ms": 0.6562,
+            "stdev_ms": 0.0088,
+            "p95_ms": 0.6672,
+            "samples_ms": [
+              0.6555,
+              0.6458,
+              0.6672
+            ]
+          },
+          "sqlalchemy": {
+            "ok": true,
+            "n_out": 2,
+            "best_ms": 0.4415,
+            "median_ms": 0.4506,
+            "mean_ms": 0.4528,
+            "stdev_ms": 0.0102,
+            "p95_ms": 0.4662,
+            "samples_ms": [
+              0.4662,
+              0.4506,
+              0.4415
+            ]
+          },
+          "python": {
+            "ok": true,
+            "n_out": 2,
+            "best_ms": 0.0928,
+            "median_ms": 0.1004,
+            "mean_ms": 0.0983,
+            "stdev_ms": 0.0039,
+            "p95_ms": 0.1017,
+            "samples_ms": [
+              0.0928,
+              0.1004,
+              0.1017
+            ]
+          }
+        },
+        "group_city": {
+          "relpy": {
+            "ok": true,
+            "n_out": 8,
+            "best_ms": 0.26,
+            "median_ms": 0.2623,
+            "mean_ms": 0.2617,
+            "stdev_ms": 0.0012,
+            "p95_ms": 0.2627,
+            "samples_ms": [
+              0.2623,
+              0.26,
+              0.2627
+            ]
+          },
+          "pandas": {
+            "ok": true,
+            "n_out": 8,
+            "best_ms": 1.3506,
+            "median_ms": 1.3693,
+            "mean_ms": 2.0227,
+            "stdev_ms": 0.9372,
+            "p95_ms": 3.3481,
+            "samples_ms": [
+              1.3693,
+              3.3481,
+              1.3506
+            ]
+          },
+          "sqlite": {
+            "ok": true,
+            "n_out": 8,
+            "best_ms": 0.2902,
+            "median_ms": 0.3119,
+            "mean_ms": 0.3056,
+            "stdev_ms": 0.0109,
+            "p95_ms": 0.3145,
+            "samples_ms": [
+              0.2902,
+              0.3145,
+              0.3119
+            ]
+          },
+          "duckdb": {
+            "ok": true,
+            "n_out": 8,
+            "best_ms": 0.9765,
+            "median_ms": 0.9826,
+            "mean_ms": 1.0077,
+            "stdev_ms": 0.0399,
+            "p95_ms": 1.064,
+            "samples_ms": [
+              0.9765,
+              0.9826,
+              1.064
+            ]
+          },
+          "sqlalchemy": {
+            "ok": true,
+            "n_out": 8,
+            "best_ms": 0.6885,
+            "median_ms": 0.6905,
+            "mean_ms": 0.693,
+            "stdev_ms": 0.005,
+            "p95_ms": 0.6999,
+            "samples_ms": [
+              0.6885,
+              0.6905,
+              0.6999
+            ]
+          },
+          "python": {
+            "ok": true,
+            "n_out": 8,
+            "best_ms": 0.1757,
+            "median_ms": 0.1904,
+            "mean_ms": 0.1886,
+            "stdev_ms": 0.0098,
+            "p95_ms": 0.1995,
+            "samples_ms": [
+              0.1904,
+              0.1995,
+              0.1757
+            ]
+          }
+        },
+        "group_city_active": {
+          "relpy": {
+            "ok": true,
+            "n_out": 16,
+            "best_ms": 0.2605,
+            "median_ms": 0.2644,
+            "mean_ms": 0.2702,
+            "stdev_ms": 0.0111,
+            "p95_ms": 0.2857,
+            "samples_ms": [
+              0.2857,
+              0.2605,
+              0.2644
+            ]
+          },
+          "pandas": {
+            "ok": true,
+            "n_out": 16,
+            "best_ms": 2.0384,
+            "median_ms": 2.0586,
+            "mean_ms": 2.0519,
+            "stdev_ms": 0.0096,
+            "p95_ms": 2.0588,
+            "samples_ms": [
+              2.0384,
+              2.0588,
+              2.0586
+            ]
+          },
+          "sqlite": {
+            "ok": true,
+            "n_out": 16,
+            "best_ms": 0.4012,
+            "median_ms": 0.4268,
+            "mean_ms": 0.4237,
+            "stdev_ms": 0.0172,
+            "p95_ms": 0.443,
+            "samples_ms": [
+              0.4012,
+              0.443,
+              0.4268
+            ]
+          },
+          "duckdb": {
+            "ok": true,
+            "n_out": 16,
+            "best_ms": 0.9342,
+            "median_ms": 1.3111,
+            "mean_ms": 1.4039,
+            "stdev_ms": 0.4265,
+            "p95_ms": 1.9664,
+            "samples_ms": [
+              0.9342,
+              1.3111,
+              1.9664
+            ]
+          },
+          "sqlalchemy": {
+            "ok": true,
+            "n_out": 16,
+            "best_ms": 0.7575,
+            "median_ms": 0.7718,
+            "mean_ms": 0.7792,
+            "stdev_ms": 0.0214,
+            "p95_ms": 0.8084,
+            "samples_ms": [
+              0.8084,
+              0.7718,
+              0.7575
+            ]
+          },
+          "python": {
+            "ok": true,
+            "n_out": 16,
+            "best_ms": 0.1917,
+            "median_ms": 0.2134,
+            "mean_ms": 0.2087,
+            "stdev_ms": 0.0124,
+            "p95_ms": 0.2211,
+            "samples_ms": [
+              0.2134,
+              0.1917,
+              0.2211
+            ]
+          }
+        },
+        "join_filter": {
+          "relpy": {
+            "ok": true,
+            "n_out": 103,
+            "best_ms": 1.2042,
+            "median_ms": 1.2404,
+            "mean_ms": 1.2864,
+            "stdev_ms": 0.0918,
+            "p95_ms": 1.4145,
+            "samples_ms": [
+              1.4145,
+              1.2404,
+              1.2042
+            ]
+          },
+          "pandas": {
+            "ok": true,
+            "n_out": 103,
+            "best_ms": 1.1445,
+            "median_ms": 1.1531,
+            "mean_ms": 1.1717,
+            "stdev_ms": 0.0325,
+            "p95_ms": 1.2173,
+            "samples_ms": [
+              1.1445,
+              1.1531,
+              1.2173
+            ]
+          },
+          "sqlite": {
+            "ok": true,
+            "n_out": 103,
+            "best_ms": 0.1267,
+            "median_ms": 0.1385,
+            "mean_ms": 0.1351,
+            "stdev_ms": 0.0059,
+            "p95_ms": 0.14,
+            "samples_ms": [
+              0.14,
+              0.1385,
+              0.1267
+            ]
+          },
+          "duckdb": {
+            "ok": true,
+            "n_out": 103,
+            "best_ms": 1.215,
+            "median_ms": 1.3219,
+            "mean_ms": 1.3639,
+            "stdev_ms": 0.1419,
+            "p95_ms": 1.5549,
+            "samples_ms": [
+              1.5549,
+              1.215,
+              1.3219
+            ]
+          },
+          "sqlalchemy": {
+            "ok": true,
+            "n_out": 103,
+            "best_ms": 0.4601,
+            "median_ms": 0.4983,
+            "mean_ms": 0.4958,
+            "stdev_ms": 0.0281,
+            "p95_ms": 0.5289,
+            "samples_ms": [
+              0.4983,
+              0.4601,
+              0.5289
+            ]
+          },
+          "python": {
+            "ok": true,
+            "n_out": 103,
+            "best_ms": 0.079,
+            "median_ms": 0.0941,
+            "mean_ms": 0.0915,
+            "stdev_ms": 0.0094,
+            "p95_ms": 0.1015,
+            "samples_ms": [
+              0.079,
+              0.0941,
+              0.1015
+            ]
+          }
+        },
+        "join_group_sum": {
+          "relpy": {
+            "ok": true,
+            "n_out": 8,
+            "best_ms": 0.5636,
+            "median_ms": 0.5731,
+            "mean_ms": 0.5742,
+            "stdev_ms": 0.0091,
+            "p95_ms": 0.5859,
+            "samples_ms": [
+              0.5731,
+              0.5636,
+              0.5859
+            ]
+          },
+          "pandas": {
+            "ok": true,
+            "n_out": 8,
+            "best_ms": 1.3334,
+            "median_ms": 1.3757,
+            "mean_ms": 1.3634,
+            "stdev_ms": 0.0214,
+            "p95_ms": 1.3812,
+            "samples_ms": [
+              1.3812,
+              1.3757,
+              1.3334
+            ]
+          },
+          "sqlite": {
+            "ok": true,
+            "n_out": 8,
+            "best_ms": 0.4379,
+            "median_ms": 0.465,
+            "mean_ms": 0.4733,
+            "stdev_ms": 0.0328,
+            "p95_ms": 0.5169,
+            "samples_ms": [
+              0.4379,
+              0.5169,
+              0.465
+            ]
+          },
+          "duckdb": {
+            "ok": true,
+            "n_out": 8,
+            "best_ms": 1.6368,
+            "median_ms": 1.6604,
+            "mean_ms": 1.6542,
+            "stdev_ms": 0.0124,
+            "p95_ms": 1.6652,
+            "samples_ms": [
+              1.6652,
+              1.6368,
+              1.6604
+            ]
+          },
+          "sqlalchemy": {
+            "ok": true,
+            "n_out": 8,
+            "best_ms": 0.8044,
+            "median_ms": 0.831,
+            "mean_ms": 0.84,
+            "stdev_ms": 0.0333,
+            "p95_ms": 0.8845,
+            "samples_ms": [
+              0.831,
+              0.8044,
+              0.8845
+            ]
+          },
+          "python": {
+            "ok": true,
+            "n_out": 8,
+            "best_ms": 0.3481,
+            "median_ms": 0.3584,
+            "mean_ms": 0.3575,
+            "stdev_ms": 0.0073,
+            "p95_ms": 0.3659,
+            "samples_ms": [
+              0.3481,
+              0.3659,
+              0.3584
+            ]
+          }
+        },
+        "order_score_desc": {
+          "relpy": {
+            "ok": true,
+            "n_out": 200,
+            "best_ms": 1.2631,
+            "median_ms": 1.2863,
+            "mean_ms": 1.2803,
+            "stdev_ms": 0.0123,
+            "p95_ms": 1.2914,
+            "samples_ms": [
+              1.2914,
+              1.2863,
+              1.2631
+            ]
+          },
+          "pandas": {
+            "ok": true,
+            "n_out": 200,
+            "best_ms": 0.6645,
+            "median_ms": 0.6891,
+            "mean_ms": 0.6826,
+            "stdev_ms": 0.013,
+            "p95_ms": 0.6943,
+            "samples_ms": [
+              0.6891,
+              0.6943,
+              0.6645
+            ]
+          },
+          "sqlite": {
+            "ok": true,
+            "n_out": 200,
+            "best_ms": 0.3645,
+            "median_ms": 0.377,
+            "mean_ms": 0.3767,
+            "stdev_ms": 0.0098,
+            "p95_ms": 0.3885,
+            "samples_ms": [
+              0.3885,
+              0.3645,
+              0.377
+            ]
+          },
+          "duckdb": {
+            "ok": true,
+            "n_out": 200,
+            "best_ms": 0.7773,
+            "median_ms": 0.8075,
+            "mean_ms": 0.7975,
+            "stdev_ms": 0.0143,
+            "p95_ms": 0.8076,
+            "samples_ms": [
+              0.8075,
+              0.7773,
+              0.8076
+            ]
+          },
+          "sqlalchemy": {
+            "ok": true,
+            "n_out": 200,
+            "best_ms": 0.6935,
+            "median_ms": 0.6938,
+            "mean_ms": 0.7039,
+            "stdev_ms": 0.0145,
+            "p95_ms": 0.7243,
+            "samples_ms": [
+              0.6938,
+              0.7243,
+              0.6935
+            ]
+          },
+          "python": {
+            "ok": true,
+            "n_out": 200,
+            "best_ms": 0.2819,
+            "median_ms": 0.2955,
+            "mean_ms": 0.2969,
+            "stdev_ms": 0.0129,
+            "p95_ms": 0.3133,
+            "samples_ms": [
+              0.3133,
+              0.2819,
+              0.2955
+            ]
+          }
+        },
+        "distinct_city": {
+          "relpy": {
+            "ok": true,
+            "n_out": 8,
+            "best_ms": 1.2569,
+            "median_ms": 1.2622,
+            "mean_ms": 1.2917,
+            "stdev_ms": 0.0455,
+            "p95_ms": 1.3559,
+            "samples_ms": [
+              1.2622,
+              1.2569,
+              1.3559
+            ]
+          },
+          "pandas": {
+            "ok": true,
+            "n_out": 8,
+            "best_ms": 0.227,
+            "median_ms": 0.248,
+            "mean_ms": 0.2415,
+            "stdev_ms": 0.0102,
+            "p95_ms": 0.2494,
+            "samples_ms": [
+              0.227,
+              0.2494,
+              0.248
+            ]
+          },
+          "sqlite": {
+            "ok": true,
+            "n_out": 8,
+            "best_ms": 0.1258,
+            "median_ms": 0.131,
+            "mean_ms": 0.1326,
+            "stdev_ms": 0.0063,
+            "p95_ms": 0.141,
+            "samples_ms": [
+              0.131,
+              0.141,
+              0.1258
+            ]
+          },
+          "duckdb": {
+            "ok": true,
+            "n_out": 8,
+            "best_ms": 0.8631,
+            "median_ms": 0.9217,
+            "mean_ms": 0.9042,
+            "stdev_ms": 0.0292,
+            "p95_ms": 0.9277,
+            "samples_ms": [
+              0.9217,
+              0.9277,
+              0.8631
+            ]
+          },
+          "sqlalchemy": {
+            "ok": true,
+            "n_out": 8,
+            "best_ms": 0.342,
+            "median_ms": 0.3721,
+            "mean_ms": 0.368,
+            "stdev_ms": 0.0198,
+            "p95_ms": 0.39,
+            "samples_ms": [
+              0.3721,
+              0.342,
+              0.39
+            ]
+          },
+          "python": {
+            "ok": true,
+            "n_out": 8,
+            "best_ms": 0.053,
+            "median_ms": 0.0568,
+            "mean_ms": 0.0565,
+            "stdev_ms": 0.0028,
+            "p95_ms": 0.0597,
+            "samples_ms": [
+              0.053,
+              0.0568,
+              0.0597
+            ]
+          }
+        },
+        "project_where": {
+          "relpy": {
+            "ok": true,
+            "n_out": 378,
+            "best_ms": 1.0471,
+            "median_ms": 1.1149,
+            "mean_ms": 1.1083,
+            "stdev_ms": 0.0475,
+            "p95_ms": 1.1629,
+            "samples_ms": [
+              1.1629,
+              1.0471,
+              1.1149
+            ]
+          },
+          "pandas": {
+            "ok": true,
+            "n_out": 378,
+            "best_ms": 1.3006,
+            "median_ms": 1.3517,
+            "mean_ms": 1.3365,
+            "stdev_ms": 0.0255,
+            "p95_ms": 1.3571,
+            "samples_ms": [
+              1.3006,
+              1.3571,
+              1.3517
+            ]
+          },
+          "sqlite": {
+            "ok": true,
+            "n_out": 378,
+            "best_ms": 0.2957,
+            "median_ms": 0.3095,
+            "mean_ms": 0.3054,
+            "stdev_ms": 0.0068,
+            "p95_ms": 0.3109,
+            "samples_ms": [
+              0.2957,
+              0.3109,
+              0.3095
+            ]
+          },
+          "duckdb": {
+            "ok": true,
+            "n_out": 378,
+            "best_ms": 0.6501,
+            "median_ms": 0.7031,
+            "mean_ms": 0.7062,
+            "stdev_ms": 0.0472,
+            "p95_ms": 0.7655,
+            "samples_ms": [
+              0.6501,
+              0.7031,
+              0.7655
+            ]
+          },
+          "sqlalchemy": {
+            "ok": true,
+            "n_out": 378,
+            "best_ms": 0.6384,
+            "median_ms": 0.6553,
+            "mean_ms": 0.6583,
+            "stdev_ms": 0.0176,
+            "p95_ms": 0.6813,
+            "samples_ms": [
+              0.6384,
+              0.6813,
+              0.6553
+            ]
+          },
+          "python": {
+            "ok": true,
+            "n_out": 378,
+            "best_ms": 0.1054,
+            "median_ms": 0.1097,
+            "mean_ms": 0.1126,
+            "stdev_ms": 0.0074,
+            "p95_ms": 0.1228,
+            "samples_ms": [
+              0.1228,
+              0.1097,
+              0.1054
+            ]
+          }
+        }
+      }
+    },
+    {
+      "size": 10000,
+      "results": {
+        "filter_eq_str": {
+          "relpy": {
+            "ok": true,
+            "n_out": 1213,
+            "best_ms": 6.1255,
+            "median_ms": 6.2145,
+            "mean_ms": 6.2239,
+            "stdev_ms": 0.0845,
+            "p95_ms": 6.3318,
+            "samples_ms": [
+              6.3318,
+              6.1255,
+              6.2145
+            ]
+          },
+          "pandas": {
+            "ok": true,
+            "n_out": 1213,
+            "best_ms": 1.2133,
+            "median_ms": 1.2964,
+            "mean_ms": 1.3025,
+            "stdev_ms": 0.0755,
+            "p95_ms": 1.3978,
+            "samples_ms": [
+              1.3978,
+              1.2133,
+              1.2964
+            ]
+          },
+          "sqlite": {
+            "ok": true,
+            "n_out": 1213,
+            "best_ms": 0.9202,
+            "median_ms": 0.9761,
+            "mean_ms": 0.9587,
+            "stdev_ms": 0.0272,
+            "p95_ms": 0.9797,
+            "samples_ms": [
+              0.9202,
+              0.9797,
+              0.9761
+            ]
+          },
+          "duckdb": {
+            "ok": true,
+            "n_out": 1213,
+            "best_ms": 0.9272,
+            "median_ms": 0.995,
+            "mean_ms": 0.9782,
+            "stdev_ms": 0.0367,
+            "p95_ms": 1.0124,
+            "samples_ms": [
+              0.9272,
+              0.995,
+              1.0124
+            ]
+          },
+          "sqlalchemy": {
+            "ok": true,
+            "n_out": 1213,
+            "best_ms": 1.3955,
+            "median_ms": 1.4549,
+            "mean_ms": 1.448,
+            "stdev_ms": 0.0403,
+            "p95_ms": 1.4935,
+            "samples_ms": [
+              1.3955,
+              1.4935,
+              1.4549
+            ]
+          },
+          "python": {
+            "ok": true,
+            "n_out": 1213,
+            "best_ms": 0.4324,
+            "median_ms": 0.4469,
+            "mean_ms": 0.4497,
+            "stdev_ms": 0.0154,
+            "p95_ms": 0.4697,
+            "samples_ms": [
+              0.4469,
+              0.4697,
+              0.4324
+            ]
+          }
+        },
+        "filter_gt": {
+          "relpy": {
+            "ok": true,
+            "n_out": 5172,
+            "best_ms": 12.137,
+            "median_ms": 12.3026,
+            "mean_ms": 12.365,
+            "stdev_ms": 0.2162,
+            "p95_ms": 12.6555,
+            "samples_ms": [
+              12.6555,
+              12.3026,
+              12.137
+            ]
+          },
+          "pandas": {
+            "ok": true,
+            "n_out": 5172,
+            "best_ms": 0.8897,
+            "median_ms": 0.8928,
+            "mean_ms": 0.9167,
+            "stdev_ms": 0.036,
+            "p95_ms": 0.9676,
+            "samples_ms": [
+              0.8928,
+              0.9676,
+              0.8897
+            ]
+          },
+          "sqlite": {
+            "ok": true,
+            "n_out": 5172,
+            "best_ms": 1.9027,
+            "median_ms": 1.9195,
+            "mean_ms": 1.9163,
+            "stdev_ms": 0.01,
+            "p95_ms": 1.9266,
+            "samples_ms": [
+              1.9266,
+              1.9027,
+              1.9195
+            ]
+          },
+          "duckdb": {
+            "ok": true,
+            "n_out": 5172,
+            "best_ms": 1.4539,
+            "median_ms": 1.4862,
+            "mean_ms": 1.4871,
+            "stdev_ms": 0.0275,
+            "p95_ms": 1.5213,
+            "samples_ms": [
+              1.5213,
+              1.4862,
+              1.4539
+            ]
+          },
+          "sqlalchemy": {
+            "ok": true,
+            "n_out": 5172,
+            "best_ms": 2.7932,
+            "median_ms": 2.8428,
+            "mean_ms": 2.8453,
+            "stdev_ms": 0.0436,
+            "p95_ms": 2.8999,
+            "samples_ms": [
+              2.7932,
+              2.8428,
+              2.8999
+            ]
+          },
+          "python": {
+            "ok": true,
+            "n_out": 5172,
+            "best_ms": 0.5709,
+            "median_ms": 0.572,
+            "mean_ms": 0.5815,
+            "stdev_ms": 0.0143,
+            "p95_ms": 0.6017,
+            "samples_ms": [
+              0.5709,
+              0.6017,
+              0.572
+            ]
+          }
+        },
+        "filter_between": {
+          "relpy": {
+            "ok": true,
+            "n_out": 1429,
+            "best_ms": 6.4831,
+            "median_ms": 6.7801,
+            "mean_ms": 6.6853,
+            "stdev_ms": 0.143,
+            "p95_ms": 6.7926,
+            "samples_ms": [
+              6.7801,
+              6.4831,
+              6.7926
+            ]
+          },
+          "pandas": {
+            "ok": true,
+            "n_out": 1429,
+            "best_ms": 0.6424,
+            "median_ms": 0.6486,
+            "mean_ms": 0.6575,
+            "stdev_ms": 0.0172,
+            "p95_ms": 0.6816,
+            "samples_ms": [
+              0.6424,
+              0.6816,
+              0.6486
+            ]
+          },
+          "sqlite": {
+            "ok": true,
+            "n_out": 1429,
+            "best_ms": 0.7789,
+            "median_ms": 0.8135,
+            "mean_ms": 0.8089,
+            "stdev_ms": 0.0228,
+            "p95_ms": 0.8341,
+            "samples_ms": [
+              0.8341,
+              0.7789,
+              0.8135
+            ]
+          },
+          "duckdb": {
+            "ok": true,
+            "n_out": 1429,
+            "best_ms": 0.774,
+            "median_ms": 0.8563,
+            "mean_ms": 0.8542,
+            "stdev_ms": 0.0646,
+            "p95_ms": 0.9323,
+            "samples_ms": [
+              0.774,
+              0.8563,
+              0.9323
+            ]
+          },
+          "sqlalchemy": {
+            "ok": true,
+            "n_out": 1429,
+            "best_ms": 1.3449,
+            "median_ms": 1.3528,
+            "mean_ms": 1.4826,
+            "stdev_ms": 0.1892,
+            "p95_ms": 1.7502,
+            "samples_ms": [
+              1.3449,
+              1.3528,
+              1.7502
+            ]
+          },
+          "python": {
+            "ok": true,
+            "n_out": 1429,
+            "best_ms": 0.5333,
+            "median_ms": 0.5365,
+            "mean_ms": 0.5393,
+            "stdev_ms": 0.0064,
+            "p95_ms": 0.5482,
+            "samples_ms": [
+              0.5365,
+              0.5333,
+              0.5482
+            ]
+          }
+        },
+        "filter_or": {
+          "relpy": {
+            "ok": true,
+            "n_out": 2014,
+            "best_ms": 7.2668,
+            "median_ms": 7.3921,
+            "mean_ms": 7.775,
+            "stdev_ms": 0.6323,
+            "p95_ms": 8.6663,
+            "samples_ms": [
+              7.3921,
+              7.2668,
+              8.6663
+            ]
+          },
+          "pandas": {
+            "ok": true,
+            "n_out": 2014,
+            "best_ms": 1.2484,
+            "median_ms": 1.255,
+            "mean_ms": 1.2539,
+            "stdev_ms": 0.0042,
+            "p95_ms": 1.2584,
+            "samples_ms": [
+              1.2584,
+              1.255,
+              1.2484
+            ]
+          },
+          "sqlite": {
+            "ok": true,
+            "n_out": 2014,
+            "best_ms": 1.1855,
+            "median_ms": 1.2041,
+            "mean_ms": 1.2117,
+            "stdev_ms": 0.025,
+            "p95_ms": 1.2454,
+            "samples_ms": [
+              1.2454,
+              1.2041,
+              1.1855
+            ]
+          },
+          "duckdb": {
+            "ok": true,
+            "n_out": 2014,
+            "best_ms": 1.1278,
+            "median_ms": 1.1528,
+            "mean_ms": 1.164,
+            "stdev_ms": 0.035,
+            "p95_ms": 1.2113,
+            "samples_ms": [
+              1.1528,
+              1.1278,
+              1.2113
+            ]
+          },
+          "sqlalchemy": {
+            "ok": true,
+            "n_out": 2014,
+            "best_ms": 1.9212,
+            "median_ms": 1.9879,
+            "mean_ms": 2.0335,
+            "stdev_ms": 0.1149,
+            "p95_ms": 2.1913,
+            "samples_ms": [
+              1.9212,
+              1.9879,
+              2.1913
+            ]
+          },
+          "python": {
+            "ok": true,
+            "n_out": 2014,
+            "best_ms": 0.6027,
+            "median_ms": 0.6951,
+            "mean_ms": 0.665,
+            "stdev_ms": 0.0441,
+            "p95_ms": 0.6972,
+            "samples_ms": [
+              0.6027,
+              0.6951,
+              0.6972
+            ]
+          }
+        },
+        "filter_in": {
+          "relpy": {
+            "ok": true,
+            "n_out": 3741,
+            "best_ms": 9.8711,
+            "median_ms": 10.4647,
+            "mean_ms": 10.3223,
+            "stdev_ms": 0.3261,
+            "p95_ms": 10.631,
+            "samples_ms": [
+              10.631,
+              10.4647,
+              9.8711
+            ]
+          },
+          "pandas": {
+            "ok": true,
+            "n_out": 3741,
+            "best_ms": 0.9018,
+            "median_ms": 1.0219,
+            "mean_ms": 1.0111,
+            "stdev_ms": 0.0852,
+            "p95_ms": 1.1095,
+            "samples_ms": [
+              0.9018,
+              1.0219,
+              1.1095
+            ]
+          },
+          "sqlite": {
+            "ok": true,
+            "n_out": 3741,
+            "best_ms": 1.8796,
+            "median_ms": 1.9015,
+            "mean_ms": 1.8994,
+            "stdev_ms": 0.0154,
+            "p95_ms": 1.9172,
+            "samples_ms": [
+              1.8796,
+              1.9015,
+              1.9172
+            ]
+          },
+          "duckdb": {
+            "ok": true,
+            "n_out": 3741,
+            "best_ms": 1.7042,
+            "median_ms": 1.7421,
+            "mean_ms": 1.7365,
+            "stdev_ms": 0.0244,
+            "p95_ms": 1.7632,
+            "samples_ms": [
+              1.7632,
+              1.7421,
+              1.7042
+            ]
+          },
+          "sqlalchemy": {
+            "ok": true,
+            "n_out": 3741,
+            "best_ms": 3.0248,
+            "median_ms": 3.0343,
+            "mean_ms": 3.034,
+            "stdev_ms": 0.0074,
+            "p95_ms": 3.0429,
+            "samples_ms": [
+              3.0343,
+              3.0429,
+              3.0248
+            ]
+          },
+          "python": {
+            "ok": true,
+            "n_out": 3741,
+            "best_ms": 0.5812,
+            "median_ms": 0.6023,
+            "mean_ms": 0.6155,
+            "stdev_ms": 0.0347,
+            "p95_ms": 0.663,
+            "samples_ms": [
+              0.5812,
+              0.6023,
+              0.663
+            ]
+          }
+        },
+        "filter_complex": {
+          "relpy": {
+            "ok": true,
+            "n_out": 4733,
+            "best_ms": 11.4258,
+            "median_ms": 11.9032,
+            "mean_ms": 11.9102,
+            "stdev_ms": 0.3984,
+            "p95_ms": 12.4015,
+            "samples_ms": [
+              12.4015,
+              11.4258,
+              11.9032
+            ]
+          },
+          "pandas": {
+            "ok": true,
+            "n_out": 4733,
+            "best_ms": 1.5336,
+            "median_ms": 1.6678,
+            "mean_ms": 1.6452,
+            "stdev_ms": 0.0834,
+            "p95_ms": 1.7342,
+            "samples_ms": [
+              1.7342,
+              1.6678,
+              1.5336
+            ]
+          },
+          "sqlite": {
+            "ok": true,
+            "n_out": 4733,
+            "best_ms": 1.9341,
+            "median_ms": 1.9396,
+            "mean_ms": 2.0006,
+            "stdev_ms": 0.0902,
+            "p95_ms": 2.1282,
+            "samples_ms": [
+              1.9396,
+              1.9341,
+              2.1282
+            ]
+          },
+          "duckdb": {
+            "ok": true,
+            "n_out": 4733,
+            "best_ms": 1.9836,
+            "median_ms": 1.9943,
+            "mean_ms": 2.004,
+            "stdev_ms": 0.0218,
+            "p95_ms": 2.0342,
+            "samples_ms": [
+              2.0342,
+              1.9943,
+              1.9836
+            ]
+          },
+          "sqlalchemy": {
+            "ok": true,
+            "n_out": 4733,
+            "best_ms": 3.2655,
+            "median_ms": 3.4294,
+            "mean_ms": 3.3906,
+            "stdev_ms": 0.0906,
+            "p95_ms": 3.477,
+            "samples_ms": [
+              3.2655,
+              3.477,
+              3.4294
+            ]
+          },
+          "python": {
+            "ok": true,
+            "n_out": 4733,
+            "best_ms": 0.7877,
+            "median_ms": 0.8163,
+            "mean_ms": 0.8144,
+            "stdev_ms": 0.0211,
+            "p95_ms": 0.8392,
+            "samples_ms": [
+              0.8163,
+              0.7877,
+              0.8392
+            ]
+          }
+        },
+        "count_gt": {
+          "relpy": {
+            "ok": true,
+            "n_out": 1,
+            "best_ms": 0.2287,
+            "median_ms": 0.2288,
+            "mean_ms": 0.2302,
+            "stdev_ms": 0.0021,
+            "p95_ms": 0.2331,
+            "samples_ms": [
+              0.2288,
+              0.2287,
+              0.2331
+            ]
+          },
+          "pandas": {
+            "ok": true,
+            "n_out": 1,
+            "best_ms": 0.2475,
+            "median_ms": 0.2476,
+            "mean_ms": 0.2481,
+            "stdev_ms": 0.0008,
+            "p95_ms": 0.2492,
+            "samples_ms": [
+              0.2475,
+              0.2492,
+              0.2476
+            ]
+          },
+          "sqlite": {
+            "ok": true,
+            "n_out": 1,
+            "best_ms": 0.4121,
+            "median_ms": 0.432,
+            "mean_ms": 0.4289,
+            "stdev_ms": 0.0127,
+            "p95_ms": 0.4427,
+            "samples_ms": [
+              0.4427,
+              0.432,
+              0.4121
+            ]
+          },
+          "duckdb": {
+            "ok": true,
+            "n_out": 1,
+            "best_ms": 0.708,
+            "median_ms": 0.7682,
+            "mean_ms": 0.7663,
+            "stdev_ms": 0.0468,
+            "p95_ms": 0.8226,
+            "samples_ms": [
+              0.708,
+              0.7682,
+              0.8226
+            ]
+          },
+          "sqlalchemy": {
+            "ok": true,
+            "n_out": 1,
+            "best_ms": 0.7597,
+            "median_ms": 0.7887,
+            "mean_ms": 0.8003,
+            "stdev_ms": 0.0387,
+            "p95_ms": 0.8524,
+            "samples_ms": [
+              0.7597,
+              0.7887,
+              0.8524
+            ]
+          },
+          "python": {
+            "ok": true,
+            "n_out": 1,
+            "best_ms": 0.5049,
+            "median_ms": 0.509,
+            "mean_ms": 0.5167,
+            "stdev_ms": 0.0139,
+            "p95_ms": 0.5361,
+            "samples_ms": [
+              0.5049,
+              0.509,
+              0.5361
+            ]
+          }
+        },
+        "sum_active_score": {
+          "relpy": {
+            "ok": true,
+            "n_out": 1,
+            "best_ms": 0.2005,
+            "median_ms": 0.2087,
+            "mean_ms": 0.2111,
+            "stdev_ms": 0.0098,
+            "p95_ms": 0.2242,
+            "samples_ms": [
+              0.2005,
+              0.2242,
+              0.2087
+            ]
+          },
+          "pandas": {
+            "ok": true,
+            "n_out": 1,
+            "best_ms": 0.4749,
+            "median_ms": 0.4749,
+            "mean_ms": 0.4771,
+            "stdev_ms": 0.0031,
+            "p95_ms": 0.4815,
+            "samples_ms": [
+              0.4749,
+              0.4815,
+              0.4749
+            ]
+          },
+          "sqlite": {
+            "ok": true,
+            "n_out": 1,
+            "best_ms": 0.4821,
+            "median_ms": 0.5591,
+            "mean_ms": 0.5335,
+            "stdev_ms": 0.0364,
+            "p95_ms": 0.5594,
+            "samples_ms": [
+              0.5594,
+              0.5591,
+              0.4821
+            ]
+          },
+          "duckdb": {
+            "ok": true,
+            "n_out": 1,
+            "best_ms": 0.9391,
+            "median_ms": 0.9547,
+            "mean_ms": 0.9962,
+            "stdev_ms": 0.0701,
+            "p95_ms": 1.095,
+            "samples_ms": [
+              0.9391,
+              1.095,
+              0.9547
+            ]
+          },
+          "sqlalchemy": {
+            "ok": true,
+            "n_out": 1,
+            "best_ms": 0.8372,
+            "median_ms": 0.8684,
+            "mean_ms": 0.9155,
+            "stdev_ms": 0.0897,
+            "p95_ms": 1.0411,
+            "samples_ms": [
+              0.8684,
+              0.8372,
+              1.0411
+            ]
+          },
+          "python": {
+            "ok": true,
+            "n_out": 1,
+            "best_ms": 0.3289,
+            "median_ms": 0.3541,
+            "mean_ms": 0.3502,
+            "stdev_ms": 0.016,
+            "p95_ms": 0.3675,
+            "samples_ms": [
+              0.3289,
+              0.3675,
+              0.3541
+            ]
+          }
+        },
+        "avg_age": {
+          "relpy": {
+            "ok": true,
+            "n_out": 1,
+            "best_ms": 0.0944,
+            "median_ms": 0.0963,
+            "mean_ms": 0.1134,
+            "stdev_ms": 0.0256,
+            "p95_ms": 0.1496,
+            "samples_ms": [
+              0.1496,
+              0.0963,
+              0.0944
+            ]
+          },
+          "pandas": {
+            "ok": true,
+            "n_out": 1,
+            "best_ms": 0.2043,
+            "median_ms": 0.2075,
+            "mean_ms": 0.2078,
+            "stdev_ms": 0.0029,
+            "p95_ms": 0.2115,
+            "samples_ms": [
+              0.2075,
+              0.2115,
+              0.2043
+            ]
+          },
+          "sqlite": {
+            "ok": true,
+            "n_out": 1,
+            "best_ms": 0.3928,
+            "median_ms": 0.4098,
+            "mean_ms": 0.4073,
+            "stdev_ms": 0.011,
+            "p95_ms": 0.4194,
+            "samples_ms": [
+              0.3928,
+              0.4098,
+              0.4194
+            ]
+          },
+          "duckdb": {
+            "ok": true,
+            "n_out": 1,
+            "best_ms": 0.799,
+            "median_ms": 0.8711,
+            "mean_ms": 0.8727,
+            "stdev_ms": 0.0608,
+            "p95_ms": 0.9479,
+            "samples_ms": [
+              0.799,
+              0.8711,
+              0.9479
+            ]
+          },
+          "sqlalchemy": {
+            "ok": true,
+            "n_out": 1,
+            "best_ms": 0.7167,
+            "median_ms": 0.7391,
+            "mean_ms": 0.7441,
+            "stdev_ms": 0.0247,
+            "p95_ms": 0.7766,
+            "samples_ms": [
+              0.7391,
+              0.7167,
+              0.7766
+            ]
+          },
+          "python": {
+            "ok": true,
+            "n_out": 1,
+            "best_ms": 0.4273,
+            "median_ms": 0.4307,
+            "mean_ms": 0.4445,
+            "stdev_ms": 0.022,
+            "p95_ms": 0.4756,
+            "samples_ms": [
+              0.4307,
+              0.4273,
+              0.4756
+            ]
+          }
+        },
+        "minmax_score": {
+          "relpy": {
+            "ok": true,
+            "n_out": 2,
+            "best_ms": 0.1507,
+            "median_ms": 0.1543,
+            "mean_ms": 0.1574,
+            "stdev_ms": 0.0071,
+            "p95_ms": 0.1672,
+            "samples_ms": [
+              0.1543,
+              0.1672,
+              0.1507
+            ]
+          },
+          "pandas": {
+            "ok": true,
+            "n_out": 2,
+            "best_ms": 0.2318,
+            "median_ms": 0.2616,
+            "mean_ms": 0.2565,
+            "stdev_ms": 0.0185,
+            "p95_ms": 0.2762,
+            "samples_ms": [
+              0.2318,
+              0.2762,
+              0.2616
+            ]
+          },
+          "sqlite": {
+            "ok": true,
+            "n_out": 2,
+            "best_ms": 0.684,
+            "median_ms": 0.6998,
+            "mean_ms": 0.7171,
+            "stdev_ms": 0.0363,
+            "p95_ms": 0.7676,
+            "samples_ms": [
+              0.6998,
+              0.684,
+              0.7676
+            ]
+          },
+          "duckdb": {
+            "ok": true,
+            "n_out": 2,
+            "best_ms": 1.0065,
+            "median_ms": 1.0185,
+            "mean_ms": 1.0159,
+            "stdev_ms": 0.0068,
+            "p95_ms": 1.0226,
+            "samples_ms": [
+              1.0185,
+              1.0065,
+              1.0226
+            ]
+          },
+          "sqlalchemy": {
+            "ok": true,
+            "n_out": 2,
+            "best_ms": 0.9282,
+            "median_ms": 1.0246,
+            "mean_ms": 1.0002,
+            "stdev_ms": 0.0517,
+            "p95_ms": 1.0477,
+            "samples_ms": [
+              1.0477,
+              1.0246,
+              0.9282
+            ]
+          },
+          "python": {
+            "ok": true,
+            "n_out": 2,
+            "best_ms": 0.7527,
+            "median_ms": 0.7699,
+            "mean_ms": 0.7935,
+            "stdev_ms": 0.0461,
+            "p95_ms": 0.8578,
+            "samples_ms": [
+              0.7527,
+              0.7699,
+              0.8578
+            ]
+          }
+        },
+        "group_city": {
+          "relpy": {
+            "ok": true,
+            "n_out": 8,
+            "best_ms": 1.0618,
+            "median_ms": 1.1201,
+            "mean_ms": 1.1023,
+            "stdev_ms": 0.0287,
+            "p95_ms": 1.125,
+            "samples_ms": [
+              1.1201,
+              1.125,
+              1.0618
+            ]
+          },
+          "pandas": {
+            "ok": true,
+            "n_out": 8,
+            "best_ms": 2.1278,
+            "median_ms": 2.1568,
+            "mean_ms": 2.1504,
+            "stdev_ms": 0.0165,
+            "p95_ms": 2.1666,
+            "samples_ms": [
+              2.1278,
+              2.1666,
+              2.1568
+            ]
+          },
+          "sqlite": {
+            "ok": true,
+            "n_out": 8,
+            "best_ms": 2.8299,
+            "median_ms": 2.8623,
+            "mean_ms": 2.8531,
+            "stdev_ms": 0.0165,
+            "p95_ms": 2.8671,
+            "samples_ms": [
+              2.8299,
+              2.8671,
+              2.8623
+            ]
+          },
+          "duckdb": {
+            "ok": true,
+            "n_out": 8,
+            "best_ms": 1.5043,
+            "median_ms": 1.5168,
+            "mean_ms": 1.526,
+            "stdev_ms": 0.0224,
+            "p95_ms": 1.5568,
+            "samples_ms": [
+              1.5568,
+              1.5043,
+              1.5168
+            ]
+          },
+          "sqlalchemy": {
+            "ok": true,
+            "n_out": 8,
+            "best_ms": 2.6882,
+            "median_ms": 2.7962,
+            "mean_ms": 2.8246,
+            "stdev_ms": 0.1246,
+            "p95_ms": 2.9894,
+            "samples_ms": [
+              2.6882,
+              2.9894,
+              2.7962
+            ]
+          },
+          "python": {
+            "ok": true,
+            "n_out": 8,
+            "best_ms": 1.1369,
+            "median_ms": 1.1377,
+            "mean_ms": 1.1502,
+            "stdev_ms": 0.0183,
+            "p95_ms": 1.176,
+            "samples_ms": [
+              1.176,
+              1.1377,
+              1.1369
+            ]
+          }
+        },
+        "group_city_active": {
+          "relpy": {
+            "ok": true,
+            "n_out": 16,
+            "best_ms": 1.268,
+            "median_ms": 1.2786,
+            "mean_ms": 1.2975,
+            "stdev_ms": 0.0345,
+            "p95_ms": 1.3459,
+            "samples_ms": [
+              1.3459,
+              1.268,
+              1.2786
+            ]
+          },
+          "pandas": {
+            "ok": true,
+            "n_out": 16,
+            "best_ms": 2.8153,
+            "median_ms": 2.8584,
+            "mean_ms": 2.8469,
+            "stdev_ms": 0.0226,
+            "p95_ms": 2.8669,
+            "samples_ms": [
+              2.8669,
+              2.8153,
+              2.8584
+            ]
+          },
+          "sqlite": {
+            "ok": true,
+            "n_out": 16,
+            "best_ms": 3.7775,
+            "median_ms": 3.7916,
+            "mean_ms": 3.7969,
+            "stdev_ms": 0.0184,
+            "p95_ms": 3.8216,
+            "samples_ms": [
+              3.7916,
+              3.8216,
+              3.7775
+            ]
+          },
+          "duckdb": {
+            "ok": true,
+            "n_out": 16,
+            "best_ms": 1.5028,
+            "median_ms": 1.5104,
+            "mean_ms": 1.5158,
+            "stdev_ms": 0.0134,
+            "p95_ms": 1.5343,
+            "samples_ms": [
+              1.5028,
+              1.5343,
+              1.5104
+            ]
+          },
+          "sqlalchemy": {
+            "ok": true,
+            "n_out": 16,
+            "best_ms": 3.7823,
+            "median_ms": 3.9318,
+            "mean_ms": 3.9424,
+            "stdev_ms": 0.1352,
+            "p95_ms": 4.1129,
+            "samples_ms": [
+              3.9318,
+              3.7823,
+              4.1129
+            ]
+          },
+          "python": {
+            "ok": true,
+            "n_out": 16,
+            "best_ms": 1.5428,
+            "median_ms": 1.596,
+            "mean_ms": 1.5836,
+            "stdev_ms": 0.0295,
+            "p95_ms": 1.6118,
+            "samples_ms": [
+              1.6118,
+              1.5428,
+              1.596
+            ]
+          }
+        },
+        "join_filter": {
+          "relpy": {
+            "ok": true,
+            "n_out": 1005,
+            "best_ms": 12.2898,
+            "median_ms": 12.9566,
+            "mean_ms": 12.9596,
+            "stdev_ms": 0.5481,
+            "p95_ms": 13.6324,
+            "samples_ms": [
+              12.2898,
+              12.9566,
+              13.6324
+            ]
+          },
+          "pandas": {
+            "ok": true,
+            "n_out": 1005,
+            "best_ms": 1.396,
+            "median_ms": 1.4965,
+            "mean_ms": 1.4789,
+            "stdev_ms": 0.0618,
+            "p95_ms": 1.5443,
+            "samples_ms": [
+              1.396,
+              1.5443,
+              1.4965
+            ]
+          },
+          "sqlite": {
+            "ok": true,
+            "n_out": 1005,
+            "best_ms": 0.9769,
+            "median_ms": 0.9795,
+            "mean_ms": 0.993,
+            "stdev_ms": 0.0209,
+            "p95_ms": 1.0224,
+            "samples_ms": [
+              0.9769,
+              0.9795,
+              1.0224
+            ]
+          },
+          "duckdb": {
+            "ok": true,
+            "n_out": 1005,
+            "best_ms": 1.7677,
+            "median_ms": 1.7678,
+            "mean_ms": 1.7729,
+            "stdev_ms": 0.0072,
+            "p95_ms": 1.7831,
+            "samples_ms": [
+              1.7678,
+              1.7831,
+              1.7677
+            ]
+          },
+          "sqlalchemy": {
+            "ok": true,
+            "n_out": 1005,
+            "best_ms": 1.4506,
+            "median_ms": 1.5117,
+            "mean_ms": 1.5221,
+            "stdev_ms": 0.0631,
+            "p95_ms": 1.604,
+            "samples_ms": [
+              1.5117,
+              1.604,
+              1.4506
+            ]
+          },
+          "python": {
+            "ok": true,
+            "n_out": 1005,
+            "best_ms": 0.4971,
+            "median_ms": 0.5195,
+            "mean_ms": 0.5166,
+            "stdev_ms": 0.0149,
+            "p95_ms": 0.5332,
+            "samples_ms": [
+              0.4971,
+              0.5195,
+              0.5332
+            ]
+          }
+        },
+        "join_group_sum": {
+          "relpy": {
+            "ok": true,
+            "n_out": 8,
+            "best_ms": 4.5904,
+            "median_ms": 4.7129,
+            "mean_ms": 4.8376,
+            "stdev_ms": 0.2677,
+            "p95_ms": 5.2095,
+            "samples_ms": [
+              4.7129,
+              4.5904,
+              5.2095
+            ]
+          },
+          "pandas": {
+            "ok": true,
+            "n_out": 8,
+            "best_ms": 2.7762,
+            "median_ms": 2.7786,
+            "mean_ms": 2.8283,
+            "stdev_ms": 0.072,
+            "p95_ms": 2.9301,
+            "samples_ms": [
+              2.9301,
+              2.7762,
+              2.7786
+            ]
+          },
+          "sqlite": {
+            "ok": true,
+            "n_out": 8,
+            "best_ms": 4.7312,
+            "median_ms": 4.7496,
+            "mean_ms": 4.7504,
+            "stdev_ms": 0.016,
+            "p95_ms": 4.7704,
+            "samples_ms": [
+              4.7496,
+              4.7704,
+              4.7312
+            ]
+          },
+          "duckdb": {
+            "ok": true,
+            "n_out": 8,
+            "best_ms": 2.3145,
+            "median_ms": 2.3675,
+            "mean_ms": 2.375,
+            "stdev_ms": 0.0527,
+            "p95_ms": 2.4429,
+            "samples_ms": [
+              2.4429,
+              2.3675,
+              2.3145
+            ]
+          },
+          "sqlalchemy": {
+            "ok": true,
+            "n_out": 8,
+            "best_ms": 5.1165,
+            "median_ms": 5.1323,
+            "mean_ms": 5.1535,
+            "stdev_ms": 0.0416,
+            "p95_ms": 5.2116,
+            "samples_ms": [
+              5.2116,
+              5.1165,
+              5.1323
+            ]
+          },
+          "python": {
+            "ok": true,
+            "n_out": 8,
+            "best_ms": 2.7468,
+            "median_ms": 3.1116,
+            "mean_ms": 3.0565,
+            "stdev_ms": 0.2337,
+            "p95_ms": 3.3111,
+            "samples_ms": [
+              2.7468,
+              3.1116,
+              3.3111
+            ]
+          }
+        },
+        "order_score_desc": {
+          "relpy": {
+            "ok": true,
+            "n_out": 200,
+            "best_ms": 8.9288,
+            "median_ms": 8.9538,
+            "mean_ms": 9.0732,
+            "stdev_ms": 0.1869,
+            "p95_ms": 9.3371,
+            "samples_ms": [
+              9.3371,
+              8.9538,
+              8.9288
+            ]
+          },
+          "pandas": {
+            "ok": true,
+            "n_out": 200,
+            "best_ms": 1.0475,
+            "median_ms": 1.1106,
+            "mean_ms": 1.1157,
+            "stdev_ms": 0.0579,
+            "p95_ms": 1.1891,
+            "samples_ms": [
+              1.0475,
+              1.1106,
+              1.1891
+            ]
+          },
+          "sqlite": {
+            "ok": true,
+            "n_out": 200,
+            "best_ms": 0.9651,
+            "median_ms": 1.0182,
+            "mean_ms": 1.0009,
+            "stdev_ms": 0.0253,
+            "p95_ms": 1.0195,
+            "samples_ms": [
+              1.0195,
+              0.9651,
+              1.0182
+            ]
+          },
+          "duckdb": {
+            "ok": true,
+            "n_out": 200,
+            "best_ms": 0.8425,
+            "median_ms": 0.9411,
+            "mean_ms": 0.9084,
+            "stdev_ms": 0.0466,
+            "p95_ms": 0.9416,
+            "samples_ms": [
+              0.9411,
+              0.8425,
+              0.9416
+            ]
+          },
+          "sqlalchemy": {
+            "ok": true,
+            "n_out": 200,
+            "best_ms": 1.2219,
+            "median_ms": 1.2302,
+            "mean_ms": 1.2312,
+            "stdev_ms": 0.0081,
+            "p95_ms": 1.2416,
+            "samples_ms": [
+              1.2416,
+              1.2302,
+              1.2219
+            ]
+          },
+          "python": {
+            "ok": true,
+            "n_out": 200,
+            "best_ms": 2.1143,
+            "median_ms": 2.1426,
+            "mean_ms": 2.1822,
+            "stdev_ms": 0.0769,
+            "p95_ms": 2.2896,
+            "samples_ms": [
+              2.1143,
+              2.2896,
+              2.1426
+            ]
+          }
+        },
+        "distinct_city": {
+          "relpy": {
+            "ok": true,
+            "n_out": 8,
+            "best_ms": 11.5433,
+            "median_ms": 12.2754,
+            "mean_ms": 12.3369,
+            "stdev_ms": 0.6744,
+            "p95_ms": 13.1919,
+            "samples_ms": [
+              13.1919,
+              12.2754,
+              11.5433
+            ]
+          },
+          "pandas": {
+            "ok": true,
+            "n_out": 8,
+            "best_ms": 0.5906,
+            "median_ms": 0.5922,
+            "mean_ms": 0.5937,
+            "stdev_ms": 0.0033,
+            "p95_ms": 0.5984,
+            "samples_ms": [
+              0.5922,
+              0.5906,
+              0.5984
+            ]
+          },
+          "sqlite": {
+            "ok": true,
+            "n_out": 8,
+            "best_ms": 0.8519,
+            "median_ms": 0.8644,
+            "mean_ms": 0.8627,
+            "stdev_ms": 0.0082,
+            "p95_ms": 0.8718,
+            "samples_ms": [
+              0.8519,
+              0.8718,
+              0.8644
+            ]
+          },
+          "duckdb": {
+            "ok": true,
+            "n_out": 8,
+            "best_ms": 1.1861,
+            "median_ms": 1.3715,
+            "mean_ms": 1.3305,
+            "stdev_ms": 0.1052,
+            "p95_ms": 1.4339,
+            "samples_ms": [
+              1.1861,
+              1.4339,
+              1.3715
+            ]
+          },
+          "sqlalchemy": {
+            "ok": true,
+            "n_out": 8,
+            "best_ms": 1.1129,
+            "median_ms": 1.1733,
+            "mean_ms": 1.1694,
+            "stdev_ms": 0.0447,
+            "p95_ms": 1.2221,
+            "samples_ms": [
+              1.1129,
+              1.1733,
+              1.2221
+            ]
+          },
+          "python": {
+            "ok": true,
+            "n_out": 8,
+            "best_ms": 0.3731,
+            "median_ms": 0.4474,
+            "mean_ms": 0.4427,
+            "stdev_ms": 0.055,
+            "p95_ms": 0.5076,
+            "samples_ms": [
+              0.5076,
+              0.4474,
+              0.3731
+            ]
+          }
+        },
+        "project_where": {
+          "relpy": {
+            "ok": true,
+            "n_out": 3891,
+            "best_ms": 8.8973,
+            "median_ms": 9.507,
+            "mean_ms": 9.3127,
+            "stdev_ms": 0.294,
+            "p95_ms": 9.5339,
+            "samples_ms": [
+              8.8973,
+              9.5339,
+              9.507
+            ]
+          },
+          "pandas": {
+            "ok": true,
+            "n_out": 3891,
+            "best_ms": 3.3133,
+            "median_ms": 3.5682,
+            "mean_ms": 3.7559,
+            "stdev_ms": 0.4577,
+            "p95_ms": 4.3863,
+            "samples_ms": [
+              3.3133,
+              3.5682,
+              4.3863
+            ]
+          },
+          "sqlite": {
+            "ok": true,
+            "n_out": 3891,
+            "best_ms": 2.2477,
+            "median_ms": 2.3588,
+            "mean_ms": 2.3762,
+            "stdev_ms": 0.1127,
+            "p95_ms": 2.5222,
+            "samples_ms": [
+              2.5222,
+              2.2477,
+              2.3588
+            ]
+          },
+          "duckdb": {
+            "ok": true,
+            "n_out": 3891,
+            "best_ms": 2.2244,
+            "median_ms": 2.2351,
+            "mean_ms": 2.2581,
+            "stdev_ms": 0.0403,
+            "p95_ms": 2.3147,
+            "samples_ms": [
+              2.2244,
+              2.2351,
+              2.3147
+            ]
+          },
+          "sqlalchemy": {
+            "ok": true,
+            "n_out": 3891,
+            "best_ms": 3.1885,
+            "median_ms": 3.446,
+            "mean_ms": 3.3773,
+            "stdev_ms": 0.1351,
+            "p95_ms": 3.4974,
+            "samples_ms": [
+              3.4974,
+              3.446,
+              3.1885
+            ]
+          },
+          "python": {
+            "ok": true,
+            "n_out": 3891,
+            "best_ms": 0.8892,
+            "median_ms": 0.929,
+            "mean_ms": 0.9982,
+            "stdev_ms": 0.1271,
+            "p95_ms": 1.1764,
+            "samples_ms": [
+              0.8892,
+              1.1764,
+              0.929
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "ingestion": [
+    {
+      "size": 1000,
+      "systems": {
+        "relpy": {
+          "ok": true,
+          "n_out": 1,
+          "best_ms": 14.7024,
+          "median_ms": 15.6884,
+          "mean_ms": 15.4043,
+          "stdev_ms": 0.4993,
+          "p95_ms": 15.8222,
+          "samples_ms": [
+            15.8222,
+            15.6884,
+            14.7024
+          ]
+        },
+        "pandas": {
+          "ok": true,
+          "n_out": 2,
+          "best_ms": 2.1465,
+          "median_ms": 2.1725,
+          "mean_ms": 2.2812,
+          "stdev_ms": 0.1725,
+          "p95_ms": 2.5247,
+          "samples_ms": [
+            2.1465,
+            2.1725,
+            2.5247
+          ]
+        },
+        "sqlite": {
+          "ok": true,
+          "n_out": 1,
+          "best_ms": 2.0109,
+          "median_ms": 2.0865,
+          "mean_ms": 2.068,
+          "stdev_ms": 0.0413,
+          "p95_ms": 2.1067,
+          "samples_ms": [
+            2.0865,
+            2.0109,
+            2.1067
+          ]
+        },
+        "duckdb": {
+          "ok": true,
+          "n_out": 1,
+          "best_ms": 196.8906,
+          "median_ms": 235.4546,
+          "mean_ms": 228.1448,
+          "stdev_ms": 23.1199,
+          "p95_ms": 252.0891,
+          "samples_ms": [
+            235.4546,
+            196.8906,
+            252.0891
+          ]
+        },
+        "sqlalchemy": {
+          "ok": true,
+          "n_out": 3,
+          "best_ms": 7.6811,
+          "median_ms": 7.7905,
+          "mean_ms": 8.9287,
+          "stdev_ms": 1.6876,
+          "p95_ms": 11.3145,
+          "samples_ms": [
+            7.7905,
+            7.6811,
+            11.3145
+          ]
+        },
+        "python": {
+          "ok": true,
+          "n_out": 3,
+          "best_ms": 0.0745,
+          "median_ms": 0.0783,
+          "mean_ms": 0.0866,
+          "stdev_ms": 0.0145,
+          "p95_ms": 0.107,
+          "samples_ms": [
+            0.107,
+            0.0783,
+            0.0745
+          ]
+        }
+      }
+    },
+    {
+      "size": 10000,
+      "systems": {
+        "relpy": {
+          "ok": true,
+          "n_out": 1,
+          "best_ms": 152.5952,
+          "median_ms": 154.1794,
+          "mean_ms": 155.0183,
+          "stdev_ms": 2.3955,
+          "p95_ms": 158.2802,
+          "samples_ms": [
+            152.5952,
+            158.2802,
+            154.1794
+          ]
+        },
+        "pandas": {
+          "ok": true,
+          "n_out": 2,
+          "best_ms": 12.8474,
+          "median_ms": 13.1197,
+          "mean_ms": 13.2258,
+          "stdev_ms": 0.3601,
+          "p95_ms": 13.7102,
+          "samples_ms": [
+            12.8474,
+            13.1197,
+            13.7102
+          ]
+        },
+        "sqlite": {
+          "ok": true,
+          "n_out": 1,
+          "best_ms": 16.027,
+          "median_ms": 16.2795,
+          "mean_ms": 16.5797,
+          "stdev_ms": 0.6119,
+          "p95_ms": 17.4327,
+          "samples_ms": [
+            17.4327,
+            16.2795,
+            16.027
+          ]
+        },
+        "duckdb": {
+          "ok": true,
+          "n_out": 1,
+          "best_ms": 1939.0044,
+          "median_ms": 2042.8665,
+          "mean_ms": 2082.0252,
+          "stdev_ms": 135.6192,
+          "p95_ms": 2264.2046,
+          "samples_ms": [
+            1939.0044,
+            2264.2046,
+            2042.8665
+          ]
+        },
+        "sqlalchemy": {
+          "ok": true,
+          "n_out": 3,
+          "best_ms": 49.394,
+          "median_ms": 50.1423,
+          "mean_ms": 50.3794,
+          "stdev_ms": 0.9168,
+          "p95_ms": 51.6019,
+          "samples_ms": [
+            51.6019,
+            50.1423,
+            49.394
+          ]
+        },
+        "python": {
+          "ok": true,
+          "n_out": 3,
+          "best_ms": 0.5593,
+          "median_ms": 0.6562,
+          "mean_ms": 0.6338,
+          "stdev_ms": 0.0541,
+          "p95_ms": 0.686,
+          "samples_ms": [
+            0.6562,
+            0.686,
+            0.5593
+          ]
+        }
+      }
+    }
+  ],
+  "capabilities": {
+    "1000": {
+      "update_bulk (active)": {
+        "ok": true,
+        "n_out": 1,
+        "best_ms": 312.1361,
+        "median_ms": 316.9075,
+        "mean_ms": 343.3635,
+        "stdev_ms": 40.8348,
+        "p95_ms": 401.0469,
+        "samples_ms": [
+          312.1361,
+          401.0469,
+          316.9075
+        ]
+      },
+      "delete_bulk (amount<50)": {
+        "ok": true,
+        "n_out": 1,
+        "best_ms": 12.2832,
+        "median_ms": 13.0413,
+        "mean_ms": 12.8992,
+        "stdev_ms": 0.4562,
+        "p95_ms": 13.3733,
+        "samples_ms": [
+          13.0413,
+          12.2832,
+          13.3733
+        ]
+      },
+      "to_list (all users)": {
+        "ok": true,
+        "n_out": 1000,
+        "best_ms": 1.7735,
+        "median_ms": 1.8713,
+        "mean_ms": 1.8487,
+        "stdev_ms": 0.0545,
+        "p95_ms": 1.9012,
+        "samples_ms": [
+          1.7735,
+          1.8713,
+          1.9012
+        ]
+      },
+      "to_pandas": {
+        "ok": true,
+        "n_out": 1000,
+        "best_ms": 2.8892,
+        "median_ms": 2.9869,
+        "mean_ms": 2.9857,
+        "stdev_ms": 0.0783,
+        "p95_ms": 3.0811,
+        "samples_ms": [
+          3.0811,
+          2.8892,
+          2.9869
+        ]
+      },
+      "to_json": {
+        "ok": true,
+        "n_out": 129273,
+        "best_ms": 5.6579,
+        "median_ms": 5.7569,
+        "mean_ms": 5.7394,
+        "stdev_ms": 0.0607,
+        "p95_ms": 5.8034,
+        "samples_ms": [
+          5.7569,
+          5.6579,
+          5.8034
+        ]
+      },
+      "save + load": {
+        "ok": true,
+        "n_out": 1,
+        "best_ms": 21.6714,
+        "median_ms": 22.3062,
+        "mean_ms": 25.5376,
+        "stdev_ms": 5.0254,
+        "p95_ms": 32.6351,
+        "samples_ms": [
+          32.6351,
+          21.6714,
+          22.3062
+        ]
+      },
+      "query on encrypted db": {
+        "ok": true,
+        "n_out": 1,
+        "best_ms": 17.2613,
+        "median_ms": 17.3814,
+        "mean_ms": 17.5311,
+        "stdev_ms": 0.3006,
+        "p95_ms": 17.9504,
+        "samples_ms": [
+          17.9504,
+          17.3814,
+          17.2613
+        ]
+      },
+      "query on plaintext db": {
+        "ok": true,
+        "n_out": 1,
+        "best_ms": 0.1003,
+        "median_ms": 0.1047,
+        "mean_ms": 0.1169,
+        "stdev_ms": 0.0204,
+        "p95_ms": 0.1457,
+        "samples_ms": [
+          0.1457,
+          0.1047,
+          0.1003
+        ]
+      }
+    },
+    "10000": {
+      "update_bulk (active)": {
+        "ok": true,
+        "n_out": 1,
+        "best_ms": 28859.5262,
+        "median_ms": 29055.08,
+        "mean_ms": 29019.5337,
+        "stdev_ms": 118.8228,
+        "p95_ms": 29143.995,
+        "samples_ms": [
+          28859.5262,
+          29055.08,
+          29143.995
+        ]
+      },
+      "delete_bulk (amount<50)": {
+        "ok": true,
+        "n_out": 1,
+        "best_ms": 112.2957,
+        "median_ms": 127.3699,
+        "mean_ms": 123.1302,
+        "stdev_ms": 7.7213,
+        "p95_ms": 129.7251,
+        "samples_ms": [
+          112.2957,
+          127.3699,
+          129.7251
+        ]
+      },
+      "to_list (all users)": {
+        "ok": true,
+        "n_out": 10000,
+        "best_ms": 16.3379,
+        "median_ms": 16.6269,
+        "mean_ms": 16.7079,
+        "stdev_ms": 0.34,
+        "p95_ms": 17.1589,
+        "samples_ms": [
+          16.6269,
+          17.1589,
+          16.3379
+        ]
+      },
+      "to_pandas": {
+        "ok": true,
+        "n_out": 10000,
+        "best_ms": 21.6295,
+        "median_ms": 21.799,
+        "mean_ms": 22.0978,
+        "stdev_ms": 0.5468,
+        "p95_ms": 22.8648,
+        "samples_ms": [
+          22.8648,
+          21.6295,
+          21.799
+        ]
+      },
+      "to_json": {
+        "ok": true,
+        "n_out": 1302548,
+        "best_ms": 53.5672,
+        "median_ms": 54.5862,
+        "mean_ms": 54.7592,
+        "stdev_ms": 1.051,
+        "p95_ms": 56.1241,
+        "samples_ms": [
+          53.5672,
+          56.1241,
+          54.5862
+        ]
+      },
+      "save + load": {
+        "ok": true,
+        "n_out": 1,
+        "best_ms": 210.8564,
+        "median_ms": 221.2311,
+        "mean_ms": 222.6886,
+        "stdev_ms": 10.3076,
+        "p95_ms": 235.9783,
+        "samples_ms": [
+          235.9783,
+          221.2311,
+          210.8564
+        ]
+      },
+      "query on encrypted db": {
+        "ok": true,
+        "n_out": 1,
+        "best_ms": 165.4812,
+        "median_ms": 168.9548,
+        "mean_ms": 168.6734,
+        "stdev_ms": 2.4994,
+        "p95_ms": 171.5841,
+        "samples_ms": [
+          171.5841,
+          165.4812,
+          168.9548
+        ]
+      },
+      "query on plaintext db": {
+        "ok": true,
+        "n_out": 1,
+        "best_ms": 0.2208,
+        "median_ms": 0.2307,
+        "mean_ms": 0.2339,
+        "stdev_ms": 0.0123,
+        "p95_ms": 0.2503,
+        "samples_ms": [
+          0.2307,
+          0.2503,
+          0.2208
+        ]
+      }
+    }
+  }
+}
